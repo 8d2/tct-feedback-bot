@@ -1,0 +1,24 @@
+{
+  "name": "tct-feedback-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/8d2/tct-feedback-bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/8d2/tct-feedback-bot/issues"
+  },
+  "homepage": "https://github.com/8d2/tct-feedback-bot#readme",
+  "description": "",
+  "dependencies": {
+    "discord.js": "^14.19.2",
+    "dotenv": "^16.5.0"
+  }
+}
