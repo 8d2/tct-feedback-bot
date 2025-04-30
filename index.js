@@ -4,8 +4,7 @@ const path = require("node:path")
 const {Client, Collection, Events, GatewayIntentBits} = require("discord.js")
 
 // Get global variables
-const dotenv = require("dotenv")
-dotenv.config()
+const {token} = require("./config.json")
 
 // Create client
 const client = new Client({intents: GatewayIntentBits.Guilds})
@@ -47,4 +46,4 @@ client.on(Events.InteractionCreate, async interaction => {
 })
 
 // Starts the bot
-client.login(process.env.token)
+client.login(token)
