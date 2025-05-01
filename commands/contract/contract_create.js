@@ -53,5 +53,6 @@ async function handleContractCreate(interaction) {
 };
 
 module.exports = {
-    handleContractCreate
+    isSubcommandModule: true,
+    handleContractCreate,
 }
