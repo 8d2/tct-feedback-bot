@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, SlashCommandSubcommandBuilder} = require("discord.js");
+const { SlashCommandBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
 const { handleContractCreate } = require("./contract_create");
 
 module.exports = {
