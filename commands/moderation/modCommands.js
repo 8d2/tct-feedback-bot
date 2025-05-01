@@ -38,7 +38,7 @@ module.exports = {
         }
         else if (subcommandName === "unblock") {
             unblockeeName = interaction.options.getUser(USER_OPTION).displayName
-            await interaction.reply("**" + blockeeName + "** has been unblocked and can now create feedback contracts.")
+            await interaction.reply("**" + unblockeeName + "** has been unblocked and can now create feedback contracts.")
         }
     },
 }
