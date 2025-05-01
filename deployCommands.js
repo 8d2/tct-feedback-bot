@@ -17,9 +17,15 @@ for (const folder of commandFolders) {
 	for (const file of commandFiles) {
 		const filePath = path.join(commandsPath, file);
 		const command = require(filePath);
-		if ('data' in command && 'execute' in command) {
+		if ('isSubcommandModule' in command) {
+			// Silences the warning if 'data' or 'execute' is not found (see the final else statement)
+			// These modules are handled within another folder, so they should be ignored here
+			continue;
+		}
+		else if ('data' in command && 'execute' in command) {
 			commands.push(command.data.toJSON());
-		} else {
+		} 
+		else {
 			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
 		}
 	}
