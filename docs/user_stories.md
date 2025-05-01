@@ -29,11 +29,20 @@
 * If there's a "sign contract" button, it should be disabled until a star rating has been assigned.
 * Once the contract is signed, the builder cannot edit their star rating without the help of a staff member.
 
+**B.4.** As a *builder*, I want to *give builder permissions to my collaborators* so that *they can accept feedback contracts on my behalf*.
+* Of course, the forum poster will have builder permissions by default.
+* It may be necessary to have separate "lead builder" and "collaborator" roles to centralize role management.
 
-## User Story C - Manual Moderation
+
+## User Story C - Moderator
 
 **C.1.** As a *moderator*, I want to *re-assign star ratings* so that I can *settle rating disputes and correct user errors*.
 
 **C.2.** As a *moderator*, I want to *block users from creating contracts* so that I can *punish repeat offenders who abuse the automated feedback system*.
 
-**C.3.** As a *moderator*, I want to *assign a role to each point milestone* so that *the bot is able to assign these roles automatically*.
+
+## User Story D - Administrator
+
+**D.1.** As an *administrator*, I want to *assign a forum channel (or channels) to be the official "tower feedback" channel* so that *the feedback bot is only used within that channel*.
+
+**D.2.** As an *administrator*, I want to *assign a role to each point milestone* so that *the bot is able to assign these roles automatically*.
