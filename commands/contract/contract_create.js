@@ -1,6 +1,6 @@
-const { ButtonBuilder, ButtonStyle, SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, italic } = require("discord.js");
+const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, Colors } = require("discord.js");
 
-async function handleCreate(interaction) {
+async function handleContractCreate(interaction) {
     // Handles the `/contract create` subcommand
 
     const embed = new EmbedBuilder()
@@ -50,24 +50,8 @@ async function handleCreate(interaction) {
         embeds: [embed],
         components: [row1, row2],
     });
-}
+};
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName("contract")
-        .setDescription("Feedback contract commands")
-        
-        .addSubcommand(new SlashCommandSubcommandBuilder()
-            .setName("create")
-            .setDescription("Creates a feedback contract")
-        ),
-
-    async execute(interaction) {
-        switch (interaction.options.getSubcommand()) {
-            case ("create"):
-                handleCreate(interaction);
-            default:
-                return;
-        }
-    },
-};
+    handleContractCreate
+}
