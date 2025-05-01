@@ -61,7 +61,11 @@ module.exports = {
 
     async execute(interaction) {
         // check that the user has moderator permissions
-        if (!interaction.member.permissions.any(MOD_PERMS)) return;
+        if (!interaction.member.permissions.any(MOD_PERMS)) {
+            // non moderator error
+            await interaction.reply({content: "You need moderator permissions to run this command.", flags: EPHEMERAL_FLAG});
+            return;
+        }
 
         let newEmbed = new EmbedBuilder().setTimestamp();
         let successful = false;
