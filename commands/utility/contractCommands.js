@@ -1,6 +1,7 @@
 const { ButtonBuilder, ButtonStyle, SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, italic } = require("discord.js");
 
 async function handleCreate(interaction) {
+    // Handles the `/contract create` subcommand
 
     const embed = new EmbedBuilder()
         .setColor(Colors.Green)
