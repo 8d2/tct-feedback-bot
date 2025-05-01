@@ -1,6 +1,17 @@
-const { ButtonBuilder, ButtonStyle, SlashCommandBuilder, ActionRowBuilder, blockQuote, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SlashCommandSubcommandBuilder } = require("discord.js");
+const { ButtonBuilder, ButtonStyle, SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, italic } = require("discord.js");
 
 async function handleCreate(interaction) {
+
+    const embed = new EmbedBuilder()
+        .setColor(Colors.Green)
+        .setTitle("Feedback Agreement")
+        .setAuthor({
+            name: interaction.user.username, 
+            iconURL: interaction.user.avatarURL(),
+        })
+        .setDescription(`${interaction.user} has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.`)
+        .setTimestamp();
+
     const starSelect = new StringSelectMenuBuilder()
         .setCustomId('star-select')
         .setPlaceholder("Select one")
@@ -23,17 +34,20 @@ async function handleCreate(interaction) {
                 .setValue('stars-3')
         );
     
-    const accept = new ButtonBuilder()
-        .setCustomId('accept')
-        .setLabel('Accept')
-        .setStyle(ButtonStyle.Primary);
+    const confirm = new ButtonBuilder()
+        .setCustomId('confirm')
+        .setLabel('Confirm')
+        .setStyle(ButtonStyle.Success);
     
-    const row = new ActionRowBuilder()
+    const row1 = new ActionRowBuilder()
         .addComponents(starSelect);
+    
+    const row2 = new ActionRowBuilder()
+        .addComponents(confirm);
 
     await interaction.reply({
-        content: `Sign ${interaction.user}'s contract bro`,
-        components: [row],
+        embeds: [embed],
+        components: [row1, row2],
     });
 }
 
@@ -51,6 +65,8 @@ module.exports = {
         switch (interaction.options.getSubcommand()) {
             case ("create"):
                 handleCreate(interaction);
+            default:
+                return;
         }
     },
 };
