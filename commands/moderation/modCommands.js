@@ -1,10 +1,13 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOption, PermissionsBitField, EmbedBuilder, Colors, MessageFlags } = require("discord.js");
 
-const USER_OPTION_NAME = "user";
+// Constants
 const MOD_PERMS = [PermissionsBitField.Flags.Administrator, PermissionsBitField.Flags.BanMembers]; // 8 (admin) or 4 (ban members)
 
+const USER_OPTION_NAME = "user";
 const BLOCK_COMMAND_NAME = "block";
 const UNBLOCK_COMMAND_NAME = "unblock";
+
+const EPHEMERAL_FLAG = MessageFlags.Ephemeral
 
 // Handles the '/mod block' command.
 // interaction: the interaction that used this command
@@ -86,7 +89,7 @@ module.exports = {
             await interaction.reply({embeds: [newEmbed]});
         }
         else {
-            await interaction.reply({embeds: [newEmbed], flags: MessageFlags.Ephemeral});
+            await interaction.reply({embeds: [newEmbed], flags: EPHEMERAL_FLAG});
         }
     },
 };
