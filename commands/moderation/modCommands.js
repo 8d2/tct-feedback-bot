@@ -6,6 +6,34 @@ const MOD_PERMS = [PermissionsBitField.Flags.Administrator, PermissionsBitField.
 const BLOCK_COMMAND_NAME = "block"
 const UNBLOCK_COMMAND_NAME = "unblock"
 
+// Handles the '/mod block' command.
+// interaction: the interaction that used this command
+// messageEmbed: the embed to modify and reply with
+// returns false if the action failed.
+async function handleBlock(interaction, messageEmbed) {
+    let blockee = interaction.options.getUser(USER_OPTION_NAME)
+    
+    // TODO: check if the blockee is already blocked, if so then notify the command user.
+    
+    messageEmbed.setDescription(`${blockee} has been blocked from creating feedback contracts.`)
+    messageEmbed.setColor(Colors.Red)
+    return true
+}
+
+// Handles the '/mod unblock' command.
+// interaction: the interaction that used this command
+// messageEmbed: the embed to modify and reply with
+// returns false if the action failed.
+async function handleUnblock(interaction, messageEmbed) {
+    let unblockee = interaction.options.getUser(USER_OPTION_NAME)
+    
+    // TODO: check if the unblockee is not blocked, if so then notify the command user.
+    
+    messageEmbed.setDescription(`${unblockee} has been unblocked and can now create feedback contracts.`)
+    messageEmbed.setColor(Colors.Green)
+    return true
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("mod")
@@ -36,23 +64,25 @@ module.exports = {
         if (!interaction.member.permissions.any(MOD_PERMS)) return
 
         let newEmbed = new EmbedBuilder().setTimestamp()
+        let successful = false
 
         // action based on subcommand
         switch (interaction.options.getSubcommand()) {
             case (BLOCK_COMMAND_NAME):
-                let blockee = interaction.options.getUser(USER_OPTION_NAME)
-                newEmbed.setDescription(`${blockee} has been blocked from creating feedback contracts.`)
-                newEmbed.setColor(Colors.Red)
+                successful = handleBlock(interaction, newEmbed)
                 break
             case (UNBLOCK_COMMAND_NAME):
-                let unblockee = interaction.options.getUser(USER_OPTION_NAME)
-                newEmbed.setDescription(`${unblockee} has been unblocked and can now create feedback contracts.`)
-                newEmbed.setColor(Colors.Green)
+                successful = handleUnblock(interaction, newEmbed)
                 break
             default:
                 break
         }
-
-        await interaction.reply({embeds: [newEmbed]})
+        
+        if (successful) {
+            await interaction.reply({embeds: [newEmbed]})
+        }
+        else {
+            await interaction.reply({embeds: [newEmbed], flags: MessageFlags.Ephemeral})
+        }
     },
 }
