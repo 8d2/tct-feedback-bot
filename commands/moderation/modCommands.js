@@ -7,7 +7,7 @@ const USER_OPTION_NAME = "user";
 const BLOCK_COMMAND_NAME = "block";
 const UNBLOCK_COMMAND_NAME = "unblock";
 
-const EPHEMERAL_FLAG = MessageFlags.Ephemeral
+const EPHEMERAL_FLAG = MessageFlags.Ephemeral;
 
 // Handles the '/mod block' command.
 // interaction: the interaction that used this command
