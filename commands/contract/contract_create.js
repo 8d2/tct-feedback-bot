@@ -99,7 +99,8 @@ async function handleContractCreate(interaction) {
     const confirm = new ButtonBuilder()
         .setCustomId('confirm')
         .setLabel('Confirm')
-        .setStyle(ButtonStyle.Success);
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(true);
     
     const row1 = new ActionRowBuilder()
         .addComponents(starSelect);
