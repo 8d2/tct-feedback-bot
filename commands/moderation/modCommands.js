@@ -1,10 +1,17 @@
-const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOption, PermissionsBitField, EmbedBuilder, Colors, MessageFlags } = require("discord.js");
+const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOption, SlashCommandIntegerOption, 
+    PermissionsBitField, EmbedBuilder, Colors, MessageFlags }
+    = require("discord.js");
+
+const userMethods = require("../../helpers/userMethods.js")
 
 // Constants
 const MOD_PERMS = [PermissionsBitField.Flags.Administrator, PermissionsBitField.Flags.BanMembers]; // 8 (admin) or 4 (ban members)
 
 const USER_OPTION_NAME = "user";
+const POINTS_OPTION_NAME = "points";
+
 const BLOCK_COMMAND_NAME = "block";
+const SET_POINTS_COMMAND_NAME = "setpoints";
 const UNBLOCK_COMMAND_NAME = "unblock";
 
 const EPHEMERAL_FLAG = MessageFlags.Ephemeral
@@ -37,6 +44,19 @@ async function handleUnblock(interaction, messageEmbed) {
     return true;
 }
 
+// Handles the '/mod setpoints' command.
+// interaction: the interaction that used this command
+// messageEmbed: the embed to modify and reply with
+// returns false if the action failed.
+async function handleSetPoints(interaction, messageEmbed) {
+    const user = interaction.options.getUser(USER_OPTION_NAME);
+    const points = interaction.options.getInteger(POINTS_OPTION_NAME);
+    userMethods.setPoints(user.id, points);
+    messageEmbed.setDescription(`${user} now has ${points} points.`);
+    messageEmbed.setColor(Colors.Green);
+    return true;
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("mod")
@@ -60,6 +80,22 @@ module.exports = {
                 .setDescription("The user to unblock")
                 .setRequired(true)
             )
+        )
+
+        .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(SET_POINTS_COMMAND_NAME)
+            .setDescription("Set how many feedback points a user has.")
+            .addUserOption(new SlashCommandUserOption()
+                .setName(USER_OPTION_NAME)
+                .setDescription("The user to set points of")
+                .setRequired(true)
+            )
+            .addIntegerOption(new SlashCommandIntegerOption()
+                .setName(POINTS_OPTION_NAME)
+                .setDescription("Points to set user to")
+                .setRequired(true)
+                .setMinValue(0)
+            )
         ),
 
     async execute(interaction) {
@@ -81,6 +117,8 @@ module.exports = {
             case (UNBLOCK_COMMAND_NAME):
                 successful = handleUnblock(interaction, newEmbed);
                 break;
+            case (SET_POINTS_COMMAND_NAME):
+                successful = handleSetPoints(interaction, newEmbed);
             default:
                 break;
         }
