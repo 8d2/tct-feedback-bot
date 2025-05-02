@@ -5,7 +5,7 @@ const {Client, Collection, Events, GatewayIntentBits} = require("discord.js")
 
 // Get global variables
 const {token} = require("./config.json")
-const userMethods = require("./userMethods.js")
+const userMethods = require("./helpers/userMethods.js")
 
 // Create client
 const client = new Client({intents: GatewayIntentBits.Guilds})
@@ -38,7 +38,7 @@ for (const folder of commandFolders) {
 
 // Will run once when the client is loaded
 client.once(Events.ClientReady, readyClient => {
-	userMethods.sync()
+	userMethods.update()
     console.log(`${readyClient.user.tag} ready.`)
     console.log(readyClient.application.id)
 })

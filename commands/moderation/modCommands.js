@@ -2,7 +2,7 @@ const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOpti
     PermissionsBitField, EmbedBuilder, Colors, MessageFlags }
     = require("discord.js");
 
-const userMethods = require("../../userMethods.js")
+const userMethods = require("../../helpers/userMethods.js")
 
 // Constants
 const MOD_PERMS = [PermissionsBitField.Flags.Administrator, PermissionsBitField.Flags.BanMembers]; // 8 (admin) or 4 (ban members)
@@ -49,7 +49,7 @@ async function handleUnblock(interaction, messageEmbed) {
 // messageEmbed: the embed to modify and reply with
 // returns false if the action failed.
 async function handleSetPoints(interaction, messageEmbed) {
-    let user = interaction.options.getUser(USER_OPTION_NAME);
+    const user = interaction.options.getUser(USER_OPTION_NAME);
     const points = interaction.options.getInteger(POINTS_OPTION_NAME);
     userMethods.setPoints(user.id, points);
     messageEmbed.setDescription(`${user} now has ${points} points.`);

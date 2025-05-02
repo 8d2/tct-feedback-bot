@@ -1,6 +1,6 @@
 const { Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption } = require("discord.js");
 
-const userMethods = require("../../userMethods.js")
+const userMethods = require("../../helpers/userMethods.js")
 
 const USER_OPTION_NAME = "user";
 
