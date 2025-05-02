@@ -1,4 +1,4 @@
-const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, Colors, bold } = require("discord.js");
+const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, Colors, bold, CommandInteractionOptionResolver } = require("discord.js");
 
 const STAR_RATING_INFO = {
     stars_0: {
@@ -53,15 +53,25 @@ const STAR_RATING_INFO = {
     },
 }
 
-// Creates a new embed corresponding to the selected star rating.
+/**
+ * Creates a new embed corresponding to the selected star rating.
+ * @param {String} star_rating The selected star rating as a string.
+ * @returns {EmbedBuilder} An embed corresponding to the selected star rating.
+ */
 function createEmbed(star_rating) {
     //WIP
     switch(star_rating) {
-        default: return;
+        case "stars-0":
+            break;
+        default: 
+            return;
     }
 }
 
-// Handles the `/contract create` subcommand
+/**
+ * Handles the `/contract create` subcommand.
+ * @param {CommandInteractionOptionResolver} interaction The interaction that used this command.
+ */
 async function handleContractCreate(interaction) {
 
     const embed = new EmbedBuilder()

@@ -15,6 +15,7 @@ module.exports = {
         switch (interaction.options.getSubcommand()) {
             case ("create"):
                 handleContractCreate(interaction);
+                break;
             default:
                 return;
         }
