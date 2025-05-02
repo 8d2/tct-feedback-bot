@@ -1,0 +1,26 @@
+// Database definition for a User
+// Each user is stored by user id in userMethods
+
+module.exports = (sequelize, DataTypes) => {
+	return sequelize.define('users', {
+		user_id: {
+            // User id.
+			type: DataTypes.STRING,
+			primaryKey: true,
+		},
+        is_blocked: {
+            // If user is blocked from making feedback contracts.
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            allowNull: false,
+        },
+        feedback_points: {
+            // How many feedback points user has.
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+            allowNull: false
+        }
+	}, {
+		timestamps: false,
+	});
+};
