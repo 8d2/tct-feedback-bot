@@ -53,8 +53,12 @@ const STAR_RATING_INFO = {
     },
 }
 
-function createEmbed() {
-
+// Creates a new embed corresponding to the selected star rating.
+function createEmbed(star_rating) {
+    //WIP
+    switch(star_rating) {
+        default: return;
+    }
 }
 
 // Handles the `/contract create` subcommand
@@ -75,21 +79,21 @@ async function handleContractCreate(interaction) {
         .setPlaceholder("Select one")
         .addOptions(
             new StringSelectMenuOptionBuilder()
-                .setLabel("💣")
-                .setDescription("Provided minimal to no feedback")
-                .setValue('stars-0'),
+                .setLabel(STAR_RATING_INFO.stars_0.menu_label)
+                .setDescription(STAR_RATING_INFO.stars_0.menu_description)
+                .setValue(STAR_RATING_INFO.stars_0.menu_value),
             new StringSelectMenuOptionBuilder()
-                .setLabel("⭐")
-                .setDescription("Provided partial feedback, or subpar feedback with demonstrable effort")
-                .setValue('stars-1'),
+                .setLabel(STAR_RATING_INFO.stars_1.menu_label)
+                .setDescription(STAR_RATING_INFO.stars_1.menu_description)
+                .setValue(STAR_RATING_INFO.stars_1.menu_value),
             new StringSelectMenuOptionBuilder()
-                .setLabel("⭐⭐")
-                .setDescription("Provided complete feedback")
-                .setValue('stars-2'),
+                .setLabel(STAR_RATING_INFO.stars_2.menu_label)
+                .setDescription(STAR_RATING_INFO.stars_2.menu_description)
+                .setValue(STAR_RATING_INFO.stars_2.menu_value),
             new StringSelectMenuOptionBuilder()
-                .setLabel("⭐⭐⭐")
-                .setDescription("Provided thoughtful, thorough, insightful feedback; went the extra mile")
-                .setValue('stars-3')
+                .setLabel(STAR_RATING_INFO.stars_3.menu_label)
+                .setDescription(STAR_RATING_INFO.stars_3.menu_description)
+                .setValue(STAR_RATING_INFO.stars_3.menu_value)
         );
     
     const confirm = new ButtonBuilder()
