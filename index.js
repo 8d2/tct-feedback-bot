@@ -1,15 +1,14 @@
 // Discord.js classes
-const fileSystem = require("node:fs")
-const path = require("node:path")
-const {Client, Collection, Events, GatewayIntentBits} = require("discord.js")
+const fileSystem = require("node:fs");
+const path = require("node:path");
+const {Client, Collection, Events, GatewayIntentBits} = require("discord.js");
 
 // Get global variables
-const {token} = require("./config.json")
-const userMethods = require("./helpers/userMethods.js")
+const {token} = require("./config.json");
 
 // Create client
-const client = new Client({intents: GatewayIntentBits.Guilds})
-client.commands = new Collection()
+const client = new Client({intents: GatewayIntentBits.Guilds});
+client.commands = new Collection();
 
 // I stole this from the docs lol
 const foldersPath = path.join(__dirname, 'commands');
@@ -36,22 +35,20 @@ for (const folder of commandFolders) {
 	}
 }
 
-// Will run once when the client is loaded
-client.once(Events.ClientReady, readyClient => {
-	userMethods.update()
-    console.log(`${readyClient.user.tag} ready.`)
-    console.log(readyClient.application.id)
-})
+// I also stole this from the docs lol
+// Retrieves all event files and loads them individually
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fileSystem.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
-client.on(Events.InteractionCreate, async interaction => {
-    if(!interaction.isChatInputCommand()) return
-
-    const command = interaction.client.commands.get(interaction.commandName)
-
-    if (command) {
-        await command.execute(interaction)
-    }
-})
+for (const file of eventFiles) {
+	const filePath = path.join(eventsPath, file);
+	const event = require(filePath);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
+	}
+}
 
 // Starts the bot
-client.login(token)
+client.login(token);
