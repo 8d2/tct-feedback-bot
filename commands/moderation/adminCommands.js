@@ -1,14 +1,17 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, 
-    SlashCommandBooleanOption, PermissionFlagsBits, EmbedBuilder, Colors, MessageFlags, ChannelType }
+    SlashCommandBooleanOption, SlashCommandRoleOption, PermissionFlagsBits, EmbedBuilder, Colors, MessageFlags, ChannelType }
     = require("discord.js");
 
 // Constants
 const CHANNEL_OPTION_NAME = "feedbackchannel";
-const REQUIREMENT_OPTION_NAME = "newrequirement";
+const REQUIREMENT_OPTION_NAME = "requirement";
+const ROLE_OPTION_NAME = "role";
 const SET_VETERAN_OPTION_NAME = "setveteranrequirement";
+const SET_VETERAN_ROLE_OPTION_NAME = "setveteranrole";
 
 const SET_CHANNEL_COMMAND_NAME = "setchannel";
 const SET_REQUIREMENT_COMMAND_NAME = "setrequirement";
+const SET_ROLE_COMMAND_NAME = "setrole";
 
 const EPHEMERAL_FLAG = MessageFlags.Ephemeral
 
@@ -37,6 +40,25 @@ async function handleSetRequirement(interaction, messageEmbed) {
     }
     else {
         messageEmbed.setDescription(`The requirement for the regular feedback role has been set to ${newRequirement} points.`);
+    }
+    
+    messageEmbed.setColor(Colors.Green);
+    return true;
+}
+
+// Handles the '/admin setrole' command.
+// interaction: the interaction that used this command
+// messageEmbed: the embed to modify and reply with
+// returns false if the action failed.
+async function handleSetRole(interaction, messageEmbed) {
+    const settingVeteranReq = interaction.options.getBoolean(SET_VETERAN_ROLE_OPTION_NAME);
+    const newRole = interaction.options.getRole(ROLE_OPTION_NAME);
+    
+    if (settingVeteranReq) {
+        messageEmbed.setDescription(`The veteran feedbacker role has been set to ${newRole}.`);
+    }
+    else {
+        messageEmbed.setDescription(`The regular feedbacker role has been set to ${newRole}.`);
     }
     
     messageEmbed.setColor(Colors.Green);
@@ -74,11 +96,26 @@ module.exports = {
                 .setRequired(true)
                 .setMinValue(1)
             )
+        )
+        
+        .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(SET_ROLE_COMMAND_NAME)
+            .setDescription("Sets the role that is obtained for reaching specific feedback point requirements.")
+            .addBooleanOption(new SlashCommandBooleanOption()
+                .setName(SET_VETERAN_ROLE_OPTION_NAME)
+                .setDescription("If true, the veteran role will be set. Sets the regular role otherwise.")
+                .setRequired(true)
+            )
+            .addRoleOption(new SlashCommandRoleOption()
+                .setName(ROLE_OPTION_NAME)
+                .setDescription("The role to use for the point requirement.")
+                .setRequired(true)
+            )
         ),
 
     async execute(interaction) {
 
-        let newEmbed = new EmbedBuilder().setTimestamp();
+        let newEmbed = new EmbedBuilder().setTimestamp().setDescription("This command has not been fully implemented.");
         let successful = false;
 
         // action based on subcommand
@@ -88,6 +125,9 @@ module.exports = {
                 break;
             case (SET_REQUIREMENT_COMMAND_NAME):
                 successful = handleSetRequirement(interaction, newEmbed);
+                break;
+            case (SET_ROLE_COMMAND_NAME):
+                successful = handleSetRole(interaction, newEmbed);
             default:
                 break;
         }
