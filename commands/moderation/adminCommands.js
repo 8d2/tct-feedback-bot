@@ -33,10 +33,10 @@ async function handleSetRequirement(interaction, messageEmbed) {
     const newRequirement = interaction.options.getInteger(REQUIREMENT_OPTION_NAME);
     
     if (settingVeteranReq) {
-        messageEmbed.setDescription(`The requirement for the veteran feedback role has been set to ${newRequirement}.`);
+        messageEmbed.setDescription(`The requirement for the veteran feedback role has been set to ${newRequirement} points.`);
     }
     else {
-        messageEmbed.setDescription(`The requirement for the regular feedback role has been set to ${newRequirement}.`);
+        messageEmbed.setDescription(`The requirement for the regular feedback role has been set to ${newRequirement} points.`);
     }
     
     messageEmbed.setColor(Colors.Green);
