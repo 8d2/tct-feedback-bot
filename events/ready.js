@@ -1,5 +1,5 @@
 // Base code taken from discord.js guide
-// https://discordjs.guide/creating-your-bot/event-handling.html#individual-event-files
+// https://discordjs.guide/creating-your-bot/event-handling.html
 
 const { Events } = require('discord.js');
 

@@ -104,7 +104,7 @@ async function handleContractCreate(interaction) {
     const embed = createEmbed(interaction);
 
     const starSelect = new StringSelectMenuBuilder()
-        .setCustomId('star-select')
+        .setCustomId('feedback-contract-star-select')
         .setPlaceholder("Select one")
         .addOptions(
             new StringSelectMenuOptionBuilder()
@@ -126,7 +126,7 @@ async function handleContractCreate(interaction) {
         );
     
     const confirm = new ButtonBuilder()
-        .setCustomId('confirm')
+        .setCustomId('feedback-contract-confirm')
         .setLabel('Confirm')
         .setStyle(ButtonStyle.Success)
         .setDisabled(true);
