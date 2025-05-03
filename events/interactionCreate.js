@@ -1,7 +1,7 @@
 // Base code taken from discord.js guide
 // https://discordjs.guide/creating-your-bot/event-handling.html
 
-const { Events, MessageFlags } = require('discord.js');
+const { Events, MessageFlags, EmbedBuilder, Colors } = require('discord.js');
 
 module.exports = {
 	name: Events.InteractionCreate,
@@ -31,10 +31,26 @@ module.exports = {
 		} 
         else if (interaction.isStringSelectMenu()) {
 			// Respond to select menus
-            console.log(interaction.customId);
-            console.log(interaction.values);
-            console.log(interaction.user.id);
-            console.log(interaction.client);
+
+            // THIS CODE IS TEMPORARY!!!!!!!!!!!!!1 
+            const select_menu_id = interaction.customId;
+            const select_menu_values = interaction.values; // NOTE: this is an array of active selections
+            
+            const embed = new EmbedBuilder()
+                .setColor(Colors.Green)
+                .setTitle("Feedback Agreement")
+                .setAuthor({
+                    name: interaction.user.username, 
+                    iconURL: interaction.user.avatarURL(),
+                })
+                .setDescription("THIS DESCRIPTION IS EDITED!!!!!!")
+                .setTimestamp();
+
+            interaction.message.edit({
+                content: `${interaction.values[0]}`,
+                embeds: [embed]
+            });
+            console.log(interaction.message);
 		}
 	},
 };
