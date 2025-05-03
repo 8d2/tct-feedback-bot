@@ -27,9 +27,11 @@ module.exports = {
                 }
             }
         } 
+
         else if (interaction.isButton()) {
 			// Respond to buttons
 		} 
+        
         else if (interaction.isStringSelectMenu()) {
 			// Respond to select menus
 

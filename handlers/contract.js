@@ -60,6 +60,22 @@ const STAR_RATING_INFO = {
 };
 
 /**
+ * Creates a new confirm button.
+ * @param {boolean} disabled Whether the button is disabled. (Default: true)
+ * @returns {ButtonBuilder} The created confirm button.
+ */
+function createConfirmButton(disabled) {
+    // Confirm button is disabled by default
+    if (disabled === null) disabled = true;
+
+    return new ButtonBuilder()
+        .setCustomId('feedback-contract-confirm')
+        .setLabel('Confirm')
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(disabled);
+}
+
+/**
  * Creates a new embed corresponding to the selected star rating.
  * @param {String?} star_rating The selected star rating as a string.
  * @param {CommandInteractionOptionResolver} interaction The interaction that used this command.
@@ -124,20 +140,36 @@ function createStarSelectDropdown() {
 }
 
 /**
- * The function name of all time :D
+ * The function name of all time. Yes, it probably needs to be that way...
+ * 
  * Handles feedback contract star select interactions.
  * @param {CommandInteractionOptionResolver} interaction The interaction that used this string select menu.
  */
 async function handleFeedbackContractStarSelectInteraction(interaction) {
 
-    const newContractEmbed = createContractEmbed(interaction, interaction.values[0]);
+    const selectedStarRating = interaction.values[0];
+    const newContractEmbed = createContractEmbed(interaction, selectedStarRating);
+
+    // Yes, we have to make a new one.
+    // If only I could just directly edit the button's disabled property...
+    const newStarSelect = createStarSelectDropdown();
+    // Enables the button if a star rating is selected
+    const newConfirmButton = createConfirmButton(selectedStarRating === null);
+
+    const row1 = new ActionRowBuilder()
+        .addComponents(newStarSelect);
+    
+    const row2 = new ActionRowBuilder()
+        .addComponents(newConfirmButton);
 
     await interaction.update({
         embeds: [newContractEmbed],
+        components: [row1, row2],
     });
 }
 
 module.exports = {
+    createConfirmButton,
     createContractEmbed,
     createStarSelectDropdown,
     handleFeedbackContractStarSelectInteraction,
