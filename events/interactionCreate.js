@@ -1,7 +1,8 @@
 // Base code taken from discord.js guide
 // https://discordjs.guide/creating-your-bot/event-handling.html
 
-const { Events, MessageFlags, EmbedBuilder, Colors } = require('discord.js');
+const { Events, MessageFlags } = require('discord.js');
+const { handleFeedbackContractStarSelectInteraction } = require('../handlers/contract');
 
 module.exports = {
 	name: Events.InteractionCreate,
@@ -32,25 +33,28 @@ module.exports = {
         else if (interaction.isStringSelectMenu()) {
 			// Respond to select menus
 
-            // THIS CODE IS TEMPORARY!!!!!!!!!!!!!1 
             const select_menu_id = interaction.customId;
-            const select_menu_values = interaction.values; // NOTE: this is an array of active selections
-            
-            const embed = new EmbedBuilder()
-                .setColor(Colors.Green)
-                .setTitle("Feedback Agreement")
-                .setAuthor({
-                    name: interaction.user.username, 
-                    iconURL: interaction.user.avatarURL(),
-                })
-                .setDescription("THIS DESCRIPTION IS EDITED!!!!!!")
-                .setTimestamp();
-
-            interaction.message.edit({
-                content: `${interaction.values[0]}`,
-                embeds: [embed]
-            });
-            console.log(interaction.message);
+            try {
+                // Respond to the interaction based on the select menu's customId
+                switch (select_menu_id) {
+                    case ('feedback-contract-star-select'):
+                        await handleFeedbackContractStarSelectInteraction(interaction);
+                        break;
+                    default:
+                        // If you've reached this line, that means the string select menu's customId
+                        // is not included in this switch statement.
+                        // We may need to refactor this in the future to keep things centralized...
+                        console.error(`Select menu ${select_menu_id} is not registered.`);
+                        break;
+                }
+            } catch (error) {
+                console.error(error);
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.followUp({ content: 'There was an error while updating this string select!', flags: MessageFlags.Ephemeral });
+                } else {
+                    await interaction.reply({ content: 'There was an error while updating this string select!', flags: MessageFlags.Ephemeral });
+                }
+            }
 		}
 	},
 };

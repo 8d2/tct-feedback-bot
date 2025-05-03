@@ -95,6 +95,10 @@ function createContractEmbed(interaction, star_rating) {
     return embed;
 }
 
+/**
+ * Creates a new feedback contract star select dropdown menu.
+ * @returns {StringSelectMenuBuilder} The created star select dropdown menu.
+ */
 function createStarSelectDropdown() {
     return new StringSelectMenuBuilder()
         .setCustomId('feedback-contract-star-select')
@@ -119,7 +123,22 @@ function createStarSelectDropdown() {
         );
 }
 
+/**
+ * The function name of all time :D
+ * Handles feedback contract star select interactions.
+ * @param {CommandInteractionOptionResolver} interaction The interaction that used this string select menu.
+ */
+async function handleFeedbackContractStarSelectInteraction(interaction) {
+
+    const newContractEmbed = createContractEmbed(interaction, interaction.values[0]);
+
+    await interaction.update({
+        embeds: [newContractEmbed],
+    });
+}
+
 module.exports = {
     createContractEmbed,
     createStarSelectDropdown,
+    handleFeedbackContractStarSelectInteraction,
 }
