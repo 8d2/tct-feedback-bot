@@ -36,7 +36,7 @@ const STAR_RATING_INFO = {
             Examples:
             • The user completed a full noclip run of the tower, sending screenshots along the way.
             • The user sent only a handful of screenshots, but made up for it by providing some helpful insights.
-            • ${bold("DO NOT")} assign this rating if your tower is less than 20% complete.`,
+            • ${bold("DO NOT")} assign this rating if your tower is less than 30% complete.`,
     },
     stars_3: {
         menu_value: "stars-3",
@@ -49,7 +49,8 @@ const STAR_RATING_INFO = {
             • The user attempted or completed a legit playthrough of the tower, providing numerous screenshots and insights from their experience.
             • The user provided extensive, nuanced insights, approaching the standards of a typical curator review.
             • The user provided additional assistance with your tower on top of usual feedback, perhaps by sending models to fix particularly tricky bugs, or by volunteering to join a team create to fix issues without the intent of collaborating.
-            • ${bold("DO NOT")} assign this rating if your tower is less than 50% complete.`,
+            • The user provided thorough feedback worthy of at least two stars, but your tower is very, very long, and the extra time spent is worthy of a third star.
+            • ${bold("DO NOT")} assign this rating if your tower is less than 60% complete.`,
     },
 }
 
