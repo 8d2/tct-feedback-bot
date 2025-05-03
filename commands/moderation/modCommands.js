@@ -1,12 +1,10 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOption, SlashCommandIntegerOption, 
-    PermissionsBitField, EmbedBuilder, Colors, MessageFlags }
+    PermissionFlagsBits, EmbedBuilder, Colors, MessageFlags }
     = require("discord.js");
 
 const userMethods = require("../../helpers/userMethods.js")
 
 // Constants
-const MOD_PERMS = [PermissionsBitField.Flags.Administrator, PermissionsBitField.Flags.BanMembers]; // 8 (admin) or 4 (ban members)
-
 const USER_OPTION_NAME = "user";
 const POINTS_OPTION_NAME = "points";
 
@@ -21,7 +19,7 @@ const EPHEMERAL_FLAG = MessageFlags.Ephemeral
 // messageEmbed: the embed to modify and reply with
 // returns false if the action failed.
 async function handleBlock(interaction, messageEmbed) {
-    let blockee = interaction.options.getUser(USER_OPTION_NAME);
+    const blockee = interaction.options.getUser(USER_OPTION_NAME);
     
     // TODO: check if the blockee is already blocked, if so then notify the command user.
     
@@ -35,7 +33,7 @@ async function handleBlock(interaction, messageEmbed) {
 // messageEmbed: the embed to modify and reply with
 // returns false if the action failed.
 async function handleUnblock(interaction, messageEmbed) {
-    let unblockee = interaction.options.getUser(USER_OPTION_NAME);
+    const unblockee = interaction.options.getUser(USER_OPTION_NAME);
     
     // TODO: check if the unblockee is not blocked, if so then notify the command user.
     
@@ -61,6 +59,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("mod")
         .setDescription("Moderator commands")
+        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
         
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(BLOCK_COMMAND_NAME)
@@ -99,12 +98,6 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        // check that the user has moderator permissions
-        if (!interaction.member.permissions.any(MOD_PERMS)) {
-            // non moderator error
-            await interaction.reply({content: "You need moderator permissions to run this command.", flags: EPHEMERAL_FLAG});
-            return;
-        }
 
         let newEmbed = new EmbedBuilder().setTimestamp();
         let successful = false;
