@@ -99,7 +99,7 @@ module.exports = {
 
     async execute(interaction) {
 
-        let newEmbed = new EmbedBuilder().setTimestamp();
+        let newEmbed = new EmbedBuilder().setTimestamp().setDescription("This command has not been fully implemented.");
         let successful = false;
 
         // action based on subcommand
