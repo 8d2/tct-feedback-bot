@@ -18,8 +18,6 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: 5,
             allowNull: false
         },
-
-        settings_identifier: DataTypes.STRING
 	}, {
 		timestamps: false,
 	});

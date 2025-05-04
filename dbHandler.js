@@ -31,8 +31,7 @@ if (sync) {
 			Roles.upsert({
 				role_type: "Regular",
 				role_id: 999999999,
-				role_requirement: 5,
-				settings_identifier: SETTINGS_MAIN_IDENTIFIER
+				role_requirement: 5
 			})
 		]);
 

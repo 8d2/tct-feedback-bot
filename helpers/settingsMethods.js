@@ -21,9 +21,19 @@ async function getRoles() {
     return settings ? await settings.getRoles() : [];
 }
 
+/**
+ * Get role from given role type.
+ * @param {string} roleType Type of role to get.
+ * @returns {Role?} Role. Null if no role found.
+ */
+async function getRole(roleType) {
+    return settings ? await settings.getRole(roleType) : null;
+}
+
 module.exports = {
     getFeedbackChannelId,
     getRoles,
+    getRole,
 
     /**
      * Initialize main settings database.

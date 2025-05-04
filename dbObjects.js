@@ -3,18 +3,33 @@
 
 const { SETTINGS_MAIN_IDENTIFIER, Roles, Settings, Users } = require('./dbHandler.js');
 
-Roles.belongsTo(Settings, {foreignKey: 'settings_identifier', as: 'settings'})
-
 /**
- * Allows for `Settings.getRoles` to retrieve all from Roles database.
+ * Allows for `Settings.getRoles()` to retrieve all from Roles database.
  */
 Reflect.defineProperty(Settings.prototype, 'getRoles', {
 	value: () => {
-		return Roles.findAll({
-			include: ['settings']
-		});
+		return Roles.findAll();
 	},
 });
+/**
+ * Allows for `Settings.getRoles(type)` to retrieve Role for a role type.
+ */
+Reflect.defineProperty(Settings.prototype, 'getRole', {
+	value: type => {
+		return Roles.findOne({
+			where: { role_type: type }
+		})
+	},
+});
+
+/**
+ * Allows for `Roles.settings` to reference main settings from role.
+ */
+Reflect.defineProperty(Roles.prototype, 'settings', {
+	value: Settings.findOne({
+		where: { identifier: SETTINGS_MAIN_IDENTIFIER }
+	})
+})
 
 module.exports = {
 	SETTINGS_MAIN_IDENTIFIER,
