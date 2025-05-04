@@ -61,7 +61,7 @@ const STAR_RATING_INFO = {
 
 /**
  * Creates a new confirm button.
- * @param {boolean} disabled Whether the button is disabled. (Default: true)
+ * @param {boolean?} disabled Whether the button is disabled. (Default: true)
  * @returns {ButtonBuilder} The created confirm button.
  */
 function createConfirmButton(disabled) {
@@ -78,7 +78,7 @@ function createConfirmButton(disabled) {
 /**
  * Creates a new embed corresponding to the selected star rating.
  * @param {String?} star_rating The selected star rating as a string.
- * @param {CommandInteractionOptionResolver} interaction The interaction that used this command.
+ * @param {import("discord.js").Interaction} interaction The interaction that used this command.
  * @returns {EmbedBuilder} An embed corresponding to the selected star rating.
  */
 function createContractEmbed(interaction, star_rating) {
@@ -109,6 +109,35 @@ function createContractEmbed(interaction, star_rating) {
         .setTimestamp();
     
     return embed;
+}
+
+/**
+ * Constructs a complete contract message, including an embed, rating select, and confirm button.
+ * @param {import("discord.js").Interaction} interaction 
+ * @returns {any} 
+ */
+function createContractMessage(interaction) {
+
+    // If no star rating is selected, this is just null
+    const selectedStarRating = interaction.values ? interaction.values[0] : null;
+    const newContractEmbed = createContractEmbed(interaction, selectedStarRating);
+
+    // Yes, we have to make a new one.
+    // If only I could just directly edit the button's disabled property...
+    const newStarSelect = createStarSelectDropdown();
+    // Enables the button if a star rating is selected
+    const newConfirmButton = createConfirmButton(selectedStarRating === null);
+
+    const row1 = new ActionRowBuilder()
+        .addComponents(newStarSelect);
+    
+    const row2 = new ActionRowBuilder()
+        .addComponents(newConfirmButton);
+
+    return {
+        embeds: [newContractEmbed],
+        components: [row1, row2],
+    }
 }
 
 /**
@@ -143,34 +172,19 @@ function createStarSelectDropdown() {
  * The function name of all time. Yes, it probably needs to be that way...
  * 
  * Handles feedback contract star select interactions.
- * @param {CommandInteractionOptionResolver} interaction The interaction that used this string select menu.
+ * @param {import("discord.js").Interaction} interaction The interaction that used this string select menu.
  */
 async function handleFeedbackContractStarSelectInteraction(interaction) {
 
-    const selectedStarRating = interaction.values[0];
-    const newContractEmbed = createContractEmbed(interaction, selectedStarRating);
+    // Updates the feedback contract message
+    await interaction.update(createContractMessage(interaction));
 
-    // Yes, we have to make a new one.
-    // If only I could just directly edit the button's disabled property...
-    const newStarSelect = createStarSelectDropdown();
-    // Enables the button if a star rating is selected
-    const newConfirmButton = createConfirmButton(selectedStarRating === null);
-
-    const row1 = new ActionRowBuilder()
-        .addComponents(newStarSelect);
-    
-    const row2 = new ActionRowBuilder()
-        .addComponents(newConfirmButton);
-
-    await interaction.update({
-        embeds: [newContractEmbed],
-        components: [row1, row2],
-    });
 }
 
 module.exports = {
     createConfirmButton,
     createContractEmbed,
+    createContractMessage,
     createStarSelectDropdown,
     handleFeedbackContractStarSelectInteraction,
 }
