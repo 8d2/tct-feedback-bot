@@ -14,46 +14,50 @@ const UNBLOCK_COMMAND_NAME = "unblock";
 
 const EPHEMERAL_FLAG = MessageFlags.Ephemeral
 
-// Handles the '/mod block' command.
-// interaction: the interaction that used this command
-// messageEmbed: the embed to modify and reply with
-// returns false if the action failed.
-async function handleBlock(interaction, messageEmbed) {
-    const blockee = interaction.options.getUser(USER_OPTION_NAME);
-    
-    // TODO: check if the blockee is already blocked, if so then notify the command user.
-    
-    messageEmbed.setDescription(`${blockee} has been blocked from creating feedback contracts.`);
-    messageEmbed.setColor(Colors.Red);
-    return true;
-}
+const COMMAND_FUNCTIONS = {
+  
+    // Handles the '/mod block' command.
+    // interaction: the interaction that used this command
+    // messageEmbed: the embed to modify and reply with
+    // returns false if the action failed.
+    [BLOCK_COMMAND_NAME]: function handleBlock(interaction, messageEmbed) {
+        const blockee = interaction.options.getUser(USER_OPTION_NAME);
+        
+        // TODO: check if the blockee is already blocked, if so then notify the command user.
+        
+        messageEmbed.setDescription(`${blockee} has been blocked from creating feedback contracts.`);
+        messageEmbed.setColor(Colors.Red);
+        return true;
+    },
 
-// Handles the '/mod unblock' command.
-// interaction: the interaction that used this command
-// messageEmbed: the embed to modify and reply with
-// returns false if the action failed.
-async function handleUnblock(interaction, messageEmbed) {
-    const unblockee = interaction.options.getUser(USER_OPTION_NAME);
-    
-    // TODO: check if the unblockee is not blocked, if so then notify the command user.
-    
-    messageEmbed.setDescription(`${unblockee} has been unblocked and can now create feedback contracts.`);
-    messageEmbed.setColor(Colors.Green);
-    return true;
-}
+    // Handles the '/mod unblock' command.
+    // interaction: the interaction that used this command
+    // messageEmbed: the embed to modify and reply with
+    // returns false if the action failed.
+    [UNBLOCK_COMMAND_NAME]: function handleUnblock(interaction, messageEmbed) {
+        const unblockee = interaction.options.getUser(USER_OPTION_NAME);
+        
+        // TODO: check if the unblockee is not blocked, if so then notify the command user.
+        
+        messageEmbed.setDescription(`${unblockee} has been unblocked and can now create feedback contracts.`);
+        messageEmbed.setColor(Colors.Green);
+        return true;
+    },
 
-// Handles the '/mod setpoints' command.
-// interaction: the interaction that used this command
-// messageEmbed: the embed to modify and reply with
-// returns false if the action failed.
-async function handleSetPoints(interaction, messageEmbed) {
-    const user = interaction.options.getUser(USER_OPTION_NAME);
-    const points = interaction.options.getInteger(POINTS_OPTION_NAME);
-    userMethods.setPoints(user.id, points);
-    messageEmbed.setDescription(`${user} now has ${points} points.`);
-    messageEmbed.setColor(Colors.Green);
-    return true;
-}
+    // Handles the '/mod setpoints' command.
+    // interaction: the interaction that used this command
+    // messageEmbed: the embed to modify and reply with
+    // returns false if the action failed.
+    [SET_POINTS_COMMAND_NAME]: function handleSetPoints(interaction, messageEmbed) {
+        const user = interaction.options.getUser(USER_OPTION_NAME);
+        const points = interaction.options.getInteger(POINTS_OPTION_NAME);
+        userMethods.setPoints(user.id, points);
+        messageEmbed.setDescription(`${user} now has ${points} points.`);
+        messageEmbed.setColor(Colors.Green);
+        return true;
+    }
+  
+};
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -99,21 +103,13 @@ module.exports = {
 
     async execute(interaction) {
 
+        const subcommandName = interaction.options.getSubcommand();
         let newEmbed = new EmbedBuilder().setTimestamp().setDescription("This command has not been fully implemented.");
         let successful = false;
 
-        // action based on subcommand
-        switch (interaction.options.getSubcommand()) {
-            case (BLOCK_COMMAND_NAME):
-                successful = handleBlock(interaction, newEmbed);
-                break;
-            case (UNBLOCK_COMMAND_NAME):
-                successful = handleUnblock(interaction, newEmbed);
-                break;
-            case (SET_POINTS_COMMAND_NAME):
-                successful = handleSetPoints(interaction, newEmbed);
-            default:
-                break;
+        // call the function if the subcommand name is a key in the function hash map
+        if (subcommandName in COMMAND_FUNCTIONS) {
+            successful = COMMAND_FUNCTIONS[subcommandName](interaction, newEmbed);
         }
         
         if (successful) {
