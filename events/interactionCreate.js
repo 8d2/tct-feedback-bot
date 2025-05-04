@@ -2,12 +2,12 @@
 // https://discordjs.guide/creating-your-bot/event-handling.html
 
 const { Events, MessageFlags } = require('discord.js');
-const { handleFeedbackContractStarSelectInteraction } = require('../handlers/contract');
+const { handleFeedbackContractStarSelectInteraction: handleContractStarSelectInteraction } = require('../handlers/contract');
 
 module.exports = {
-	name: Events.InteractionCreate,
-	async execute(interaction) {
-		if (interaction.isChatInputCommand()) {
+    name: Events.InteractionCreate,
+    async execute(interaction) {
+        if (interaction.isChatInputCommand()) {
             // Respond to chat commands
             const command = interaction.client.commands.get(interaction.commandName);
 
@@ -28,19 +28,22 @@ module.exports = {
             }
         } 
 
+        // We will need this in the future
+        /*
         else if (interaction.isButton()) {
 			// Respond to buttons
-		} 
-        
+		}
+        */
+
         else if (interaction.isStringSelectMenu()) {
-			// Respond to select menus
+            // Respond to select menus
 
             const select_menu_id = interaction.customId;
             try {
                 // Respond to the interaction based on the select menu's customId
                 switch (select_menu_id) {
                     case ('feedback-contract-star-select'):
-                        await handleFeedbackContractStarSelectInteraction(interaction);
+                        await handleContractStarSelectInteraction(interaction);
                         break;
                     default:
                         // If you've reached this line, that means the string select menu's customId
@@ -49,14 +52,16 @@ module.exports = {
                         console.error(`Select menu ${select_menu_id} is not registered.`);
                         break;
                 }
-            } catch (error) {
+            } 
+            catch (error) {
                 console.error(error);
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({ content: 'There was an error while updating this string select!', flags: MessageFlags.Ephemeral });
-                } else {
+                } 
+                else {
                     await interaction.reply({ content: 'There was an error while updating this string select!', flags: MessageFlags.Ephemeral });
                 }
             }
-		}
-	},
+        }
+    },
 };

@@ -64,10 +64,7 @@ const STAR_RATING_INFO = {
  * @param {boolean?} disabled Whether the button is disabled. (Default: true)
  * @returns {ButtonBuilder} The created confirm button.
  */
-function createConfirmButton(disabled) {
-    // Confirm button is disabled by default
-    if (disabled === null) disabled = true;
-
+function createConfirmButton(disabled = true) {
     return new ButtonBuilder()
         .setCustomId('feedback-contract-confirm')
         .setLabel('Confirm')
@@ -174,7 +171,7 @@ function createStarSelectDropdown() {
  * Handles feedback contract star select interactions.
  * @param {import("discord.js").Interaction} interaction The interaction that used this string select menu.
  */
-async function handleFeedbackContractStarSelectInteraction(interaction) {
+async function handleContractStarSelectInteraction(interaction) {
 
     // Updates the feedback contract message
     await interaction.update(createContractMessage(interaction));
@@ -182,9 +179,6 @@ async function handleFeedbackContractStarSelectInteraction(interaction) {
 }
 
 module.exports = {
-    createConfirmButton,
-    createContractEmbed,
     createContractMessage,
-    createStarSelectDropdown,
-    handleFeedbackContractStarSelectInteraction,
+    handleContractStarSelectInteraction,
 }
