@@ -132,8 +132,8 @@ function createContractEmbed(interaction, star_rating) {
 
 /**
  * Constructs a complete contract message, including an embed, rating select, and confirm button.
- * @param {import("discord.js").Interaction} interaction 
- * @returns {any} 
+ * @param {import("discord.js").Interaction} interaction The interaction that created/used the contract.
+ * @returns {import("discord.js").InteractionReplyOptions} The created contract message.
  */
 function createContractMessage(interaction) {
 
