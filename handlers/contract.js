@@ -146,22 +146,13 @@ function createStarSelectDropdown() {
         .setCustomId('feedback-contract-star-select')
         .setPlaceholder("Select one")
         .addOptions(
-            new StringSelectMenuOptionBuilder()
-                .setLabel(STAR_RATING_INFO["stars-0"].menu_label)
-                .setDescription(STAR_RATING_INFO["stars-0"].menu_description)
-                .setValue(STAR_RATING_INFO["stars-0"].menu_value),
-            new StringSelectMenuOptionBuilder()
-                .setLabel(STAR_RATING_INFO["stars-1"].menu_label)
-                .setDescription(STAR_RATING_INFO["stars-1"].menu_description)
-                .setValue(STAR_RATING_INFO["stars-1"].menu_value),
-            new StringSelectMenuOptionBuilder()
-                .setLabel(STAR_RATING_INFO["stars-2"].menu_label)
-                .setDescription(STAR_RATING_INFO["stars-2"].menu_description)
-                .setValue(STAR_RATING_INFO["stars-2"].menu_value),
-            new StringSelectMenuOptionBuilder()
-                .setLabel(STAR_RATING_INFO["stars-3"].menu_label)
-                .setDescription(STAR_RATING_INFO["stars-3"].menu_description)
-                .setValue(STAR_RATING_INFO["stars-3"].menu_value)
+            // Create a menu option for each star rating
+            Object.values(STAR_RATING_INFO).map(rating => 
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(rating.menu_label)
+                    .setDescription(rating.menu_description)
+                    .setValue(rating.menu_value)
+            )
         );
 }
 

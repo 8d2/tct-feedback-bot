@@ -2,7 +2,7 @@
 // https://discordjs.guide/creating-your-bot/event-handling.html
 
 const { Events, MessageFlags } = require('discord.js');
-const { handleFeedbackContractStarSelectInteraction: handleContractStarSelectInteraction } = require('../handlers/contract');
+const { handleContractStarSelectInteraction } = require('../handlers/contract');
 
 module.exports = {
     name: Events.InteractionCreate,
