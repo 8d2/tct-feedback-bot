@@ -92,18 +92,40 @@ function createContractEmbed(interaction, star_rating) {
         star_rating_label = `${star_data.menu_label} ${point_value} STAR${point_value === 1 ? '' : 'S'}`;
     }
 
+    // Get the user (as an author) who sent the contract originally
+    // This may seem weird, but I swear it's like this for a reason
+    const contract_sender_author = {
+        name: interaction.user.username, 
+        iconURL: interaction.user.avatarURL(),
+    };
+    let contract_sender_userid = interaction.user.id;
+    if (interaction.message) {
+        // Drill, baby, drill!
+        const embed_data = interaction.message.embeds[0].data;
+        const author_data = embed_data.author;
+        contract_sender_author.name = author_data.name;
+        contract_sender_author.iconURL = author_data.icon_url;
+
+        // Extract the contract sender's user ID from the description in the embed (THIS IS SO BAD)
+        const embed_description = embed_data.description;
+        // ^^^^^^ Example of the string we're dissecting: 
+        // '<@699>811922283629313> has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.'
+        const idx_a = embed_description.indexOf('@');
+        const idx_b = embed_description.indexOf('>');
+        contract_sender_userid = embed_description.slice(idx_a + 1, idx_b);
+    }
+
     // Build the embed
     const embed = new EmbedBuilder()
         .setColor(Colors.Green)
         .setTitle("Feedback Agreement")
-        .setAuthor({
-            name: interaction.user.username, 
-            iconURL: interaction.user.avatarURL(),
-        })
+        .setAuthor(contract_sender_author)
         .setDescription(
-            `${interaction.user} has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.
+            `<@${contract_sender_userid}> has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.
             ${full_description ? `${HORIZONTAL_RULE}# ` + star_rating_label + "\n" + blockQuote(full_description) : ""}`)
         .setTimestamp();
+    // Save original author to embed's data so it can be reused later
+    embed.original_author = contract_sender_author;
     
     return embed;
 }
