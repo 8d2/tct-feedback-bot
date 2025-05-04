@@ -1,22 +1,24 @@
 // Defines helper methods within database models.
 // For example, getting a user could call some method user.foo() if defined here.
-const { sequelize, dataTypes } = require("./dbDefinition")
 
-const Users = require('./models/Users.js')(sequelize, dataTypes);
+const { SETTINGS_MAIN_IDENTIFIER, Roles, Settings, Users } = require('./dbHandler.js');
 
-Reflect.defineProperty(Users.prototype, 'isBlocked', {
+Roles.belongsTo(Settings, {foreignKey: 'settings_identifier', as: 'settings'})
+
+/**
+ * Allows for `Settings.getRoles` to retrieve all from Roles database.
+ */
+Reflect.defineProperty(Settings.prototype, 'getRoles', {
 	value: () => {
-		const user = Users.findOne({
-			where: { user_id: this.user_id },
+		return Roles.findAll({
+			include: ['settings']
 		});
-
-		if (user) {
-			return user.is_blocked;
-		}
-		return false;
 	},
 });
 
 module.exports = {
+	SETTINGS_MAIN_IDENTIFIER,
+	Roles,
+	Settings,
 	Users
 }

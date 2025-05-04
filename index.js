@@ -36,9 +36,12 @@ for (const folder of commandFolders) {
 	}
 }
 
+const settingsMethods = require("./helpers/settingsMethods.js")
+
 // Will run once when the client is loaded
 client.once(Events.ClientReady, readyClient => {
-	userMethods.update()
+	userMethods.init()
+	settingsMethods.init()
     console.log(`${readyClient.user.tag} ready.`)
     console.log(readyClient.application.id)
 })
