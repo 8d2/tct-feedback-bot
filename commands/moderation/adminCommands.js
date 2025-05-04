@@ -15,55 +15,60 @@ const SET_ROLE_COMMAND_NAME = "setrole";
 
 const EPHEMERAL_FLAG = MessageFlags.Ephemeral
 
-// Handles the '/admin setchannel' command.
-// interaction: the interaction that used this command
-// messageEmbed: the embed to modify and reply with
-// returns false if the action failed.
-async function handleSetChannel(interaction, messageEmbed) {
-    const feedbackChannel = interaction.options.getChannel(CHANNEL_OPTION_NAME);
+const COMMAND_FUNCTIONS = {
     
-    messageEmbed.setDescription(`${feedbackChannel} has been set as the feedback forum channel.`);
-    messageEmbed.setColor(Colors.Green);
-    return true;
-}
-
-// Handles the '/admin setrequirement' command.
-// interaction: the interaction that used this command
-// messageEmbed: the embed to modify and reply with
-// returns false if the action failed.
-async function handleSetRequirement(interaction, messageEmbed) {
-    const settingVeteranReq = interaction.options.getBoolean(SET_VETERAN_OPTION_NAME);
-    const newRequirement = interaction.options.getInteger(REQUIREMENT_OPTION_NAME);
+    // Handles the '/admin setchannel' command.
+    // interaction: the interaction that used this command
+    // messageEmbed: the embed to modify and reply with
+    // returns false if the action failed.
+    [SET_CHANNEL_COMMAND_NAME]: function handleSetChannel(interaction, messageEmbed) {
+        const feedbackChannel = interaction.options.getChannel(CHANNEL_OPTION_NAME);
+        
+        messageEmbed.setDescription(`${feedbackChannel} has been set as the feedback forum channel.`);
+        messageEmbed.setColor(Colors.Green);
+        return true;
+    },
     
-    if (settingVeteranReq) {
-        messageEmbed.setDescription(`The requirement for the veteran feedback role has been set to ${newRequirement} points.`);
+    // Handles the '/admin setrequirement' command.
+    // interaction: the interaction that used this command
+    // messageEmbed: the embed to modify and reply with
+    // returns false if the action failed.
+    [SET_REQUIREMENT_COMMAND_NAME]: function handleSetRequirement(interaction, messageEmbed) {
+        const settingVeteranReq = interaction.options.getBoolean(SET_VETERAN_OPTION_NAME);
+        const newRequirement = interaction.options.getInteger(REQUIREMENT_OPTION_NAME);
+        
+        if (settingVeteranReq) {
+            // points doesn't singularize with the argument as 1, but this is such a small and unlikely scenario so i won't fix
+            messageEmbed.setDescription(`The requirement for the veteran feedback role has been set to ${newRequirement} points.`);
+        }
+        else {
+            messageEmbed.setDescription(`The requirement for the regular feedback role has been set to ${newRequirement} points.`);
+        }
+        
+        messageEmbed.setColor(Colors.Green);
+        return true;
+    },
+    
+    // Handles the '/admin setrole' command.
+    // interaction: the interaction that used this command
+    // messageEmbed: the embed to modify and reply with
+    // returns false if the action failed.
+    [SET_ROLE_COMMAND_NAME]: function handleSetRole(interaction, messageEmbed) {
+        const settingVeteranReq = interaction.options.getBoolean(SET_VETERAN_ROLE_OPTION_NAME);
+        const newRole = interaction.options.getRole(ROLE_OPTION_NAME);
+        
+        if (settingVeteranReq) {
+            messageEmbed.setDescription(`The veteran feedbacker role has been set to ${newRole}.`);
+        }
+        else {
+            messageEmbed.setDescription(`The regular feedbacker role has been set to ${newRole}.`);
+        }
+        
+        messageEmbed.setColor(Colors.Green);
+        return true;
     }
-    else {
-        messageEmbed.setDescription(`The requirement for the regular feedback role has been set to ${newRequirement} points.`);
-    }
     
-    messageEmbed.setColor(Colors.Green);
-    return true;
-}
-
-// Handles the '/admin setrole' command.
-// interaction: the interaction that used this command
-// messageEmbed: the embed to modify and reply with
-// returns false if the action failed.
-async function handleSetRole(interaction, messageEmbed) {
-    const settingVeteranReq = interaction.options.getBoolean(SET_VETERAN_ROLE_OPTION_NAME);
-    const newRole = interaction.options.getRole(ROLE_OPTION_NAME);
-    
-    if (settingVeteranReq) {
-        messageEmbed.setDescription(`The veteran feedbacker role has been set to ${newRole}.`);
-    }
-    else {
-        messageEmbed.setDescription(`The regular feedbacker role has been set to ${newRole}.`);
-    }
-    
-    messageEmbed.setColor(Colors.Green);
-    return true;
-}
+};
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -115,21 +120,13 @@ module.exports = {
 
     async execute(interaction) {
 
+        const subcommandName = interaction.options.getSubcommand();
         let newEmbed = new EmbedBuilder().setTimestamp().setDescription("This command has not been fully implemented.");
         let successful = false;
-
-        // action based on subcommand
-        switch (interaction.options.getSubcommand()) {
-            case (SET_CHANNEL_COMMAND_NAME):
-                successful = handleSetChannel(interaction, newEmbed);
-                break;
-            case (SET_REQUIREMENT_COMMAND_NAME):
-                successful = handleSetRequirement(interaction, newEmbed);
-                break;
-            case (SET_ROLE_COMMAND_NAME):
-                successful = handleSetRole(interaction, newEmbed);
-            default:
-                break;
+        
+        // call the function if the subcommand name is a key in the function hash map
+        if (subcommandName in COMMAND_FUNCTIONS) {
+            successful = COMMAND_FUNCTIONS[subcommandName](interaction, newEmbed);
         }
         
         if (successful) {
