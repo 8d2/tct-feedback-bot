@@ -12,7 +12,7 @@ const BLOCK_COMMAND_NAME = "block";
 const SET_POINTS_COMMAND_NAME = "setpoints";
 const UNBLOCK_COMMAND_NAME = "unblock";
 
-const EPHEMERAL_FLAG = MessageFlags.Ephemeral
+const EPHEMERAL_FLAG = MessageFlags.Ephemeral;
 
 const COMMAND_FUNCTIONS = {
   
