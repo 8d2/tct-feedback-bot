@@ -24,7 +24,7 @@ const STAR_RATING_INFO = {
 
             ${bold(underline("EXAMPLES"))}
             • The user posted a few helpful screenshots showing the first few floors, but stopped sharing feedback in the middle of the tower.
-            • The user provided some basic constructive remarks about the tower, but did not share any examples.
+            • The user provided some helpful, constructive remarks about the tower, but did not share any examples.
             • The user attempted to provide full feedback on the tower, but because it was far outside their difficulty range, they could not provide much help.
             • ${bold("DO NOT")} assign this rating if you simply disagree with the feedback.`,
         point_value: 1,
