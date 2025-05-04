@@ -143,7 +143,7 @@ function createContractMessage(interaction) {
 
     // Yes, we have to make a new one.
     // If only I could just directly edit the button's disabled property...
-    const newStarSelect = createStarSelectDropdown();
+    const newStarSelect = createStarSelectDropdown(selectedStarRating);
     // Enables the button if a star rating is selected
     const newConfirmButton = createConfirmButton(selectedStarRating === null);
 
@@ -156,17 +156,18 @@ function createContractMessage(interaction) {
     return {
         embeds: [newContractEmbed],
         components: [row1, row2],
-    }
+    };
 }
 
 /**
  * Creates a new feedback contract star select dropdown menu.
+ * @param {string?} selected The currently selected star rating.
  * @returns {StringSelectMenuBuilder} The created star select dropdown menu.
  */
-function createStarSelectDropdown() {
+function createStarSelectDropdown(selected) {
     return new StringSelectMenuBuilder()
         .setCustomId('feedback-contract-star-select')
-        .setPlaceholder("Select one")
+        .setPlaceholder(STAR_RATING_INFO[selected] ? STAR_RATING_INFO[selected].menu_label : "Select one...")
         .addOptions(
             // Create a menu option for each star rating
             Object.values(STAR_RATING_INFO).map(rating => 
