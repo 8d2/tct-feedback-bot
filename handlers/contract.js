@@ -109,7 +109,7 @@ function createContractEmbed(interaction, star_rating) {
         // Extract the contract sender's user ID from the description in the embed (THIS IS SO BAD)
         const embed_description = embed_data.description;
         // ^^^^^^ Example of the string we're dissecting: 
-        // '<@699>811922283629313> has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.'
+        // '<@699811922283629313> has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.'
         const idx_a = embed_description.indexOf('@');
         const idx_b = embed_description.indexOf('>');
         contract_sender_userid = embed_description.slice(idx_a + 1, idx_b);
