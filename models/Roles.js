@@ -19,6 +19,6 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
     }, {
-        tamps: false,
+        timestamps: false,
     });
 };
