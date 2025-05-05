@@ -16,10 +16,12 @@ const EPHEMERAL_FLAG = MessageFlags.Ephemeral;
 
 const COMMAND_FUNCTIONS = {
   
-    // Handles the '/mod block' command.
-    // interaction: the interaction that used this command
-    // messageEmbed: the embed to modify and reply with
-    // returns false if the action failed.
+    /**
+     * Handles the '/mod block' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
     [BLOCK_COMMAND_NAME]: async function handleBlock(interaction, messageEmbed) {
         const blockee = interaction.options.getUser(USER_OPTION_NAME);
         const isBlocked = userMethods.getIsBlocked(blockee.id);
@@ -37,10 +39,12 @@ const COMMAND_FUNCTIONS = {
         return !isBlocked;
     },
 
-    // Handles the '/mod unblock' command.
-    // interaction: the interaction that used this command
-    // messageEmbed: the embed to modify and reply with
-    // returns false if the action failed.
+    /**
+     * Handles the '/mod unblock' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
     [UNBLOCK_COMMAND_NAME]: async function handleUnblock(interaction, messageEmbed) {
         const unblockee = interaction.options.getUser(USER_OPTION_NAME);
         const isBlocked = userMethods.getIsBlocked(unblockee.id);
@@ -58,10 +62,12 @@ const COMMAND_FUNCTIONS = {
         return isBlocked;
     },
 
-    // Handles the '/mod setpoints' command.
-    // interaction: the interaction that used this command
-    // messageEmbed: the embed to modify and reply with
-    // returns false if the action failed.
+    /**
+     * Handles the '/mod setpoints' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
     [SET_POINTS_COMMAND_NAME]: async function handleSetPoints(interaction, messageEmbed) {
         const user = interaction.options.getUser(USER_OPTION_NAME);
         const points = interaction.options.getInteger(POINTS_OPTION_NAME);
