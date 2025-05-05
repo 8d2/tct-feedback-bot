@@ -23,11 +23,13 @@ const EPHEMERAL_FLAG = MessageFlags.Ephemeral
 
 const COMMAND_FUNCTIONS = {
     
-    // Handles the '/admin setchannel' command.
-    // interaction: the interaction that used this command
-    // messageEmbed: the embed to modify and reply with
-    // returns false if the action failed.
-    [SET_CHANNEL_COMMAND_NAME]: function handleSetChannel(interaction, messageEmbed) {
+    /**
+     * Handles the '/admin setchannel' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [SET_CHANNEL_COMMAND_NAME]: async function handleSetChannel(interaction, messageEmbed) {
         const feedbackChannel = interaction.options.getChannel(CHANNEL_OPTION_NAME);
         settingsMethods.setFeedbackChannelId(feedbackChannel.id);
         messageEmbed.setDescription(`${feedbackChannel} has been set as the feedback forum channel.`);
@@ -35,11 +37,13 @@ const COMMAND_FUNCTIONS = {
         return true;
     },
     
-    // Handles the '/admin setrequirement' command.
-    // interaction: the interaction that used this command
-    // messageEmbed: the embed to modify and reply with
-    // returns false if the action failed.
-    [SET_REQUIREMENT_COMMAND_NAME]: function handleSetRequirement(interaction, messageEmbed) {
+    /**
+     * Handles the '/admin setrequirement' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [SET_REQUIREMENT_COMMAND_NAME]: async function handleSetRequirement(interaction, messageEmbed) {
         const roleType = interaction.options.getString(ROLE_TYPE_OPTION_NAME);
         const newRequirement = interaction.options.getInteger(REQUIREMENT_OPTION_NAME);
         settingsMethods.setRoleRequirement(roleType, newRequirement);
@@ -50,11 +54,13 @@ const COMMAND_FUNCTIONS = {
         return true;
     },
     
-    // Handles the '/admin setrole' command.
-    // interaction: the interaction that used this command
-    // messageEmbed: the embed to modify and reply with
-    // returns false if the action failed.
-    [SET_ROLE_COMMAND_NAME]: function handleSetRole(interaction, messageEmbed) {
+    /**
+     * Handles the '/admin setrole' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [SET_ROLE_COMMAND_NAME]: async function handleSetRole(interaction, messageEmbed) {
         const roleType = interaction.options.getString(ROLE_TYPE_OPTION_NAME);
         const newRole = interaction.options.getRole(ROLE_OPTION_NAME);
         settingsMethods.setRoleId(roleType, newRole.id)
@@ -124,7 +130,7 @@ module.exports = {
         
         // call the function if the subcommand name is a key in the function hash map
         if (subcommandName in COMMAND_FUNCTIONS) {
-            successful = COMMAND_FUNCTIONS[subcommandName](interaction, newEmbed);
+            successful = await COMMAND_FUNCTIONS[subcommandName](interaction, newEmbed);
         }
         
         if (successful) {
