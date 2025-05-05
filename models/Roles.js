@@ -2,7 +2,7 @@
 // Stores individual data about a role requirement
 
 module.exports = (sequelize, DataTypes) => {
-	return sequelize.define('roles', {
+    return sequelize.define('roles', {
         role_type: {
             // Type of role to set (regular feedback, veteran feedback, etc.)
             type: DataTypes.STRING,
@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: 5,
             allowNull: false
         },
-	}, {
-		timestamps: false,
-	});
+    }, {
+        tamps: false,
+    });
 };
