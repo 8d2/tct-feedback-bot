@@ -1,13 +1,19 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, 
-    SlashCommandBooleanOption, SlashCommandRoleOption, PermissionFlagsBits, EmbedBuilder, Colors, MessageFlags, ChannelType }
-    = require("discord.js");
+    SlashCommandBooleanOption, SlashCommandStringOption, SlashCommandRoleOption, PermissionFlagsBits, EmbedBuilder,
+    Colors, MessageFlags, ChannelType } = require("discord.js");
+
+const settingsMethods = require("../../helpers/settingsMethods.js")
 
 // Constants
 const CHANNEL_OPTION_NAME = "feedbackchannel";
 const REQUIREMENT_OPTION_NAME = "requirement";
 const ROLE_OPTION_NAME = "role";
-const SET_VETERAN_OPTION_NAME = "setveteranrequirement";
-const SET_VETERAN_ROLE_OPTION_NAME = "setveteranrole";
+const ROLE_TYPE_OPTION_NAME = "roletype";
+
+const ROLE_TYPES = [
+    {name: "regular", value: "regular"},
+    {name: "veteran", value: "veteran"}
+];
 
 const SET_CHANNEL_COMMAND_NAME = "setchannel";
 const SET_REQUIREMENT_COMMAND_NAME = "setrequirement";
@@ -23,7 +29,7 @@ const COMMAND_FUNCTIONS = {
     // returns false if the action failed.
     [SET_CHANNEL_COMMAND_NAME]: function handleSetChannel(interaction, messageEmbed) {
         const feedbackChannel = interaction.options.getChannel(CHANNEL_OPTION_NAME);
-        
+        settingsMethods.setFeedbackChannelId(feedbackChannel.id);
         messageEmbed.setDescription(`${feedbackChannel} has been set as the feedback forum channel.`);
         messageEmbed.setColor(Colors.Green);
         return true;
@@ -34,17 +40,12 @@ const COMMAND_FUNCTIONS = {
     // messageEmbed: the embed to modify and reply with
     // returns false if the action failed.
     [SET_REQUIREMENT_COMMAND_NAME]: function handleSetRequirement(interaction, messageEmbed) {
-        const settingVeteranReq = interaction.options.getBoolean(SET_VETERAN_OPTION_NAME);
+        const roleType = interaction.options.getString(ROLE_TYPE_OPTION_NAME);
         const newRequirement = interaction.options.getInteger(REQUIREMENT_OPTION_NAME);
+        settingsMethods.setRoleRequirement(roleType, newRequirement);
         
-        if (settingVeteranReq) {
-            // points doesn't singularize with the argument as 1, but this is such a small and unlikely scenario so i won't fix
-            messageEmbed.setDescription(`The requirement for the veteran feedback role has been set to ${newRequirement} points.`);
-        }
-        else {
-            messageEmbed.setDescription(`The requirement for the regular feedback role has been set to ${newRequirement} points.`);
-        }
-        
+        // points doesn't singularize with the argument as 1, but this is such a small and unlikely scenario so i won't fix
+        messageEmbed.setDescription(`The requirement for the ${roleType} feedbacker role has been set to ${newRequirement} points.`);
         messageEmbed.setColor(Colors.Green);
         return true;
     },
@@ -54,16 +55,11 @@ const COMMAND_FUNCTIONS = {
     // messageEmbed: the embed to modify and reply with
     // returns false if the action failed.
     [SET_ROLE_COMMAND_NAME]: function handleSetRole(interaction, messageEmbed) {
-        const settingVeteranReq = interaction.options.getBoolean(SET_VETERAN_ROLE_OPTION_NAME);
+        const roleType = interaction.options.getString(ROLE_TYPE_OPTION_NAME);
         const newRole = interaction.options.getRole(ROLE_OPTION_NAME);
-        
-        if (settingVeteranReq) {
-            messageEmbed.setDescription(`The veteran feedbacker role has been set to ${newRole}.`);
-        }
-        else {
-            messageEmbed.setDescription(`The regular feedbacker role has been set to ${newRole}.`);
-        }
-        
+        settingsMethods.setRoleId(roleType, newRole.id)
+
+        messageEmbed.setDescription(`The ${roleType} feedbacker role has been set to ${newRole}.`);
         messageEmbed.setColor(Colors.Green);
         return true;
     }
@@ -74,7 +70,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("admin")
         .setDescription("administrator commands")
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+        // .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(SET_CHANNEL_COMMAND_NAME)
@@ -90,10 +86,11 @@ module.exports = {
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(SET_REQUIREMENT_COMMAND_NAME)
             .setDescription("Sets the feedback point requirement to obtain a specific role.")
-            .addBooleanOption(new SlashCommandBooleanOption()
-                .setName(SET_VETERAN_OPTION_NAME)
-                .setDescription("If true, the veteran requirement will be set. Sets the regular requirement otherwise.") // constrained to 100 chars, can't have proper wording
+            .addStringOption(new SlashCommandStringOption()
+                .setName(ROLE_TYPE_OPTION_NAME)
+                .setDescription("The role type to set requirement of")
                 .setRequired(true)
+                .setChoices(...ROLE_TYPES)
             )
             .addIntegerOption(new SlashCommandIntegerOption()
                 .setName(REQUIREMENT_OPTION_NAME)
@@ -106,10 +103,11 @@ module.exports = {
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(SET_ROLE_COMMAND_NAME)
             .setDescription("Sets the role that is obtained for reaching specific feedback point requirements.")
-            .addBooleanOption(new SlashCommandBooleanOption()
-                .setName(SET_VETERAN_ROLE_OPTION_NAME)
-                .setDescription("If true, the veteran role will be set. Sets the regular role otherwise.")
+            .addStringOption(new SlashCommandStringOption()
+                .setName(ROLE_TYPE_OPTION_NAME)
+                .setDescription("The role type to set")
                 .setRequired(true)
+                .setChoices(...ROLE_TYPES)
             )
             .addRoleOption(new SlashCommandRoleOption()
                 .setName(ROLE_OPTION_NAME)

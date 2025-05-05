@@ -25,14 +25,7 @@ if (sync) {
 	sequelize.sync({ force }).then(async () => {
 		// Make sure the main settings database item is there.
 		await Promise.all([
-			Settings.upsert({identifier: SETTINGS_MAIN_IDENTIFIER}),
-
-			// Temporary for testing, would be set in settingsMethods
-			Roles.upsert({
-				role_type: "Regular",
-				role_id: 999999999,
-				role_requirement: 5
-			})
+			Settings.upsert({identifier: SETTINGS_MAIN_IDENTIFIER})
 		]);
 
 
