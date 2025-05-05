@@ -1,8 +1,9 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, 
     SlashCommandBooleanOption, SlashCommandStringOption, SlashCommandRoleOption, PermissionFlagsBits, EmbedBuilder,
-    Colors, MessageFlags, ChannelType } = require("discord.js");
+    Colors, ChannelType } = require("discord.js");
 
-const settingsMethods = require("../../helpers/settingsMethods.js")
+const { subcommandExecute } = require("../handlers/commands.js")
+const settingsMethods = require("../helpers/settingsMethods.js")
 
 // Constants
 const CHANNEL_OPTION_NAME = "feedbackchannel";
@@ -18,8 +19,6 @@ const ROLE_TYPES = [
 const SET_CHANNEL_COMMAND_NAME = "setchannel";
 const SET_REQUIREMENT_COMMAND_NAME = "setrequirement";
 const SET_ROLE_COMMAND_NAME = "setrole";
-
-const EPHEMERAL_FLAG = MessageFlags.Ephemeral
 
 const COMMAND_FUNCTIONS = {
     
@@ -76,7 +75,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("admin")
         .setDescription("administrator commands")
-        // .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(SET_CHANNEL_COMMAND_NAME)
@@ -123,21 +122,6 @@ module.exports = {
         ),
 
     async execute(interaction) {
-
-        const subcommandName = interaction.options.getSubcommand();
-        let newEmbed = new EmbedBuilder().setTimestamp().setDescription("This command has not been fully implemented.");
-        let successful = false;
-        
-        // call the function if the subcommand name is a key in the function hash map
-        if (subcommandName in COMMAND_FUNCTIONS) {
-            successful = await COMMAND_FUNCTIONS[subcommandName](interaction, newEmbed);
-        }
-        
-        if (successful) {
-            await interaction.reply({embeds: [newEmbed]});
-        }
-        else {
-            await interaction.reply({embeds: [newEmbed], flags: EPHEMERAL_FLAG});
-        }
+        subcommandExecute(interaction, COMMAND_FUNCTIONS);
     },
 };

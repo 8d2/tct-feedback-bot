@@ -20,6 +20,7 @@ function getFeedbackChannelId() {
 function setFeedbackChannelId(id) {
     if (settings) {
         settings.feedback_channel_id = id;
+        settings.save();
     }
 }
 
