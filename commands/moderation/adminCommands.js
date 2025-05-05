@@ -126,7 +126,7 @@ module.exports = {
         
         // call the function if the subcommand name is a key in the function hash map
         if (subcommandName in COMMAND_FUNCTIONS) {
-            successful = COMMAND_FUNCTIONS[subcommandName](interaction, newEmbed);
+            successful = await COMMAND_FUNCTIONS[subcommandName](interaction, newEmbed);
         }
         
         if (successful) {
