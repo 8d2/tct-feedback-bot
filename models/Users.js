@@ -1,4 +1,4 @@
-// Database definition for a User
+// Database definition for Users
 // Each user is stored by user id in userMethods
 
 module.exports = (sequelize, DataTypes) => {

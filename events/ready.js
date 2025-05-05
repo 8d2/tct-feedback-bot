@@ -4,13 +4,15 @@
 const { Events } = require('discord.js');
 
 const userMethods = require("../helpers/userMethods.js")
+const settingsMethods = require("../helpers/settingsMethods.js")
 
 module.exports = {
     name: Events.ClientReady,
     once: true,
     execute(client) {
         // Will run once when the client is loaded
-        userMethods.update();
+        userMethods.init();
+        settingsMethods.init();
         console.log(`${client.user.tag} ready.`);
         console.log(client.application.id);
     },

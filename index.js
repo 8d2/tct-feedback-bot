@@ -35,6 +35,8 @@ for (const folder of commandFolders) {
     }
 }
 
+const settingsMethods = require("./helpers/settingsMethods.js")
+
 // I also stole this from the docs lol
 // Retrieves all event files and loads them individually
 const eventsPath = path.join(__dirname, 'events');
