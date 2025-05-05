@@ -16,39 +16,59 @@ const EPHEMERAL_FLAG = MessageFlags.Ephemeral;
 
 const COMMAND_FUNCTIONS = {
   
-    // Handles the '/mod block' command.
-    // interaction: the interaction that used this command
-    // messageEmbed: the embed to modify and reply with
-    // returns false if the action failed.
-    [BLOCK_COMMAND_NAME]: function handleBlock(interaction, messageEmbed) {
+    /**
+     * Handles the '/mod block' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [BLOCK_COMMAND_NAME]: async function handleBlock(interaction, messageEmbed) {
         const blockee = interaction.options.getUser(USER_OPTION_NAME);
+        const isBlocked = userMethods.getIsBlocked(blockee.id);
         
-        // TODO: check if the blockee is already blocked, if so then notify the command user.
+         if (isBlocked) {
+            messageEmbed.setDescription(`${blockee} is already blocked.`);
+            messageEmbed.setColor(Colors.Yellow);
+        }
+        else {
+            userMethods.setIsBlocked(blockee.id, true);
+            messageEmbed.setDescription(`${blockee} has been blocked from creating feedback contracts.`);
+            messageEmbed.setColor(Colors.Red);
+        }
         
-        messageEmbed.setDescription(`${blockee} has been blocked from creating feedback contracts.`);
-        messageEmbed.setColor(Colors.Red);
-        return true;
+        return !isBlocked;
     },
 
-    // Handles the '/mod unblock' command.
-    // interaction: the interaction that used this command
-    // messageEmbed: the embed to modify and reply with
-    // returns false if the action failed.
-    [UNBLOCK_COMMAND_NAME]: function handleUnblock(interaction, messageEmbed) {
+    /**
+     * Handles the '/mod unblock' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [UNBLOCK_COMMAND_NAME]: async function handleUnblock(interaction, messageEmbed) {
         const unblockee = interaction.options.getUser(USER_OPTION_NAME);
+        const isBlocked = userMethods.getIsBlocked(unblockee.id);
         
-        // TODO: check if the unblockee is not blocked, if so then notify the command user.
+        if (isBlocked) {
+            userMethods.setIsBlocked(unblockee.id, false);
+            messageEmbed.setDescription(`${unblockee} has been unblocked and can now create feedback contracts.`);
+            messageEmbed.setColor(Colors.Green);
+        }
+        else {
+            messageEmbed.setDescription(`${unblockee} isn't blocked.`);
+            messageEmbed.setColor(Colors.Yellow);
+        }
         
-        messageEmbed.setDescription(`${unblockee} has been unblocked and can now create feedback contracts.`);
-        messageEmbed.setColor(Colors.Green);
-        return true;
+        return isBlocked;
     },
 
-    // Handles the '/mod setpoints' command.
-    // interaction: the interaction that used this command
-    // messageEmbed: the embed to modify and reply with
-    // returns false if the action failed.
-    [SET_POINTS_COMMAND_NAME]: function handleSetPoints(interaction, messageEmbed) {
+    /**
+     * Handles the '/mod setpoints' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [SET_POINTS_COMMAND_NAME]: async function handleSetPoints(interaction, messageEmbed) {
         const user = interaction.options.getUser(USER_OPTION_NAME);
         const points = interaction.options.getInteger(POINTS_OPTION_NAME);
         userMethods.setPoints(user.id, points);
@@ -109,7 +129,7 @@ module.exports = {
 
         // call the function if the subcommand name is a key in the function hash map
         if (subcommandName in COMMAND_FUNCTIONS) {
-            successful = COMMAND_FUNCTIONS[subcommandName](interaction, newEmbed);
+            successful = await COMMAND_FUNCTIONS[subcommandName](interaction, newEmbed);
         }
         
         if (successful) {
