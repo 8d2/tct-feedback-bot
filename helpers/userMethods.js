@@ -40,6 +40,16 @@ function getPoints(id) {
 }
 
 /**
+ * Get whether the user ID is blocked from creating contracts.
+ * @param {string} the user id to get the block status of
+ * @return {boolean} whether the user is blocked
+ */
+function getIsBlocked(id) {
+    const user = getUserInfo(id);
+    return user ? user.is_blocked : false;
+}
+
+/**
  * Set how many feedback points a user has.
  * @param {Users} user User to set points of.
  * @param {int} points Points to set.
@@ -47,6 +57,17 @@ function getPoints(id) {
  */
 async function setPointsFromUser(user, points) {
     user.feedback_points = points;
+    return user.save();
+}
+
+/**
+ * Sets a user's blocked state for creating contracts.
+ * @param {Users} user User to set the blocked state of.
+ * @param {boolean} the new blocked state to set.
+ * @returns {Users} the user.
+ */
+async function setIsBlockedFromUser(user, isBlocked) {
+    user.is_blocked = isBlocked;
     return user.save();
 }
 
@@ -72,10 +93,23 @@ async function addPoints(id, amount) {
     return setPointsFromUser(user, user.feedback_points + amount);
 }
 
+/**
+ * Sets a user's blocked state for creating contracts, based on their user ID.
+ * @param {string} the user ID to set the blocked state of
+ * @param {boolean} the new blocked state (true -> blocked, false -> unblocked)
+ * @returns {Users} the user
+ */
+async function setIsBlocked(id, isBlocked) {
+    const user = await getOrCreateUserInfo(id);
+    return setIsBlockedFromUser(user, isBlocked);
+}
+
 module.exports = {
     getUserInfo,
     getPoints,
+    getIsBlocked,
     setPoints,
+    setIsBlocked,
 
     /**
      * Initialize users collection from database.
