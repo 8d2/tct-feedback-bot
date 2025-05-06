@@ -15,7 +15,7 @@ async function getFeedbackThreadFromInteraction(interaction) {
 }
 
 /**
- * Gets the owner ID of a feedback threadm or `null` if not a feedback thread.
+ * Gets the owner ID of a feedback thread or `null` if not a feedback thread.
  * @param {ThreadChannel} thread The thread.
  * @returns {string?} 
  */
