@@ -17,7 +17,7 @@ async function getFeedbackThreadFromInteraction(interaction) {
 /**
  * Gets the owner ID of a feedback thread or `null` if not a feedback thread.
  * @param {ThreadChannel} thread The thread.
- * @returns {string?} 
+ * @returns {string?} The user ID of the thread owner.
  */
 async function getFeedbackThreadOwnerId(thread) {
     const feedback_channel_id = await getFeedbackChannelId();
