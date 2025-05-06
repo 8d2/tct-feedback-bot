@@ -19,7 +19,7 @@ const COMMAND_FUNCTIONS = {
      * @return {boolean} true if the command succeeded, false if it failed.
      */
     [CREATE_COMMAND_NAME]: async function handleContractCreate(interaction) {
-        const ping_thread_owner = interaction.options.getBoolean(PING_OPTION_NAME);
+        const pingThreadOwner = interaction.options.getBoolean(PING_OPTION_NAME);
 
         // Check if the interaction occurred within a feedback thread
         const feedbackThread = await contractMethods.getFeedbackThreadFromInteraction(interaction);
@@ -48,8 +48,8 @@ const COMMAND_FUNCTIONS = {
         else {
             // Component creation has been outsourced to handlers </3
             // Pings the thread owner if that option is set to true
-            const ping_id = ping_thread_owner ? await contractMethods.getFeedbackThreadOwnerId(feedbackThread) : null;
-            await interaction.reply(createContractMessage(interaction, ping_id));
+            const pingId = pingThreadOwner ? await contractMethods.getFeedbackThreadOwnerId(feedbackThread) : null;
+            await interaction.reply(createContractMessage(interaction, pingId));
             return true;
         }
     },
@@ -65,7 +65,7 @@ const COMMAND_FUNCTIONS = {
         if (!feedbackThread) {
             // Get the actual feedback thread ID to include in the error message
             const realFeedbackThread = await getFeedbackChannelId();
-            
+
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Red)
@@ -75,12 +75,12 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         else {
-            const feedback_thread_owner_id = await contractMethods.getFeedbackThreadOwnerId(feedbackThread);
+            const feedbackThreadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread);
 
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Blue)
-                .setDescription(`Builder: <@${feedback_thread_owner_id}>`);
+                .setDescription(`Builder: <@${feedbackThreadOwnerId}>`);
 
             await interaction.reply({embeds: [responseEmbed]});
             return true;
