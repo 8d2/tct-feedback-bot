@@ -1,4 +1,4 @@
-const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, Colors, bold, CommandInteractionOptionResolver, strikethrough, blockQuote, underline, subtext } = require("discord.js");
+const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, Colors, bold, strikethrough, blockQuote, underline, subtext } = require("discord.js");
 
 const HORIZONTAL_RULE = `\n${subtext(strikethrough("-------------------------------"))}\n`;
 const STAR_RATING_INFO = {
@@ -133,9 +133,10 @@ function createContractEmbed(interaction, star_rating) {
 /**
  * Constructs a complete contract message, including an embed, rating select, and confirm button.
  * @param {import("discord.js").Interaction} interaction The interaction that created/used the contract.
+ * @param {string?} ping_id ID of the user to ping within the contract message.
  * @returns {import("discord.js").InteractionReplyOptions} The created contract message.
  */
-function createContractMessage(interaction) {
+function createContractMessage(interaction, ping_id) {
 
     // If no star rating is selected, this is just null
     const selectedStarRating = interaction.values ? interaction.values[0] : null;
@@ -152,8 +153,14 @@ function createContractMessage(interaction) {
     
     const row2 = new ActionRowBuilder()
         .addComponents(newConfirmButton);
+    
+    // Adds a thread owner ping to the message
+    const thread_owner_ping = ping_id ? `<@${ping_id}>` : null;
+    // Preserves the thread owner ping between message updates
+    const previous_content = interaction.message ? interaction.message.content : null;
 
     return {
+        content: thread_owner_ping || previous_content,
         embeds: [newContractEmbed],
         components: [row1, row2],
     };
