@@ -1,14 +1,29 @@
-const { Interaction } = require('discord.js');
+const { ThreadChannel } = require('discord.js');
 const { getFeedbackChannelId } = require('./settingsMethods');
 
 /**
  * Gets whether an interaction occurred within a feedback thread. Returns the
- * feedback thread ID, or `null` if the interaction happened outside of a
+ * feedback thread, or `null` if the interaction happened outside of a
  * designated feedback thread.
- * @param {Interaction} interaction 
- * @returns {string?} The feedback thread ID if it exists, or null if invalid.
+ * @param {import('discord.js').Interaction} interaction The interaction.
+ * @returns {ThreadChannel?} The feedback thread if it exists, or null if invalid.
  */
 async function getFeedbackThreadFromInteraction(interaction) {
     if (interaction.channel.parentId != getFeedbackChannelId()) return null;
-    return interaction.channel.id;
+    return interaction.channel;
+}
+
+/**
+ * Gets the owner ID of a feedback threadm or `null` if not a feedback thread.
+ * @param {ThreadChannel} thread The thread.
+ * @returns {string?} 
+ */
+async function getFeedbackThreadOwnerId(thread) {
+    if (thread.parentId != getFeedbackChannelId()) return null;
+    return thread.ownerId;
+}
+
+module.exports = {
+    getFeedbackThreadFromInteraction,
+    getFeedbackThreadOwnerId,
 }
