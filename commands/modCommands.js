@@ -1,8 +1,9 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOption, SlashCommandIntegerOption, 
-    PermissionFlagsBits, EmbedBuilder, Colors, MessageFlags }
+    PermissionFlagsBits, Colors }
     = require("discord.js");
 
-const userMethods = require("../../helpers/userMethods.js")
+const { subcommandExecute } = require("../handlers/commands.js")
+const userMethods = require("../helpers/userMethods.js")
 
 // Constants
 const USER_OPTION_NAME = "user";
@@ -11,8 +12,6 @@ const POINTS_OPTION_NAME = "points";
 const BLOCK_COMMAND_NAME = "block";
 const SET_POINTS_COMMAND_NAME = "setpoints";
 const UNBLOCK_COMMAND_NAME = "unblock";
-
-const EPHEMERAL_FLAG = MessageFlags.Ephemeral;
 
 const COMMAND_FUNCTIONS = {
   
@@ -26,7 +25,7 @@ const COMMAND_FUNCTIONS = {
         const blockee = interaction.options.getUser(USER_OPTION_NAME);
         const isBlocked = userMethods.getIsBlocked(blockee.id);
         
-         if (isBlocked) {
+        if (isBlocked) {
             messageEmbed.setDescription(`${blockee} is already blocked.`);
             messageEmbed.setColor(Colors.Yellow);
         }
@@ -122,21 +121,6 @@ module.exports = {
         ),
 
     async execute(interaction) {
-
-        const subcommandName = interaction.options.getSubcommand();
-        let newEmbed = new EmbedBuilder().setTimestamp().setDescription("This command has not been fully implemented.");
-        let successful = false;
-
-        // call the function if the subcommand name is a key in the function hash map
-        if (subcommandName in COMMAND_FUNCTIONS) {
-            successful = await COMMAND_FUNCTIONS[subcommandName](interaction, newEmbed);
-        }
-        
-        if (successful) {
-            await interaction.reply({embeds: [newEmbed]});
-        }
-        else {
-            await interaction.reply({embeds: [newEmbed], flags: EPHEMERAL_FLAG});
-        }
+        subcommandExecute(interaction, COMMAND_FUNCTIONS);
     },
 };

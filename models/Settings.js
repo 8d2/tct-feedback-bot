@@ -4,7 +4,7 @@
 module.exports = (sequelize, DataTypes) => {
 	return sequelize.define('settings', {
         identifier: {
-            // Identifier for these settings
+            // Identifier for these settings.
             type: DataTypes.STRING,
             primaryKey: true
         },
