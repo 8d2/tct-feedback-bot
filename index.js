@@ -1,7 +1,7 @@
 // Discord.js classes
 const fileSystem = require("node:fs");
 const path = require("node:path");
-const { Client, Collection, Events, GatewayIntentBits } = require("discord.js");
+const { Client, GatewayIntentBits } = require("discord.js");
 
 const { loadCommands } = require('./handlers/commands.js');
 const settingsMethods = require("./helpers/settingsMethods.js");

@@ -29,7 +29,7 @@ function loadCommand(filePath) {
  
 /**
  * Loads commands within folder into the commands list.
- * @returns Commands collection.
+ * @returns {Collection} Commands collection.
  */
 function loadCommands() {
     // Stole from docs... but a bit better!
@@ -58,7 +58,7 @@ function loadCommands() {
  * Execute running a subcommand from the interaction.
  * @param {CommandInteraction} interaction Command interaction.
  * @param {Map} commands Map from subcommand to function.
- * @param {bool?} noEmbed If true, a preset embed will not provided to command functions.
+ * @param {boolean?} noEmbed If true, a preset embed will not provided to command functions.
  */
 async function subcommandExecute(interaction, commands, noEmbed = false) {
     const subcommandName = interaction.options.getSubcommand();

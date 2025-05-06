@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, 
-    SlashCommandBooleanOption, SlashCommandStringOption, SlashCommandRoleOption, PermissionFlagsBits, EmbedBuilder,
-    Colors, ChannelType } = require("discord.js");
+    SlashCommandStringOption, SlashCommandRoleOption, PermissionFlagsBits, Colors, ChannelType } = require("discord.js");
 
 const { subcommandExecute } = require("../handlers/commands.js")
 const settingsMethods = require("../helpers/settingsMethods.js")

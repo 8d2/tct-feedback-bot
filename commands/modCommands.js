@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOption, SlashCommandIntegerOption, 
-    PermissionFlagsBits, EmbedBuilder, Colors }
+    PermissionFlagsBits, Colors }
     = require("discord.js");
 
 const { subcommandExecute } = require("../handlers/commands.js")
