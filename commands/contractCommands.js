@@ -2,6 +2,7 @@ const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors
 
 const { createContractMessage } = require("../handlers/contract");
 const { subcommandExecute } = require("../handlers/commands.js")
+const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
 
 // Constants
@@ -14,8 +15,18 @@ const COMMAND_FUNCTIONS = {
      */
     [CREATE_COMMAND_NAME]: async function handleContractCreate(interaction) {
         
-        // check the user is blocked... this function is empty no longer
-        if (userMethods.getIsBlocked(interaction.user.id)) {
+        // Check if the interaction occurred within a feedback thread
+        const feedbackThread = await contractMethods.getFeedbackThreadFromInteraction(interaction);
+        if (!feedbackThread) {
+            let responseEmbed = new EmbedBuilder()
+                .setTimestamp()
+                .setColor(Colors.Red)
+                .setDescription(`You can only use ${`/contract ${CREATE_COMMAND_NAME}`} within feedback threads.`);
+            
+            await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+        }
+        // Check if the user is blocked
+        else if (userMethods.getIsBlocked(interaction.user.id)) {
             let responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Red)

@@ -9,7 +9,8 @@ const { getFeedbackChannelId } = require('./settingsMethods');
  * @returns {ThreadChannel?} The feedback thread if it exists, or null if invalid.
  */
 async function getFeedbackThreadFromInteraction(interaction) {
-    if (interaction.channel.parentId != getFeedbackChannelId()) return null;
+    const feedback_channel_id = await getFeedbackChannelId();
+    if (interaction.channel.parentId != feedback_channel_id) return null;
     return interaction.channel;
 }
 
@@ -19,7 +20,8 @@ async function getFeedbackThreadFromInteraction(interaction) {
  * @returns {string?} 
  */
 async function getFeedbackThreadOwnerId(thread) {
-    if (thread.parentId != getFeedbackChannelId()) return null;
+    const feedback_channel_id = await getFeedbackChannelId();
+    if (thread.parentId != feedback_channel_id) return null;
     return thread.ownerId;
 }
 
