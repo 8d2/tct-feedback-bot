@@ -4,6 +4,7 @@ const { createContractMessage } = require("../handlers/contract");
 const { subcommandExecute } = require("../handlers/commands.js")
 const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
+const { getFeedbackChannelId } = require("../helpers/settingsMethods.js");
 
 // Constants
 const CREATE_COMMAND_NAME = "create";
@@ -23,10 +24,13 @@ const COMMAND_FUNCTIONS = {
         // Check if the interaction occurred within a feedback thread
         const feedbackThread = await contractMethods.getFeedbackThreadFromInteraction(interaction);
         if (!feedbackThread) {
+            // Get the actual feedback thread ID to include in the error message
+            const realFeedbackThread = await getFeedbackChannelId();
+
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Red)
-                .setDescription(`You can only use ${inlineCode(`/contract ${CREATE_COMMAND_NAME}`)} within feedback threads.`);
+                .setDescription(`You can only use ${inlineCode(`/contract ${CREATE_COMMAND_NAME}`)} within <#${realFeedbackThread}>.`);
             
             await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
             return false;
@@ -59,10 +63,13 @@ const COMMAND_FUNCTIONS = {
         // Check if the interaction occurred within a feedback thread
         const feedbackThread = await contractMethods.getFeedbackThreadFromInteraction(interaction);
         if (!feedbackThread) {
+            // Get the actual feedback thread ID to include in the error message
+            const realFeedbackThread = await getFeedbackChannelId();
+            
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Red)
-                .setDescription(`You can only use ${inlineCode(`/contract ${GET_INFO_COMMAND_NAME}`)} within feedback threads.`);
+                .setDescription(`You can only use ${inlineCode(`/contract ${GET_INFO_COMMAND_NAME}`)} within <#${realFeedbackThread}>.`);
             
             await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
             return false;
