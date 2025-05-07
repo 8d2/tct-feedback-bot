@@ -1,5 +1,5 @@
 const { ThreadChannel, Client } = require('discord.js');
-const { getFeedbackChannelId } = require('./settingsMethods');
+const { getFeedbackChannelId, getFeedbackForumTagId } = require('./settingsMethods');
 
 /**
  * Gets the list of tags that are applicable within the feedback
@@ -8,12 +8,24 @@ const { getFeedbackChannelId } = require('./settingsMethods');
  */
 async function getFeedbackForumTags() {
     const feedbackChannelId = await getFeedbackChannelId();
-    if (!feedbackChannelId) return null;
+    if (!feedbackChannelId) return [];
 
-    // Temporarily create a new client to get the channel by id
+    // Temporarily create a new client to get the channel by id (scuffed workaround)
     const client = new Client();
     const feedbackChannel = client.channels.cache.get(feedbackChannelId);
-    return feedbackChannel.availableTags;
+    return feedbackChannel.availableTags ?? [];
+}
+
+/**
+ * Returns `true` if the thread has the "open for feedback" tag.
+ * @param {ThreadChannel} thread The thread.
+ * @returns {boolean} True if the thread is open for feedback.
+ */
+async function getFeedbackThreadEnabled(thread) {
+    const feedbackForumTags = thread.appliedTags;
+    const feedbackEnabledTag = await getFeedbackForumTagId();
+    if (!feedbackEnabledTag) return false;
+    return feedbackForumTags.includes(feedbackEnabledTag);
 }
 
 /**
@@ -42,6 +54,7 @@ async function getFeedbackThreadOwnerId(thread) {
 
 module.exports = {
     getFeedbackForumTags,
+    getFeedbackThreadEnabled,
     getFeedbackThreadFromInteraction,
     getFeedbackThreadOwnerId,
 }
