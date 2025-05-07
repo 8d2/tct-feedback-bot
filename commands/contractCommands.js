@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags, CommandInteractionOptionResolver, inlineCode, SlashCommandBooleanOption } = require("discord.js");
 
 const { createContractMessage } = require("../handlers/contract");
-const { subcommandExecute } = require("../handlers/commands.js")
+const { handleSubcommandExecute } = require("../handlers/commands.js")
 const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
 const { getFeedbackChannelId } = require("../helpers/settingsMethods.js");
@@ -109,6 +109,6 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        subcommandExecute(interaction, COMMAND_FUNCTIONS, true);
+        handleSubcommandExecute(interaction, COMMAND_FUNCTIONS, true);
     },
 };
