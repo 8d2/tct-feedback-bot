@@ -23,7 +23,6 @@ const COMMAND_FUNCTIONS = {
      * @return {boolean} true if the command succeeded, false if it failed.
      */
     [CREATE_COMMAND_NAME]: async function handleContractCreate(interaction) {
-        const pingThreadOwner = interaction.options.getBoolean(PING_OPTION_NAME);
 
         // Check if the interaction occurred within a feedback thread
         const feedbackThread = await contractMethods.getFeedbackThreadFromInteraction(interaction);
@@ -51,8 +50,10 @@ const COMMAND_FUNCTIONS = {
         }
         else {
             // Component creation has been outsourced to handlers </3
-            // Pings the thread owner if that option is set to true
-            const pingId = pingThreadOwner ? await contractMethods.getFeedbackThreadOwnerId(feedbackThread) : null;
+            // Pings the thread owner if they have allow pings on.
+            const threadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread)
+            const userAllowsPings = userMethods.getAllowPings(threadOwnerId)
+            const pingId = userAllowsPings ? threadOwnerId: null;
             await interaction.reply(createContractMessage(interaction, pingId));
             return true;
         }
@@ -120,11 +121,6 @@ module.exports = {
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(CREATE_COMMAND_NAME)
             .setDescription("Creates a feedback contract")
-            .addBooleanOption(new SlashCommandBooleanOption()
-                .setName(PING_OPTION_NAME)
-                .setDescription("If true, pings the owner of the feedback thread")
-                .setRequired(false)
-            )
         )
 
         .addSubcommand(new SlashCommandSubcommandBuilder()
