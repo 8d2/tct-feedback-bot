@@ -60,7 +60,7 @@ function loadCommands() {
  * @param {Map} commands Map from subcommand to function.
  * @param {boolean?} noEmbed If true, a preset embed will not provided to command functions.
  */
-async function subcommandExecute(interaction, commands, noEmbed = false) {
+async function handleSubcommandExecute(interaction, commands, noEmbed = false) {
     const subcommandName = interaction.options.getSubcommand();
     const command = (subcommandName in commands) ? commands[subcommandName] : null;
 
@@ -91,5 +91,5 @@ async function subcommandExecute(interaction, commands, noEmbed = false) {
 module.exports = {
     loadCommand,
     loadCommands,
-    subcommandExecute
+    handleSubcommandExecute
 }

@@ -54,7 +54,7 @@ async function getRoles() {
 /**
  * Get role from given role type.
  * @param {string} roleType Type of role to get.
- * @returns {Role?} Role. Null if no role found.
+ * @returns {Roles?} Role. Null if no role found.
  */
 async function getRole(roleType) {
     return settings ? settings.getRole(roleType) : null;
@@ -63,7 +63,7 @@ async function getRole(roleType) {
 /**
  * Get role from given role type, or create a new role if not found.
  * @param {string} roleType Type of role to get.
- * @returns {Role} Role.
+ * @returns {Roles} Role.
  */
 async function getOrCreateRole(roleType) {
     const role = await getRole(roleType);
@@ -88,7 +88,7 @@ async function getRoleId(roleType, roleId) {
  * Sets the id of the role.
  * @param {Roles} role Role to set.
  * @param {string} roleId Role ID to set.
- * @returns {Role} Role.
+ * @returns {Roles} Role.
  */
 async function setRoleIdFromRole(role, roleId) {
     role.role_id = roleId;
@@ -99,7 +99,7 @@ async function setRoleIdFromRole(role, roleId) {
  * Sets the id of the role with the role type.
  * @param {string} roleType Type of role to set.
  * @param {string} roleId Role ID to set.
- * @returns {Role} Role.
+ * @returns {Roles} Role.
  */
 async function setRoleId(roleType, roleId) {
     const role = await getOrCreateRole(roleType);
@@ -120,7 +120,7 @@ async function getRoleRequirement(roleType, roleRequirement) {
  * Sets the requirement for the role.
  * @param {Roles} role Role to set.
  * @param {int} roleRequirement Role requirement to set.
- * @returns {Role} Role.
+ * @returns {Roles} Role.
  */
 async function setRoleRequirementFromRole(role, roleRequirement) {
     role.role_requirement = roleRequirement;
@@ -131,7 +131,7 @@ async function setRoleRequirementFromRole(role, roleRequirement) {
  * Sets the requirement of the role type.
  * @param {string} roleType Type of role to set.
  * @param {int} roleRequirement Role requirement to set.
- * @returns {Role} Role.
+ * @returns {Roles} Role.
  */
 async function setRoleRequirement(roleType, roleRequirement) {
     const role = await getOrCreateRole(roleType);
