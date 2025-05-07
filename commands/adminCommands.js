@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, 
     SlashCommandStringOption, SlashCommandRoleOption, PermissionFlagsBits, Colors, ChannelType } = require("discord.js");
 
-const { subcommandExecute } = require("../handlers/commands.js")
+const { handleSubcommandExecute } = require("../handlers/commands.js")
 const settingsMethods = require("../helpers/settingsMethods.js")
 
 // Constants
@@ -121,6 +121,6 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        subcommandExecute(interaction, COMMAND_FUNCTIONS);
+        handleSubcommandExecute(interaction, COMMAND_FUNCTIONS);
     },
 };
