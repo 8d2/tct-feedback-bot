@@ -9,8 +9,12 @@ const { getFeedbackChannelId } = require("../helpers/settingsMethods.js");
 // Constants
 const CREATE_COMMAND_NAME = "create";
 const GET_INFO_COMMAND_NAME = "getinfo";
+const ALLOW_PINGS_COMMAND_NAME = "allowpings";
 
 const PING_OPTION_NAME = "ping";
+
+const ALLOW_PINGS_MESSAGE_TRUE = "You will now recieve pings when a contract is created in your feedback thread.";
+const ALLOW_PINGS_MESSAGE_FALSE = "You will no longer recieve pings when a contract is created in your feedback thread.";
 
 const COMMAND_FUNCTIONS = {
     /**
@@ -86,6 +90,25 @@ const COMMAND_FUNCTIONS = {
             return true;
         }
     },
+
+    /**
+     * Handles the `/contract allowpings` subcommand.
+     * @param {CommandInteractionOptionResolver} interaction The interaction that used this command.
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [ALLOW_PINGS_COMMAND_NAME]: async function handleContractPingSettings(interaction) {
+        const optionValue = interaction.options.getBoolean(PING_OPTION_NAME);
+        const colorToDisplay = optionValue ? Colors.Green: Colors.Red;
+        const messageToDisplay = optionValue ? ALLOW_PINGS_MESSAGE_TRUE: ALLOW_PINGS_MESSAGE_FALSE;
+        
+        const responseEmbed = new EmbedBuilder()
+            .setTimestamp()
+            .setColor(colorToDisplay)
+            .setDescription(messageToDisplay)
+        
+        await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral})
+        return true;
+    },
 };
 
 module.exports = {
@@ -106,6 +129,16 @@ module.exports = {
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(GET_INFO_COMMAND_NAME)
             .setDescription("Displays info about the current feedback thread")
+        )
+
+        .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(ALLOW_PINGS_COMMAND_NAME)
+            .setDescription("Change whether you will receive pings on contract creation")
+            .addBooleanOption(new SlashCommandBooleanOption()
+                .setName(PING_OPTION_NAME)
+                .setDescription("If true, you will be pinged when a contract is created in your thread")
+                .setRequired(true)
+            )
         ),
 
     async execute(interaction) {
