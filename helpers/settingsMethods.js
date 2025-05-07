@@ -28,7 +28,7 @@ function setFeedbackChannelId(id) {
  * Gets the "open for feedback" forum tag id.
  * @returns {string?} Currently set feedback channel ID. Null if not set.
  */
-function getFeedbackTagId() {
+function getFeedbackForumTagId() {
     return settings ? settings.feedback_tag_id : null;
 }
 
@@ -36,7 +36,7 @@ function getFeedbackTagId() {
  * Sets the "open for feedback" tag to the id.
  * @param {string} id Channel ID to set.
  */
-function setFeedbackTagId(id) {
+function setFeedbackForumTagId(id) {
     if (settings) {
         settings.feedback_tag_id = id;
         settings.save();
@@ -141,8 +141,8 @@ async function setRoleRequirement(roleType, roleRequirement) {
 module.exports = {
     getFeedbackChannelId,
     setFeedbackChannelId,
-    getFeedbackTagId,
-    setFeedbackTagId,
+    getFeedbackForumTagId,
+    setFeedbackForumTagId,
     getRoles,
     getRole,
     getOrCreateRole,
