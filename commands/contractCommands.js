@@ -35,6 +35,16 @@ const COMMAND_FUNCTIONS = {
             await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
             return false;
         }
+        // Check if the feedback thread is open for feedback
+        else if (!(await contractMethods.getFeedbackThreadEnabled(feedbackThread))) {
+            const responseEmbed = new EmbedBuilder()
+                .setTimestamp()
+                .setColor(Colors.Red)
+                .setDescription("This feedback thread is not currently open for feedback contracts.");
+            
+            await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+            return false;
+        }
         // Check if the user is blocked
         else if (userMethods.getIsBlocked(interaction.user.id)) {
             const responseEmbed = new EmbedBuilder()
