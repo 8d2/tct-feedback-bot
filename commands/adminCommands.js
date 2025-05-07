@@ -46,7 +46,7 @@ const COMMAND_FUNCTIONS = {
     [SET_FORUM_TAG_COMMAND_NAME]: async function handleSetForumTag(interaction, messageEmbed) {
         const forumTagId = interaction.options.getString(FORUM_TAG_OPTION_NAME);
         settingsMethods.setFeedbackForumTagId(forumTagId.id);
-        messageEmbed.setDescription(`${feedbackChannel} has been set as the feedback forum channel.`);
+        messageEmbed.setDescription(`${forumTagId} has been set as the feedback tag.`);
         messageEmbed.setColor(Colors.Green);
         return true;
     },
