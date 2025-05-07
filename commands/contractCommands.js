@@ -101,6 +101,7 @@ const COMMAND_FUNCTIONS = {
         const colorToDisplay = optionValue ? Colors.Green: Colors.Red;
         const messageToDisplay = optionValue ? ALLOW_PINGS_MESSAGE_TRUE: ALLOW_PINGS_MESSAGE_FALSE;
         
+        userMethods.setAllowPings(interaction.user.id, optionValue)
         const responseEmbed = new EmbedBuilder()
             .setTimestamp()
             .setColor(colorToDisplay)

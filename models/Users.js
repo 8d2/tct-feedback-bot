@@ -14,6 +14,12 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: false,
             allowNull: false,
         },
+        allow_pings: {
+            // If the user will receive a ping on contract creation in their thread.
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+            allowNull: false,
+        },
         feedback_points: {
             // How many feedback points user has.
             type: DataTypes.INTEGER,
