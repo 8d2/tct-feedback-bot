@@ -1,4 +1,4 @@
-const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, Colors, bold, CommandInteractionOptionResolver, strikethrough, blockQuote, underline, subtext } = require("discord.js");
+const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, Colors, bold, strikethrough, blockQuote, underline, subtext } = require("discord.js");
 
 const HORIZONTAL_RULE = `\n${subtext(strikethrough("-------------------------------"))}\n`;
 const STAR_RATING_INFO = {
@@ -74,58 +74,58 @@ function createConfirmButton(disabled = true) {
 
 /**
  * Creates a new embed corresponding to the selected star rating.
- * @param {String?} star_rating The selected star rating as a string.
+ * @param {String?} starRating The selected star rating as a string.
  * @param {import("discord.js").Interaction} interaction The interaction that used this command.
  * @returns {EmbedBuilder} An embed corresponding to the selected star rating.
  */
-function createContractEmbed(interaction, star_rating) {
+function createContractEmbed(interaction, starRating) {
 
     // Get star rating info from star rating
-    const star_data = STAR_RATING_INFO[star_rating];
+    const starData = STAR_RATING_INFO[starRating];
 
     // Assign description and star rating label
-    let full_description = null;
-    let star_rating_label = "";
-    if (star_rating) {
-        full_description = star_data.full_description;
-        point_value = star_data.point_value
-        star_rating_label = `${star_data.menu_label} ${point_value} STAR${point_value === 1 ? '' : 'S'}`;
+    let fullDescription = null;
+    let starRatingLabel = "";
+    if (starRating) {
+        fullDescription = starData.full_description;
+        pointValue = starData.point_value
+        starRatingLabel = `${starData.menu_label} ${pointValue} STAR${pointValue === 1 ? '' : 'S'}`;
     }
 
     // Get the user (as an author) who sent the contract originally
     // This may seem weird, but I swear it's like this for a reason
-    const contract_sender_author = {
+    const contractSenderAuthor = {
         name: interaction.user.username, 
         iconURL: interaction.user.avatarURL(),
     };
-    let contract_sender_userid = interaction.user.id;
+    let contractSenderUserId = interaction.user.id;
     if (interaction.message) {
         // Drill, baby, drill!
-        const embed_data = interaction.message.embeds[0].data;
-        const author_data = embed_data.author;
-        contract_sender_author.name = author_data.name;
-        contract_sender_author.iconURL = author_data.icon_url;
+        const embedData = interaction.message.embeds[0].data;
+        const authorData = embedData.author;
+        contractSenderAuthor.name = authorData.name;
+        contractSenderAuthor.iconURL = authorData.icon_url;
 
         // Extract the contract sender's user ID from the description in the embed (THIS IS SO BAD)
-        const embed_description = embed_data.description;
+        const embedDescription = embedData.description;
         // ^^^^^^ Example of the string we're dissecting: 
         // '<@699811922283629313> has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.'
-        const idx_a = embed_description.indexOf('@');
-        const idx_b = embed_description.indexOf('>');
-        contract_sender_userid = embed_description.slice(idx_a + 1, idx_b);
+        const idxA = embedDescription.indexOf('@');
+        const idxB = embedDescription.indexOf('>');
+        contractSenderUserId = embedDescription.slice(idxA + 1, idxB);
     }
 
     // Build the embed
     const embed = new EmbedBuilder()
         .setColor(Colors.Green)
         .setTitle("Feedback Agreement")
-        .setAuthor(contract_sender_author)
+        .setAuthor(contractSenderAuthor)
         .setDescription(
-            `<@${contract_sender_userid}> has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.
-            ${full_description ? `${HORIZONTAL_RULE}# ` + star_rating_label + "\n" + blockQuote(full_description) : ""}`)
+            `<@${contractSenderUserId}> has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.
+            ${fullDescription ? `${HORIZONTAL_RULE}# ` + starRatingLabel + "\n" + blockQuote(fullDescription) : ""}`)
         .setTimestamp();
     // Save original author to embed's data so it can be reused later
-    embed.original_author = contract_sender_author;
+    embed.original_author = contractSenderAuthor;
     
     return embed;
 }
@@ -133,9 +133,10 @@ function createContractEmbed(interaction, star_rating) {
 /**
  * Constructs a complete contract message, including an embed, rating select, and confirm button.
  * @param {import("discord.js").Interaction} interaction The interaction that created/used the contract.
+ * @param {string?} pingId ID of the user to ping within the contract message.
  * @returns {import("discord.js").InteractionReplyOptions} The created contract message.
  */
-function createContractMessage(interaction) {
+function createContractMessage(interaction, pingId) {
 
     // If no star rating is selected, this is just null
     const selectedStarRating = interaction.values ? interaction.values[0] : null;
@@ -152,8 +153,14 @@ function createContractMessage(interaction) {
     
     const row2 = new ActionRowBuilder()
         .addComponents(newConfirmButton);
+    
+    // Adds a thread owner ping to the message
+    const threadOwnerPing = pingId ? `<@${pingId}>` : null;
+    // Preserves the thread owner ping between message updates
+    const previousContent = interaction.message ? interaction.message.content : null;
 
     return {
+        content: threadOwnerPing || previousContent,
         embeds: [newContractEmbed],
         components: [row1, row2],
     };
