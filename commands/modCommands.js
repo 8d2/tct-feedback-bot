@@ -100,7 +100,10 @@ const COMMAND_FUNCTIONS = {
         const givingFeedbackEmbed = new EmbedBuilder()
             .setDescription(messages[2])
             .setColor(Colors.Aqua);
-        await handleSendMessage(feedbackChannel, {embeds: [titleEmbed, gettingFeedbackEmbed, givingFeedbackEmbed]}, messageEmbed)
+        const rulesEmbed = new EmbedBuilder()
+            .setDescription(messages[3])
+            .setColor(Colors.Orange);
+        await handleSendMessage(feedbackChannel, {embeds: [titleEmbed, gettingFeedbackEmbed, givingFeedbackEmbed, rulesEmbed]}, messageEmbed)
         return false;
     }
 };

@@ -4,6 +4,7 @@ const { createContractMessage } = require("../handlers/contract");
 const { handleSubcommandExecute } = require("../handlers/commands.js")
 const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
+const messageMethods = require("../helpers/messageMethods.js")
 const { getFeedbackChannelId } = require("../helpers/settingsMethods.js");
 const constants = require("../helpers/constants.js")
 
@@ -50,10 +51,10 @@ const COMMAND_FUNCTIONS = {
         }
         // Check if user has read and accepted the rules
         else if (!acceptedRules) {
-            const responseEmbed = new EmbedBuilder()
-                .setTimestamp()
-                .setColor(Colors.Red)
-                .setDescription("dems da rules cuh")
+            const messages = await messageMethods.getPointsInfoDisplayMessages(interaction);
+             const rulesEmbed = new EmbedBuilder()
+                .setDescription(messages[3])
+                .setColor(Colors.Orange);
             const acceptButton = new ButtonBuilder()
                 .setCustomId("accept")
                 .setLabel("Accept")
@@ -61,7 +62,7 @@ const COMMAND_FUNCTIONS = {
             const row = new ActionRowBuilder()
                 .addComponents(acceptButton)
             
-            const response = await interaction.reply({embeds: [responseEmbed], components: [row], flags: MessageFlags.Ephemeral, withResponse: true});
+            const response = await interaction.reply({embeds: [rulesEmbed], components: [row], flags: MessageFlags.Ephemeral, withResponse: true});
             try {
                 // Await for the response with a time limit
                 const confirmation = await response.resource.message.awaitMessageComponent({ time: 600_000 });
@@ -73,7 +74,7 @@ const COMMAND_FUNCTIONS = {
                     const updatedResponseEmbed = new EmbedBuilder()
                         .setTimestamp()
                         .setColor(Colors.Green)
-                        .setDescription("rules accepted, run command again")
+                        .setDescription("## Rules accepted \n Run the `/contract create` command again to get started!")
                     await confirmation.update({embeds: [updatedResponseEmbed], components: [], flags: MessageFlags.Ephemeral})
                 }
             } catch {
@@ -81,7 +82,7 @@ const COMMAND_FUNCTIONS = {
                 const failedResponseEmbed = new EmbedBuilder()
                         .setTimestamp()
                         .setColor(Colors.Red)
-                        .setDescription("cancelled, you probably ran out of time")
+                        .setDescription("## Cancelled \n Rules acknowledgement cancelled, you probably timed out or an unknown error occured. Run `/contract create` again.")
                 await interaction.editReply({embeds: [failedResponseEmbed], components: [], flags: MessageFlags.Ephemeral});
             }
             return false;
