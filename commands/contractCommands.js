@@ -50,8 +50,8 @@ const COMMAND_FUNCTIONS = {
             // Component creation has been outsourced to handlers </3
             // Pings the thread owner if they have allow pings on.
             const threadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread)
-            const userAllowsPings = userMethods.getAllowPings(threadOwnerId)
-            const pingId = userAllowsPings ? threadOwnerId: null;
+            const userAllowsPings = await userMethods.getAllowPings(threadOwnerId)
+            const pingId = userAllowsPings ? threadOwnerId : null;
             await interaction.reply(createContractMessage(interaction, pingId));
             return true;
         }
@@ -97,8 +97,8 @@ const COMMAND_FUNCTIONS = {
      */
     [ALLOW_PINGS_COMMAND_NAME]: async function handleContractPingSettings(interaction) {
         const optionValue = interaction.options.getBoolean(PING_OPTION_NAME);
-        const colorToDisplay = optionValue ? Colors.Green: Colors.Red;
-        const messageToDisplay = optionValue ? constants.ALLOW_PINGS_MESSAGE_TRUE: constants.ALLOW_PINGS_MESSAGE_FALSE;
+        const colorToDisplay = optionValue ? Colors.Green : Colors.Red;
+        const messageToDisplay = optionValue ? constants.ALLOW_PINGS_MESSAGE_TRUE : constants.ALLOW_PINGS_MESSAGE_FALSE;
         
         userMethods.setAllowPings(interaction.user.id, optionValue)
         const responseEmbed = new EmbedBuilder()

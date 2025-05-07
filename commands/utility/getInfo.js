@@ -21,7 +21,7 @@ module.exports = {
                 name: user.username, 
                 iconURL: user.avatarURL(),
             })
-            .setDescription(`Feedback Points: ${userMethods.getPoints(user.id)}\nAllow Pings: ${userMethods.getAllowPings(user.id)}`);
+            .setDescription(`Feedback Points: ${await userMethods.getPoints(user.id)}\nAllow Pings: ${await userMethods.getAllowPings(user.id)}`);
     
         await interaction.reply({
             embeds: [embed],
