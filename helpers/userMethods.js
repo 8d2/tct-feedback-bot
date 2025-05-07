@@ -34,8 +34,8 @@ async function getOrCreateUserInfo(id) {
  * @param {string} id ID to get.
  * @returns {int} User's points.
  */
-function getPoints(id) {
-    const user = getUserInfo(id);
+async function getPoints(id) {
+    const user = await getOrCreateUserInfo(id);
     return user ? user.feedback_points : 0;
 }
 
@@ -44,8 +44,8 @@ function getPoints(id) {
  * @param {string} the user id to get the block status of
  * @return {boolean} whether the user is blocked
  */
-function getIsBlocked(id) {
-    const user = getUserInfo(id);
+async function getIsBlocked(id) {
+    const user = await getOrCreateUserInfo(id);
     return user ? user.is_blocked : false;
 }
 
@@ -54,8 +54,8 @@ function getIsBlocked(id) {
  * @param {string} the user id to get the allowping status of
  * @return {boolean} whether the user allows pings
  */
-function getAllowPings(id) {
-    const user = getUserInfo(id);
+async function getAllowPings(id) {
+    const user = await getOrCreateUserInfo(id);
     return user ? user.allow_pings : false;
 }
 

@@ -37,7 +37,7 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         // Check if the user is blocked
-        else if (userMethods.getIsBlocked(interaction.user.id)) {
+        else if (await userMethods.getIsBlocked(interaction.user.id)) {
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Red)
