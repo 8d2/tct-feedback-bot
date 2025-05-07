@@ -157,10 +157,10 @@ function createContractMessage(interaction, pingId) {
     // Adds a thread owner ping to the message
     const threadOwnerPing = pingId ? `<@${pingId}>` : null;
     // Preserves the thread owner ping between message updates
-    const previous_content = interaction.message ? interaction.message.content : null;
+    const previousContent = interaction.message ? interaction.message.content : null;
 
     return {
-        content: threadOwnerPing || previous_content,
+        content: threadOwnerPing || previousContent,
         embeds: [newContractEmbed],
         components: [row1, row2],
     };
