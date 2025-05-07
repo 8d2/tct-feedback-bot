@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags, CommandInteractionOptionResolver, inlineCode, SlashCommandBooleanOption } = require("discord.js");
+const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags, CommandInteractionOptionResolver, inlineCode, SlashCommandBooleanOption, bold } = require("discord.js");
 
 const { createContractMessage } = require("../handlers/contract");
 const { handleSubcommandExecute } = require("../handlers/commands.js")
@@ -86,11 +86,14 @@ const COMMAND_FUNCTIONS = {
         }
         else {
             const feedbackThreadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread);
+            const feedbackEnabled = await contractMethods.getFeedbackThreadEnabled(feedbackThread);
 
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Blue)
-                .setDescription(`Builder: <@${feedbackThreadOwnerId}>`);
+                .setDescription(
+                    `Builder: <@${feedbackThreadOwnerId}>
+                    Feedback Enabled: ${bold(`${feedbackEnabled}`)}`);
 
             await interaction.reply({embeds: [responseEmbed]});
             return true;
