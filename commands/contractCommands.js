@@ -5,6 +5,7 @@ const { handleSubcommandExecute } = require("../handlers/commands.js")
 const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
 const { getFeedbackChannelId } = require("../helpers/settingsMethods.js");
+const constants = require("../helpers/constants.js")
 
 // Constants
 const CREATE_COMMAND_NAME = "create";
@@ -12,9 +13,6 @@ const GET_INFO_COMMAND_NAME = "getinfo";
 const ALLOW_PINGS_COMMAND_NAME = "allowpings";
 
 const PING_OPTION_NAME = "ping";
-
-const ALLOW_PINGS_MESSAGE_TRUE = "You will now recieve pings when a contract is created in your feedback thread.";
-const ALLOW_PINGS_MESSAGE_FALSE = "You will no longer recieve pings when a contract is created in your feedback thread.";
 
 const COMMAND_FUNCTIONS = {
     /**
@@ -100,7 +98,7 @@ const COMMAND_FUNCTIONS = {
     [ALLOW_PINGS_COMMAND_NAME]: async function handleContractPingSettings(interaction) {
         const optionValue = interaction.options.getBoolean(PING_OPTION_NAME);
         const colorToDisplay = optionValue ? Colors.Green: Colors.Red;
-        const messageToDisplay = optionValue ? ALLOW_PINGS_MESSAGE_TRUE: ALLOW_PINGS_MESSAGE_FALSE;
+        const messageToDisplay = optionValue ? constants.ALLOW_PINGS_MESSAGE_TRUE: constants.ALLOW_PINGS_MESSAGE_FALSE;
         
         userMethods.setAllowPings(interaction.user.id, optionValue)
         const responseEmbed = new EmbedBuilder()
