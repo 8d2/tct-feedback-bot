@@ -9,6 +9,7 @@ const { pluralize } = require('../helpers/util.js');
 
 // Constants
 const CHANNEL_OPTION_NAME = "feedbackchannel";
+const FORUM_TAG_OPTION_NAME = "forumtag";
 const REQUIREMENT_OPTION_NAME = "requirement";
 const ROLE_OPTION_NAME = "role";
 const ROLE_TYPE_OPTION_NAME = "roletype";
@@ -19,6 +20,7 @@ const ROLE_TYPES = [
 ];
 
 const SET_CHANNEL_COMMAND_NAME = "setchannel";
+const SET_FORUM_TAG_COMMAND_NAME = "setforumtag";
 const SET_REQUIREMENT_COMMAND_NAME = "setrequirement";
 const SET_ROLE_COMMAND_NAME = "setrole";
 const GET_SETTINGS_COMMAND_NAME = "settings";
@@ -35,6 +37,20 @@ const COMMAND_FUNCTIONS = {
         const feedbackChannel = interaction.options.getChannel(CHANNEL_OPTION_NAME);
         settingsMethods.setFeedbackChannelId(feedbackChannel.id);
         messageEmbed.setDescription(`${feedbackChannel} has been set as the feedback forum channel.`);
+        messageEmbed.setColor(Colors.Green);
+        return true;
+    },
+
+    /**
+     * Handles the '/admin setforumtag' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [SET_FORUM_TAG_COMMAND_NAME]: async function handleSetForumTag(interaction, messageEmbed) {
+        const forumTagId = interaction.options.getString(FORUM_TAG_OPTION_NAME);
+        settingsMethods.setFeedbackForumTagId(forumTagId);
+        messageEmbed.setDescription(`${forumTagId} has been set as the feedback tag.`);
         messageEmbed.setColor(Colors.Green);
         return true;
     },
@@ -107,6 +123,16 @@ module.exports = {
                 .setDescription("The channel to set as the feedback channel")
                 .setRequired(true)
                 .addChannelTypes(ChannelType.GuildForum)
+            )
+        )
+
+        .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(SET_FORUM_TAG_COMMAND_NAME)
+            .setDescription("Sets a forum tag as the \"open for feedback\" tag, allowing feedback contracts to be posted.")
+            .addStringOption(new SlashCommandStringOption()
+                .setName(FORUM_TAG_OPTION_NAME)
+                .setDescription("The ID of the forum tag to set as the \"open for feedback\" tag.")
+                .setRequired(true)
             )
         )
 
