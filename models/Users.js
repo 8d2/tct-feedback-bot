@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
 		},
         accepted_rules: {
             // If user has read and accepted the rules.
-            type: dataTypes.BOOLEAN,
+            type: DataTypes.BOOLEAN,
             defaultValue: false,
             allowNull: false
         },

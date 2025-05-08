@@ -64,7 +64,7 @@ async function getPointsInfoDisplayMessages(interaction) {
         "## Rules:\n" +
         "This bot is a powerful tool for giving and receiving feedback and as such, we have the power to punish those who misuse it. Along with common sense, here is a list of DONTS:\n" +
         "- DONT submit empty feedback\n" +
-        "- DONT be unfair / biased when feedbacking\n" +
+        "- DONT be unfair/biased when feedbacking\n" +
         "- DONT offer bribes (robux, feedback, etc) in return for positive feedback\n" +
         "**If you are found to be breaking these rules or abusing the bot in any other way, we will block you from using the bot, denying your ability to make feedback contracts and receive feedback points.**\n\n" +
         "*Happy feedbacking!*"
