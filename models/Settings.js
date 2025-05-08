@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
         feedback_channel_id: {
             // The forum channel where feedback contracts can be made.
             type: DataTypes.STRING
+        },
+        feedback_tag_id: {
+            // The forum tag that enables feedback contracts in the thread.
+            type: DataTypes.STRING
         }
 	}, {
 		timestamps: false,
