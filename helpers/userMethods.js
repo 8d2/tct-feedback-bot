@@ -13,6 +13,19 @@ const users = new Collection();
 function getUserInfo(id) {
     return users.get(id);
 }
+/**
+ * Returns a list of ids that have data in the system.
+ * @returns {[string]} Id that has data.
+ */
+async function getIdsWithInfo() {
+    const allUsers = await Users.findAll()
+
+    var listOfIds = []
+    for (let key in allUsers) {
+        listOfIds.push(allUsers[key].user_id)
+    }
+    return listOfIds;
+}
 
 /**
  * Get a User from user id, and if not found, create a new user to store.
@@ -153,6 +166,7 @@ async function getRulesAccepted(id) {
 
 module.exports = {
     getUserInfo,
+    getIdsWithInfo,
     getPoints,
     getIsBlocked,
     getAllowPings,

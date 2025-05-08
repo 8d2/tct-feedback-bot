@@ -1,4 +1,4 @@
-const { Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption } = require("discord.js");
+const { Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption, MessageFlags } = require("discord.js");
 
 const userMethods = require("../../helpers/userMethods.js")
 
@@ -8,6 +8,7 @@ module.exports = {
         .setDescription("View the top 10 feedbackers with the most points"),
 
     async execute(interaction) {
+
         const responseEmbed = new EmbedBuilder()
             .setTimestamp()
             .setColor(Colors.Purple)
