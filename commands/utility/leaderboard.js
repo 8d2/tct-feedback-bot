@@ -1,15 +1,26 @@
-const { Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption, MessageFlags, bold } = require("discord.js");
+const { Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandBooleanOption, MessageFlags, bold } = require("discord.js");
 
 const userMethods = require("../../helpers/userMethods.js")
+
+const HIDDEN_OPTION_NAME = "hidden"
 
 const maxDisplay = 10
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("leaderboard")
-        .setDescription("View the top 10 feedbackers with the most points"),
+        .setDescription("View the top 10 feedbackers with the most points")
+        .addBooleanOption(new SlashCommandBooleanOption()
+                .setName(HIDDEN_OPTION_NAME)
+                .setDescription("If true, the leaderboard will only be visible to you")
+                .setRequired(false)
+        ),
 
     async execute(interaction) {
+        // Logic for hiding the leaderboard if true
+        const hiddenValue = interaction.options.getBoolean(HIDDEN_OPTION_NAME);
+        const flagsToAdd = hiddenValue ? MessageFlags.Ephemeral : [];
+
         // Get a list of user ids which have data
         const listOfUserIds = await userMethods.getIdsWithInfo()
 
@@ -54,6 +65,6 @@ module.exports = {
             .setTimestamp()
             .setColor(Colors.Purple)
             .setDescription("## Leaderboard\n" + appendedLeaderboardMessage)
-        await interaction.reply({embeds: [responseEmbed]});
+        await interaction.reply({embeds: [responseEmbed], flags: flagsToAdd});
     },
 }
