@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags, CommandInteractionOptionResolver, inlineCode, SlashCommandBooleanOption, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require("discord.js");
+const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags, CommandInteractionOptionResolver, inlineCode, SlashCommandBooleanOption, bold, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require("discord.js");
 
 const { createContractMessage } = require("../handlers/contract");
 const { handleSubcommandExecute } = require("../handlers/commands.js")
@@ -35,6 +35,16 @@ const COMMAND_FUNCTIONS = {
                 .setTimestamp()
                 .setColor(Colors.Red)
                 .setDescription(`You can only use ${inlineCode(`/contract ${CREATE_COMMAND_NAME}`)} within <#${realFeedbackThread}>.`);
+            
+            await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+            return false;
+        }
+        // Check if the feedback thread is open for feedback
+        else if (!(await contractMethods.isFeedbackEnabled(feedbackThread))) {
+            const responseEmbed = new EmbedBuilder()
+                .setTimestamp()
+                .setColor(Colors.Red)
+                .setDescription("This feedback thread is not currently open for feedback contracts.");
             
             await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
             return false;
@@ -121,11 +131,14 @@ const COMMAND_FUNCTIONS = {
         }
         else {
             const feedbackThreadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread);
+            const feedbackEnabled = await contractMethods.isFeedbackEnabled(feedbackThread);
 
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Blue)
-                .setDescription(`Builder: <@${feedbackThreadOwnerId}>`);
+                .setDescription(
+                    `Builder: <@${feedbackThreadOwnerId}>
+                    Feedback Enabled: ${bold(`${feedbackEnabled}`)}`);
 
             await interaction.reply({embeds: [responseEmbed]});
             return true;
