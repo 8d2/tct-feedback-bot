@@ -25,6 +25,16 @@ function setFeedbackChannelId(id) {
 }
 
 /**
+ * Gets the feedback channel set in settings from the guild.
+ * @param {Guild} guild The guild to get channel from.
+ * @returns {GuildBaseChannel?} Currently set feedback channel. Null if not set.
+ */
+function getFeedbackChannel(guild) {
+    const feedbackChannelId = getFeedbackChannelId();
+    return feedbackChannelId ? guild.channels.fetch(feedbackChannelId) : null;
+}
+
+/**
  * Get roles for settings.
  * @returns {[Roles]} Roles. Empty if no roles set.
  */

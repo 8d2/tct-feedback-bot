@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         role_requirement: {
             // The requirement for the role.
             type: DataTypes.INTEGER,
-            defaultValue: 5,
+            defaultValue: 0,
             allowNull: false
         },
     }, {
