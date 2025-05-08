@@ -1,4 +1,4 @@
-const { Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption, MessageFlags } = require("discord.js");
+const { Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption, MessageFlags, bold } = require("discord.js");
 
 const userMethods = require("../../helpers/userMethods.js")
 
@@ -31,7 +31,14 @@ module.exports = {
         var cycle = 0
         for (let userId in sortedLeaderboardStats) {
             cycle += 1
-            appendedLeaderboardMessage += `${cycle}. <@${userId}> - ${sortedLeaderboardStats[userId]} points\n`
+            var message = `${cycle}. <@${userId}> - ${sortedLeaderboardStats[userId]} points\n`
+
+            // If the user appears on the leaderboard, make their entry bold
+            if (userId == interaction.user.id) {
+                message = bold(message)
+            }
+
+            appendedLeaderboardMessage += message
         }
 
         const responseEmbed = new EmbedBuilder()
