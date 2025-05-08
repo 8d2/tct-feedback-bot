@@ -22,13 +22,7 @@ module.exports = {
         const flagsToAdd = hiddenValue ? MessageFlags.Ephemeral : [];
 
         // Get a list of users which have data
-        const allUsers = await userMethods.getUsersWithInfo()
-        
-        // Converts users into discord.js users
-        var listOfUsers = []
-        for (let user of allUsers) {
-            listOfUsers.push((await interaction.guild.members.fetch(user.user_id)).user)
-        }
+        const listOfUsers = await userMethods.getUsersWithInfo()
 
         // Loop through all users and get their points
         var rawLeaderboardStats = {}

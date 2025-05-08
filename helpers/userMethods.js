@@ -15,10 +15,18 @@ function getUserInfo(id) {
 }
 /**
  * Returns a list of users that have data in the system.
- * @returns {[Users]} Users that have data.
+ * @returns {[User]} Users that have data.
  */
 async function getUsersWithInfo() {
-    return await Users.findAll()
+    const allUsers = await Users.findAll();
+        
+    // Converts users into discord.js users
+    // I moved this into here for easy use elsewhere if needed
+    var listOfUsers = []
+    for (let user of allUsers) {
+        listOfUsers.push((await interaction.guild.members.fetch(user.user_id)).user)
+    }
+    return listOfUsers;
 }
 
 /**
