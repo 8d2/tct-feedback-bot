@@ -13,6 +13,13 @@ const users = new Collection();
 function getUserInfo(id) {
     return users.get(id);
 }
+/**
+ * Returns a list of users that have data in the system.
+ * @returns {[Users]} Users that have data.
+ */
+async function getUsersWithInfo() {
+    return await Users.findAll()
+}
 
 /**
  * Get a User from user id, and if not found, create a new user to store.
@@ -137,7 +144,8 @@ async function setAllowPings(id, allow) {
 }
 
 /**
- * Handles the user reading and accepting the rules, as well as checks for if they have done so.
+ * Sets a user's accepted_rules to true so they can create contracts.
+ * @param {string} the user ID to accept the rules for
  */
 async function setRulesAccepted(id) {
     // Since this is a 1 use function, there is no need for a fromUser version
@@ -146,6 +154,11 @@ async function setRulesAccepted(id) {
     user.save()
 }
 
+/**
+ * Checks if a user has accepted the rules
+ * @param {string} the user ID to check the rules for
+ * @returns {boolean} Returns true if rules accepted and false if not
+ */
 async function getRulesAccepted(id) {
     const user = await getOrCreateUserInfo(id);
     return user ? user.accepted_rules : false;
@@ -153,6 +166,7 @@ async function getRulesAccepted(id) {
 
 module.exports = {
     getUserInfo,
+    getUsersWithInfo,
     getPoints,
     getIsBlocked,
     getAllowPings,

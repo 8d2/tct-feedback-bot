@@ -62,7 +62,7 @@ const COMMAND_FUNCTIONS = {
         // Check if user has read and accepted the rules
         else if (!acceptedRules) {
             const messages = await messageMethods.getPointsInfoDisplayMessages(interaction);
-             const rulesEmbed = new EmbedBuilder()
+            const rulesEmbed = new EmbedBuilder()
                 .setDescription(messages[3])
                 .setColor(Colors.Orange);
             const acceptButton = new ButtonBuilder()
@@ -85,9 +85,10 @@ const COMMAND_FUNCTIONS = {
                         .setTimestamp()
                         .setColor(Colors.Green)
                         .setDescription("## Rules accepted \n Run the `/contract create` command again to get started!")
-                    await confirmation.update({embeds: [updatedResponseEmbed], components: [], flags: MessageFlags.Ephemeral})
+                    await confirmation.update({embeds: [updatedResponseEmbed], components: [], flags: MessageFlags.Ephemeral});
                 }
-            } catch {
+            }
+            catch {
                 // Embed to use when the interaction failed for whatever reason
                 const failedResponseEmbed = new EmbedBuilder()
                         .setTimestamp()
