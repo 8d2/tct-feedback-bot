@@ -14,17 +14,11 @@ function getUserInfo(id) {
     return users.get(id);
 }
 /**
- * Returns a list of ids that have data in the system.
- * @returns {[string]} Id that has data.
+ * Returns a list of users that have data in the system.
+ * @returns {[Users]} Users that have data.
  */
-async function getIdsWithInfo() {
-    const allUsers = await Users.findAll()
-
-    var listOfIds = []
-    for (let key in allUsers) {
-        listOfIds.push(allUsers[key].user_id)
-    }
-    return listOfIds;
+async function getUsersWithInfo() {
+    return await Users.findAll()
 }
 
 /**
@@ -172,7 +166,7 @@ async function getRulesAccepted(id) {
 
 module.exports = {
     getUserInfo,
-    getIdsWithInfo,
+    getUsersWithInfo,
     getPoints,
     getIsBlocked,
     getAllowPings,

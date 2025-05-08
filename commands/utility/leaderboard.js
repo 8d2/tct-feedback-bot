@@ -4,7 +4,7 @@ const userMethods = require("../../helpers/userMethods.js")
 
 const HIDDEN_OPTION_NAME = "hidden"
 
-const maxDisplay = 10
+const MAX_DISPLAY = 10
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -21,18 +21,24 @@ module.exports = {
         const hiddenValue = interaction.options.getBoolean(HIDDEN_OPTION_NAME);
         const flagsToAdd = hiddenValue ? MessageFlags.Ephemeral : [];
 
-        // Get a list of user ids which have data
-        const listOfUserIds = await userMethods.getIdsWithInfo()
+        // Get a list of users which have data
+        const allUsers = await userMethods.getUsersWithInfo()
+        
+        // Converts users into discord.js users
+        var listOfUsers = []
+        for (let user of allUsers) {
+            listOfUsers.push((await interaction.guild.members.fetch(user.user_id)).user)
+        }
 
-        // Loop through all ids and get their points
+        // Loop through all users and get their points
         var rawLeaderboardStats = {}
-        for (var i = 0; i < listOfUserIds.length; i++) {
-            const id = listOfUserIds[i]
+        for (var i = 0; i < listOfUsers.length; i++) {
+            const user = listOfUsers[i]
 
             // Discard users with 0 points
-            const points = await userMethods.getPoints(id)
+            const points = await userMethods.getPoints(user.id)
             if (points > 0) {
-                rawLeaderboardStats[id] = points
+                rawLeaderboardStats[user] = points
             }
         }
         
@@ -42,21 +48,21 @@ module.exports = {
         // Create the contents of the leaderboard message
         var appendedLeaderboardMessage = ""
         var cycle = 0
-        for (let userId in sortedLeaderboardStats) {
+        for (let user in sortedLeaderboardStats) {
             cycle += 1
-            var message = `${cycle}. <@${userId}> - ${sortedLeaderboardStats[userId]} points\n`
+            var message = `${cycle}. ${user} - ${sortedLeaderboardStats[user]} points\n`
 
             // If the user appears on the leaderboard, make their entry bold
-            if (userId == interaction.user.id) {
+            if (user == interaction.user) {
                 message = bold(message)
             }
 
             // If we havent reached the max amount to display
-            if (cycle <= maxDisplay) {
+            if (cycle <= MAX_DISPLAY) {
                 appendedLeaderboardMessage += message
             }
             // Stop displaying them unless the user appears in the data, append them separately at the bottom
-            else if (userId == interaction.user.id) {
+            else if (user == interaction.user) {
                 appendedLeaderboardMessage += "‧‧‧\n" + message
             }
         }
