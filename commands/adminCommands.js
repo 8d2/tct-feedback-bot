@@ -110,7 +110,6 @@ module.exports = {
                 .setName(FORUM_TAG_OPTION_NAME)
                 .setDescription("The ID of the forum tag to set as the \"open for feedback\" tag.")
                 .setRequired(true)
-                //.addChoices() TODO: Implement this
             )
         )
 

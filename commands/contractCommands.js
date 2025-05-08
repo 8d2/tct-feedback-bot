@@ -36,7 +36,7 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         // Check if the feedback thread is open for feedback
-        else if (!(await contractMethods.getFeedbackThreadEnabled(feedbackThread))) {
+        else if (!(await contractMethods.isFeedbackEnabled(feedbackThread))) {
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Red)
