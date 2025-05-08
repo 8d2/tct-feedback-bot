@@ -130,7 +130,7 @@ const COMMAND_FUNCTIONS = {
         }
         else {
             const feedbackThreadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread);
-            const feedbackEnabled = await contractMethods.getFeedbackThreadEnabled(feedbackThread);
+            const feedbackEnabled = await contractMethods.isFeedbackEnabled(feedbackThread);
 
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
