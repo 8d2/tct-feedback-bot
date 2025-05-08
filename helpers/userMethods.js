@@ -34,8 +34,8 @@ async function getOrCreateUserInfo(id) {
  * @param {string} id ID to get.
  * @returns {int} User's points.
  */
-function getPoints(id) {
-    const user = getUserInfo(id);
+async function getPoints(id) {
+    const user = await getOrCreateUserInfo(id);
     return user ? user.feedback_points : 0;
 }
 
@@ -44,9 +44,19 @@ function getPoints(id) {
  * @param {string} the user id to get the block status of
  * @return {boolean} whether the user is blocked
  */
-function getIsBlocked(id) {
-    const user = getUserInfo(id);
+async function getIsBlocked(id) {
+    const user = await getOrCreateUserInfo(id);
     return user ? user.is_blocked : false;
+}
+
+/**
+ * Get whether the user ID will receive pings on creation of a contract in their thread.
+ * @param {string} the user id to get the allowping status of
+ * @return {boolean} whether the user allows pings
+ */
+async function getAllowPings(id) {
+    const user = await getOrCreateUserInfo(id);
+    return user ? user.allow_pings : false;
 }
 
 /**
@@ -68,6 +78,17 @@ async function setPointsFromUser(user, points) {
  */
 async function setIsBlockedFromUser(user, isBlocked) {
     user.is_blocked = isBlocked;
+    return user.save();
+}
+
+/**
+ * Set value of allowpings setting.
+ * @param {Users} user User to set for.
+ * @param {int} allow Value to set.
+ * @returns {Users} User.
+ */
+async function setAllowPingsFromUser(user, allow) {
+    user.allow_pings = allow;
     return user.save();
 }
 
@@ -104,12 +125,42 @@ async function setIsBlocked(id, isBlocked) {
     return setIsBlockedFromUser(user, isBlocked);
 }
 
+/**
+ * Set value of allowpings setting, based on their user ID.
+ * @param {string} the user ID to set the allowpings setting of
+ * @param {boolean} the new value (true -> allow, false -> unallow)
+ * @returns {Users} the user
+ */
+async function setAllowPings(id, allow) {
+    const user = await getOrCreateUserInfo(id);
+    return setAllowPingsFromUser(user, allow);
+}
+
+/**
+ * Handles the user reading and accepting the rules, as well as checks for if they have done so.
+ */
+async function setRulesAccepted(id) {
+    // Since this is a 1 use function, there is no need for a fromUser version
+    const user = await getOrCreateUserInfo(id);
+    user.accepted_rules = true;
+    user.save()
+}
+
+async function getRulesAccepted(id) {
+    const user = await getOrCreateUserInfo(id);
+    return user ? user.accepted_rules : false;
+}
+
 module.exports = {
     getUserInfo,
     getPoints,
     getIsBlocked,
+    getAllowPings,
+    getRulesAccepted,
     setPoints,
     setIsBlocked,
+    setAllowPings,
+    setRulesAccepted,
 
     /**
      * Initialize users collection from database.

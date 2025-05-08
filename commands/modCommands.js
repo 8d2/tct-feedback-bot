@@ -28,7 +28,7 @@ const COMMAND_FUNCTIONS = {
      */
     [BLOCK_COMMAND_NAME]: async function handleBlock(interaction, messageEmbed) {
         const blockee = interaction.options.getUser(USER_OPTION_NAME);
-        const isBlocked = userMethods.getIsBlocked(blockee.id);
+        const isBlocked = await userMethods.getIsBlocked(blockee.id);
         
         if (isBlocked) {
             messageEmbed.setDescription(`${blockee} is already blocked.`);
@@ -51,7 +51,7 @@ const COMMAND_FUNCTIONS = {
      */
     [UNBLOCK_COMMAND_NAME]: async function handleUnblock(interaction, messageEmbed) {
         const unblockee = interaction.options.getUser(USER_OPTION_NAME);
-        const isBlocked = userMethods.getIsBlocked(unblockee.id);
+        const isBlocked = await userMethods.getIsBlocked(unblockee.id);
         
         if (isBlocked) {
             userMethods.setIsBlocked(unblockee.id, false);
@@ -99,7 +99,10 @@ const COMMAND_FUNCTIONS = {
         const givingFeedbackEmbed = new EmbedBuilder()
             .setDescription(messages[2])
             .setColor(Colors.Aqua);
-        await handleSendMessage(feedbackChannel, {embeds: [titleEmbed, gettingFeedbackEmbed, givingFeedbackEmbed]}, messageEmbed)
+        const rulesEmbed = new EmbedBuilder()
+            .setDescription(messages[3])
+            .setColor(Colors.Orange);
+        await handleSendMessage(feedbackChannel, {embeds: [titleEmbed, gettingFeedbackEmbed, givingFeedbackEmbed, rulesEmbed]}, messageEmbed)
         return false;
     }
 };
