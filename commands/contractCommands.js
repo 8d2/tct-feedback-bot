@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags, CommandInteractionOptionResolver, inlineCode, SlashCommandBooleanOption, bold } = require("discord.js");
-const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags, CommandInteractionOptionResolver, inlineCode, SlashCommandBooleanOption, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require("discord.js");
+const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags, CommandInteractionOptionResolver, inlineCode, SlashCommandBooleanOption, bold, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require("discord.js");
 
 const { createContractMessage } = require("../handlers/contract");
 const { handleSubcommandExecute } = require("../handlers/commands.js")
