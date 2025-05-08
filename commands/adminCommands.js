@@ -95,7 +95,7 @@ const COMMAND_FUNCTIONS = {
      */
     [GET_SETTINGS_COMMAND_NAME]: async function handleGetSettings(interaction, messageEmbed) {
         const channel = await settingsMethods.getFeedbackChannel(interaction.guild);
-        const tag = null; // Needs to be implemented in template's PR.
+        const tag = await settingsMethods.getFeedbackForumTagId();
         const rolesMessage = await messageMethods.getRoleRequirementMessage(interaction, true);
         messageEmbed.setDescription(
             "## Admin Settings\n" +
