@@ -7,7 +7,8 @@ const MESSAGE_SENT_FAILED_MESSAGE = "The message failed to send."
 const MESSAGE_SENT_PERMISSION_FAILED_MESSAGE = "The message failed to send due to lack of permissions."
 const ALLOW_PINGS_MESSAGE_TRUE = "You will now recieve pings when a contract is created in your feedback thread.";
 const ALLOW_PINGS_MESSAGE_FALSE = "You will no longer recieve pings when a contract is created in your feedback thread.";
-const OPTION_NULL = "`N/A`";
+const OPTION_NULL_NO_FORMAT = "N/A";
+const OPTION_NULL = "`" + OPTION_NULL_NO_FORMAT + "`";
 const HORIZONTAL_RULE = `\n${subtext(strikethrough("-------------------------------"))}\n`;
 const STAR_RATING_INFO = {
     ["stars-0"]: {
@@ -74,6 +75,7 @@ module.exports = {
     MESSAGE_SENT_PERMISSION_FAILED_MESSAGE,
     ALLOW_PINGS_MESSAGE_TRUE,
     ALLOW_PINGS_MESSAGE_FALSE,
+    OPTION_NULL_NO_FORMAT,
     OPTION_NULL,
     HORIZONTAL_RULE,
     STAR_RATING_INFO

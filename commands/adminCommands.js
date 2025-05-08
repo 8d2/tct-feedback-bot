@@ -100,10 +100,10 @@ const COMMAND_FUNCTIONS = {
         messageEmbed.setDescription(
             "## Admin Settings\n" +
             `Feedback Channel: ${channel ?? constants.OPTION_NULL}\n` +
-            `Feedback Tag: \`${tag ?? constants.OPTION_NULL}\`\n` +
+            `Feedback Tag: \`${tag ?? constants.OPTION_NULL_NO_FORMAT}\`\n` +
             `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}`
         );
-        messageEmbed.setColor(Colors.Blue);
+        messageEmbed.setColor(Colors.DarkVividPink);
         return true;
     }
     
