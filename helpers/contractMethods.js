@@ -25,7 +25,18 @@ async function getFeedbackThreadOwnerId(thread) {
     return thread.ownerId;
 }
 
+/**
+ * Gets the owner of a feedback thread in the guild or `null` if not a feedback thread.
+ * @param {ThreadChannel} thread The thread.
+ * @returns {User?} The thread owner's user.
+ */
+async function getFeedbackThreadOwner(thread) {
+    const ownerId = await getFeedbackThreadOwnerId(thread);
+    return thread.guild.members.fetch(ownerId);
+}
+
 module.exports = {
     getFeedbackThreadFromInteraction,
     getFeedbackThreadOwnerId,
+    getFeedbackThreadOwner
 }

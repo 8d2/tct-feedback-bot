@@ -138,6 +138,7 @@ async function setAllowPings(id, allow) {
 
 /**
  * Handles the user reading and accepting the rules, as well as checks for if they have done so.
+ * @param {string} id The user id to set.
  */
 async function setRulesAccepted(id) {
     // Since this is a 1 use function, there is no need for a fromUser version
@@ -146,6 +147,10 @@ async function setRulesAccepted(id) {
     user.save()
 }
 
+/**
+ * Get whether a user has accepted contract rules.
+ * @param {string} id The user id to get.
+ */
 async function getRulesAccepted(id) {
     const user = await getOrCreateUserInfo(id);
     return user ? user.accepted_rules : false;

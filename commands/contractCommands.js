@@ -52,7 +52,7 @@ const COMMAND_FUNCTIONS = {
         // Check if user has read and accepted the rules
         else if (!acceptedRules) {
             const messages = await messageMethods.getPointsInfoDisplayMessages(interaction);
-             const rulesEmbed = new EmbedBuilder()
+            const rulesEmbed = new EmbedBuilder()
                 .setDescription(messages[3])
                 .setColor(Colors.Orange);
             const acceptButton = new ButtonBuilder()
@@ -90,10 +90,11 @@ const COMMAND_FUNCTIONS = {
         else {
             // Component creation has been outsourced to handlers </3
             // Pings the thread owner if they have allow pings on.
-            const threadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread)
-            const userAllowsPings = await userMethods.getAllowPings(threadOwnerId)
-            const pingId = userAllowsPings ? threadOwnerId : null;
-            await interaction.reply(createContractMessage(interaction, pingId));
+            const threadOwner = (await contractMethods.getFeedbackThreadOwner(feedbackThread)).user;
+            const userAllowsPings = await userMethods.getAllowPings(threadOwner.id);
+            console.log(threadOwner);
+            const pingUsers = userAllowsPings ? [threadOwner] : null;
+            await interaction.reply(createContractMessage(interaction, pingUsers));
             return true;
         }
     },
@@ -119,12 +120,12 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         else {
-            const feedbackThreadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread);
+            const feedbackThreadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
 
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Blue)
-                .setDescription(`Builder: <@${feedbackThreadOwnerId}>`);
+                .setDescription(`Builder: ${feedbackThreadOwner}`);
 
             await interaction.reply({embeds: [responseEmbed]});
             return true;

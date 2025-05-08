@@ -1,9 +1,11 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, 
     SlashCommandStringOption, SlashCommandRoleOption, PermissionFlagsBits, Colors, ChannelType } = require("discord.js");
 
-const { handleSubcommandExecute } = require("../handlers/commands.js")
-const settingsMethods = require("../helpers/settingsMethods.js")
-const messageMethods = require("../helpers/messageMethods.js")
+const { handleSubcommandExecute } = require("../handlers/commands.js");
+const constants = require("../helpers/constants.js");
+const settingsMethods = require("../helpers/settingsMethods.js");
+const messageMethods = require("../helpers/messageMethods.js");
+const { pluralize } = require('../helpers/util.js');
 
 // Constants
 const CHANNEL_OPTION_NAME = "feedbackchannel";
@@ -76,14 +78,14 @@ const COMMAND_FUNCTIONS = {
      * @return {boolean} true if the command succeeded, false if it failed.
      */
     [GET_SETTINGS_COMMAND_NAME]: async function handleGetSettings(interaction, messageEmbed) {
-        const channel = null;//settingsMethods.getFeedbackChannel();
-        const tag = null;
+        const channel = await settingsMethods.getFeedbackChannel(interaction.guild);
+        const tag = null; // Needs to be implemented in template's PR.
         const rolesMessage = await messageMethods.getRoleRequirementMessage(interaction, true);
         messageEmbed.setDescription(
             "## Admin Settings\n" +
-            `Feedback Channel: ${channel ?? "N/A"}\n` +
-            `Feedback Tag: \`${tag ?? "N/A"}\`\n` +
-            `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : "N/A"}`
+            `Feedback Channel: ${channel ?? constants.OPTION_NULL}\n` +
+            `Feedback Tag: \`${tag ?? constants.OPTION_NULL}\`\n` +
+            `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}`
         );
         messageEmbed.setColor(Colors.Blue);
         return true;

@@ -132,6 +132,7 @@ async function setRoleRequirement(roleType, roleRequirement) {
 module.exports = {
     getFeedbackChannelId,
     setFeedbackChannelId,
+    getFeedbackChannel,
     getRoles,
     getRole,
     getOrCreateRole,

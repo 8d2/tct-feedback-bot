@@ -51,9 +51,9 @@ async function getPointsInfoDisplayMessages(interaction) {
         "`2. Add \"open for feedback\" tag when you're ready for feedback` - This will allow feedbackers to create feedback contracts, where they can claim rewards for giving you feedback.\n" +
         "\`3. Rate contracts appropriately\` - When a feedback contract is made, give it an appropriate score from the dropdown. *Please try to be accurate and as fair as possible!*\n" +
         "### Other Helpful Commands:\n" +
-        "- `/contract addbuilder` + `/contract removebuilder` - Add or remove collaborators to be able to accept contracts for you.\n"+
-        "- `/contract allowpings` - Toggles whether you will be pinged when a contract you need to accept is posted.",
-        "- `/contract getinfo` - Get info about the tower's builders."
+        "- `/contract addbuilder` + `/contract removebuilder` - Add or remove collaborators to be able to accept contracts for you.\n" +
+        "- `/contract allowpings` - Toggles whether you will be pinged when a contract you need to accept is posted." +
+        "- `/contract getinfo` - Get info about the tower's builders.",
 
         "## Giving Feedback:\n" +
         "After giving a tower feedback, run the `/contract create` command in the thread. The builder will then rate your feedback, which will give you *feedback points*:\n" +
@@ -71,8 +71,23 @@ async function getPointsInfoDisplayMessages(interaction) {
     ];
 }
 
+/**
+ * Get the original user who supplied the root of this interaction.
+ * @param {import('discord.js').Interaction} interaction The interaction to analyze.
+ * @returns {User} The original root of this interaction.
+ */
+function getOriginalUser(interaction) {
+    if (interaction.message) {
+        // Previous message exists, get interaction for previous user
+        return interaction.message.interactionMetadata.user;
+    }
+    // No previous message, first time interaction
+    return interaction.user;
+}
+
 module.exports = {
     getRatingPointsMessage,
     getRoleRequirementMessage,
-    getPointsInfoDisplayMessages
+    getPointsInfoDisplayMessages,
+    getOriginalUser
 }
