@@ -29,9 +29,9 @@ function setFeedbackChannelId(id) {
  * @param {Guild} guild The guild to get channel from.
  * @returns {GuildBaseChannel?} Currently set feedback channel. Null if not set.
  */
-function getFeedbackChannel(guild) {
+async function getFeedbackChannel(guild) {
     const feedbackChannelId = getFeedbackChannelId();
-    return feedbackChannelId ? guild.channels.fetch(feedbackChannelId) : null;
+    return feedbackChannelId ? (await guild.channels.fetch(feedbackChannelId)) : null;
 }
 
 /**

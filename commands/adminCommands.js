@@ -95,7 +95,7 @@ const COMMAND_FUNCTIONS = {
      */
     [GET_SETTINGS_COMMAND_NAME]: async function handleGetSettings(interaction, messageEmbed) {
         const channel = await settingsMethods.getFeedbackChannel(interaction.guild);
-        const tag = await settingsMethods.getFeedbackForumTagId();
+        const tag = settingsMethods.getFeedbackForumTagId();
         const rolesMessage = await messageMethods.getRoleRequirementMessage(interaction, true);
         messageEmbed.setDescription(
             "## Admin Settings\n" +
@@ -103,7 +103,7 @@ const COMMAND_FUNCTIONS = {
             `Feedback Tag: \`${tag ?? constants.OPTION_NULL_NO_FORMAT}\`\n` +
             `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}`
         );
-        messageEmbed.setColor(Colors.DarkVividPink);
+        messageEmbed.setColor(Colors.DarkPurple);
         return true;
     }
     
