@@ -75,7 +75,7 @@ const COMMAND_FUNCTIONS = {
                         .setTimestamp()
                         .setColor(Colors.Green)
                         .setDescription("## Rules accepted \n Run the `/contract create` command again to get started!")
-                    await confirmation.update({embeds: [updatedResponseEmbed], components: [], flags: MessageFlags.Ephemeral})
+                    await confirmation.update({embeds: [updatedResponseEmbed], components: [], flags: MessageFlags.Ephemeral});
                 }
             } catch {
                 // Embed to use when the interaction failed for whatever reason
