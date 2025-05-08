@@ -2,6 +2,8 @@ const { Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption, Messa
 
 const userMethods = require("../../helpers/userMethods.js")
 
+const maxDisplay = 10
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("leaderboard")
@@ -38,7 +40,14 @@ module.exports = {
                 message = bold(message)
             }
 
-            appendedLeaderboardMessage += message
+            // If we havent reached the max amount to display
+            if (cycle <= maxDisplay) {
+                appendedLeaderboardMessage += message
+            }
+            // Stop displaying them unless the user appears in the data, append them separately at the bottom
+            else if (userId == interaction.user.id) {
+                appendedLeaderboardMessage += "‧‧‧\n" + message
+            }
         }
 
         const responseEmbed = new EmbedBuilder()
