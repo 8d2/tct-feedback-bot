@@ -136,14 +136,31 @@ async function setAllowPings(id, allow) {
     return setAllowPingsFromUser(user, allow);
 }
 
+/**
+ * Handles the user reading and accepting the rules, as well as checks for if they have done so.
+ */
+async function setRulesAccepted(id) {
+    // Since this is a 1 use function, there is no need for a fromUser version
+    const user = await getOrCreateUserInfo(id);
+    user.accepted_rules = true;
+    user.save()
+}
+
+async function getRulesAccepted(id) {
+    const user = await getOrCreateUserInfo(id);
+    return user ? user.accepted_rules : false;
+}
+
 module.exports = {
     getUserInfo,
     getPoints,
     getIsBlocked,
     getAllowPings,
+    getRulesAccepted,
     setPoints,
     setIsBlocked,
     setAllowPings,
+    setRulesAccepted,
 
     /**
      * Initialize users collection from database.

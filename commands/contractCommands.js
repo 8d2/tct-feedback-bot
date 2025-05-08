@@ -1,9 +1,10 @@
-const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags, CommandInteractionOptionResolver, inlineCode, SlashCommandBooleanOption } = require("discord.js");
+const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags, CommandInteractionOptionResolver, inlineCode, SlashCommandBooleanOption, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require("discord.js");
 
 const { createContractMessage } = require("../handlers/contract");
 const { handleSubcommandExecute } = require("../handlers/commands.js")
 const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
+const messageMethods = require("../helpers/messageMethods.js")
 const { getFeedbackChannelId } = require("../helpers/settingsMethods.js");
 const constants = require("../helpers/constants.js")
 
@@ -24,6 +25,8 @@ const COMMAND_FUNCTIONS = {
 
         // Check if the interaction occurred within a feedback thread
         const feedbackThread = await contractMethods.getFeedbackThreadFromInteraction(interaction);
+        // Check if user has read and accepted the rules
+        const acceptedRules = await userMethods.getRulesAccepted(interaction.user.id)
         if (!feedbackThread) {
             // Get the actual feedback thread ID to include in the error message
             const realFeedbackThread = await getFeedbackChannelId();
@@ -44,6 +47,44 @@ const COMMAND_FUNCTIONS = {
                 .setDescription("You have been blocked from creating feedback contracts for spam or abuse.");
             
             await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+            return false;
+        }
+        // Check if user has read and accepted the rules
+        else if (!acceptedRules) {
+            const messages = await messageMethods.getPointsInfoDisplayMessages(interaction);
+             const rulesEmbed = new EmbedBuilder()
+                .setDescription(messages[3])
+                .setColor(Colors.Orange);
+            const acceptButton = new ButtonBuilder()
+                .setCustomId("accept")
+                .setLabel("Accept")
+                .setStyle(ButtonStyle.Success)
+            const row = new ActionRowBuilder()
+                .addComponents(acceptButton)
+            
+            const response = await interaction.reply({embeds: [rulesEmbed], components: [row], flags: MessageFlags.Ephemeral, withResponse: true});
+            try {
+                // Await for the response with a time limit
+                const confirmation = await response.resource.message.awaitMessageComponent({ time: 600_000 });
+                if (confirmation.customId === "accept") {
+                    // Changes accepted_rules to true to stop this from triggering again
+                    await userMethods.setRulesAccepted(interaction.user.id);
+
+                    // Embed to use when under success
+                    const updatedResponseEmbed = new EmbedBuilder()
+                        .setTimestamp()
+                        .setColor(Colors.Green)
+                        .setDescription("## Rules accepted \n Run the `/contract create` command again to get started!")
+                    await confirmation.update({embeds: [updatedResponseEmbed], components: [], flags: MessageFlags.Ephemeral})
+                }
+            } catch {
+                // Embed to use when the interaction failed for whatever reason
+                const failedResponseEmbed = new EmbedBuilder()
+                        .setTimestamp()
+                        .setColor(Colors.Red)
+                        .setDescription("## Cancelled \n Rules acknowledgement cancelled, you probably timed out or an unknown error occured. Run `/contract create` again.")
+                await interaction.editReply({embeds: [failedResponseEmbed], components: [], flags: MessageFlags.Ephemeral});
+            }
             return false;
         }
         else {
