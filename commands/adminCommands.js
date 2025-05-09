@@ -182,7 +182,7 @@ module.exports = {
         
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(GET_SETTINGS_COMMAND_NAME)
-            .setDescription("Show the current settings.")
+            .setDescription("Show the current feedback bot admin settings.")
         ),
 
     async execute(interaction) {
