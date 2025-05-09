@@ -23,14 +23,13 @@ function getRatingPointsMessage() {
 async function getRoleRequirementMessage(interaction, displayRoleType = false) {
     let message = "";
     const roles = await getRoles();
-    for (let index = 0; index < roles.length; index++) {
-        const role = roles[index];
-        const guildRole = await interaction.guild.roles.fetch(role.role_id);
+    roles.forEach((role, index) => {
+        const guildRole = interaction.guild.roles.cache.get(role.role_id);
         message += `- ${displayRoleType ? `${role.role_type}: ` : ""}${guildRole} - ${pluralize(role.role_requirement, "point")}`;
         if (index != roles.length - 1) {
             message += "\n";
         }
-    }
+    });
     return message;
 }
 

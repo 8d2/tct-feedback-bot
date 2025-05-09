@@ -76,6 +76,7 @@ const COMMAND_FUNCTIONS = {
         const user = interaction.options.getUser(USER_OPTION_NAME);
         const points = interaction.options.getInteger(POINTS_OPTION_NAME);
         userMethods.setPoints(user.id, points);
+        userMethods.updateRoles(interaction, user.id);
         messageEmbed.setDescription(`${user} now has ${points} points.`);
         messageEmbed.setColor(Colors.Green);
         return true;

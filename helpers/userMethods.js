@@ -1,5 +1,6 @@
 // Stores users by user id, including some helpful user data modification methods.
 
+const { getRoles } = require('./settingsMethods.js');
 const { Collection } = require('discord.js');
 const { Users } = require('../dbObjects.js');
 
@@ -24,7 +25,7 @@ async function getUsersWithInfo() {
     // I moved this into here for easy use elsewhere if needed
     var listOfUsers = []
     for (let user of allUsers) {
-        listOfUsers.push((await interaction.guild.members.fetch(user.user_id)).user)
+        listOfUsers.push(interaction.guild.members.cache.get(user.user_id).user)
     }
     return listOfUsers;
 }
@@ -45,13 +46,22 @@ async function getOrCreateUserInfo(id) {
 }
 
 /**
+ * Get how many feedback points a user has.
+ * @param {Users} user User to get.
+ * @returns {int} User's points.
+ */
+async function getPointsFromUser(user) {
+    return user ? user.feedback_points : 0;
+}
+
+/**
  * Get how many feedback points a user has from their user id.
  * @param {string} id ID to get.
  * @returns {int} User's points.
  */
 async function getPoints(id) {
     const user = await getOrCreateUserInfo(id);
-    return user ? user.feedback_points : 0;
+    return getPointsFromUser(user);
 }
 
 /**
@@ -86,28 +96,6 @@ async function setPointsFromUser(user, points) {
 }
 
 /**
- * Sets a user's blocked state for creating contracts.
- * @param {Users} user User to set the blocked state of.
- * @param {boolean} the new blocked state to set.
- * @returns {Users} the user.
- */
-async function setIsBlockedFromUser(user, isBlocked) {
-    user.is_blocked = isBlocked;
-    return user.save();
-}
-
-/**
- * Set value of allowpings setting.
- * @param {Users} user User to set for.
- * @param {int} allow Value to set.
- * @returns {Users} User.
- */
-async function setAllowPingsFromUser(user, allow) {
-    user.allow_pings = allow;
-    return user.save();
-}
-
-/**
  * Set how many feedback points a user has based on their user id.
  * @param {string} id ID to set points of.
  * @param {int} points Points to set.
@@ -130,6 +118,17 @@ async function addPoints(id, amount) {
 }
 
 /**
+ * Sets a user's blocked state for creating contracts.
+ * @param {Users} user User to set the blocked state of.
+ * @param {boolean} the new blocked state to set.
+ * @returns {Users} the user.
+ */
+async function setIsBlockedFromUser(user, isBlocked) {
+    user.is_blocked = isBlocked;
+    return user.save();
+}
+
+/**
  * Sets a user's blocked state for creating contracts, based on their user ID.
  * @param {string} the user ID to set the blocked state of
  * @param {boolean} the new blocked state (true -> blocked, false -> unblocked)
@@ -138,6 +137,17 @@ async function addPoints(id, amount) {
 async function setIsBlocked(id, isBlocked) {
     const user = await getOrCreateUserInfo(id);
     return setIsBlockedFromUser(user, isBlocked);
+}
+
+/**
+ * Set value of allowpings setting.
+ * @param {Users} user User to set for.
+ * @param {int} allow Value to set.
+ * @returns {Users} User.
+ */
+async function setAllowPingsFromUser(user, allow) {
+    user.allow_pings = allow;
+    return user.save();
 }
 
 /**
@@ -172,9 +182,44 @@ async function getRulesAccepted(id) {
     return user ? user.accepted_rules : false;
 }
 
+/**
+ * Updates a user's roles depending on how many feedback points they have, based on their user id.
+ * @param {Guild} guild The guild to update roles in.
+ * @param {Users} user The user to update.
+ */
+async function updateRolesFromUser(guild, user) {
+    const guildMember = guild.members.cache.get(user.user_id);
+    const feedbackPoints = getPointsFromUser(user);
+    const roles = await getRoles();
+    console.log(roles);
+    roles.forEach(role => {
+        const hasRole = feedbackPoints >= role.role_requirement;
+        const guildRole = guild.roles.cache.get(role.role_id);
+        if (hasRole) {
+            // User has enough points for this role
+            guildMember.roles.add(guildRole);
+        }
+        else {
+            // Not enough, remove if they had role before
+            guildMember.roles.remove(guildRole);
+        }
+    });
+}
+
+/**
+ * Updates a user's roles in the guild depending on how many feedback points they have, based on their user id.
+ * @param {Guild} guild The guild to update roles in.
+ * @param {string} id The user id of the user to update.
+ */
+async function updateRoles(guild, id) {
+    const user = await getOrCreateUserInfo(id);
+    await updateRolesFromUser(guild, user);
+}
+
 module.exports = {
     getUserInfo,
     getUsersWithInfo,
+    getPointsFromUser,
     getPoints,
     getIsBlocked,
     getAllowPings,
@@ -183,6 +228,8 @@ module.exports = {
     setIsBlocked,
     setAllowPings,
     setRulesAccepted,
+    updateRolesFromUser,
+    updateRoles,
 
     /**
      * Initialize users collection from database.
