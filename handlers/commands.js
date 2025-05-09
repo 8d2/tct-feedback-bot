@@ -78,9 +78,21 @@ async function handleSubcommandExecute(interaction, commands, noEmbed = false) {
     else {
         // Create embed to reply
         let newEmbed = new EmbedBuilder().setTimestamp().setDescription(constants.COMMAND_NOT_IMPLEMENTED_DESC);
-        const successful = command ? await command(interaction, newEmbed) : false;
-        if (successful) {
+        const result = command ? await command(interaction, newEmbed) : false;
+        if (result) {
             await interaction.reply({embeds: [newEmbed]});
+            if (typeof(result) == "object") {
+                let followUpOptions = {};
+                if ("followUpEmbeds" in result) {
+                    followUpOptions.embeds = result.followUpEmbeds;
+                }
+                if ("doFollowUpPing" in result && result.doFollowUpPing) {
+                    followUpOptions.content = `${interaction.user}` + (followUpOptions.content ? "\n" + followUpOptions.content : "");
+                }
+                if (followUpOptions.content || (followUpOptions.embeds && followUpOptions.embeds.length > 0)) {
+                    await interaction.followUp(followUpOptions);
+                }
+            }
         }
         else {
             await interaction.reply({embeds: [newEmbed], flags: EPHEMERAL_FLAG});

@@ -1,19 +1,15 @@
 // Stores users by user id, including some helpful user data modification methods.
 
+const { Colors, EmbedBuilder } = require("discord.js");
+
 const { getRoles } = require('./settingsMethods.js');
+const { handleAddRole, handleRemoveRole } = require('../handlers/permissions.js');
 const { Collection } = require('discord.js');
 const { Users } = require('../dbObjects.js');
+const constants = require("../helpers/constants.js")
 
 const users = new Collection();
 
-/**
- * Get a User from user id.
- * @param {string} id ID to get.
- * @returns {Users?} User. Null if doesn't exist.
- */
-function getUserInfo(id) {
-    return users.get(id);
-}
 /**
  * Returns a list of users that have data in the system.
  * @returns {[User]} Users that have data.
@@ -28,6 +24,15 @@ async function getUsersWithInfo(interaction) {
         listOfUsers.push(interaction.guild.members.cache.get(user.user_id).user)
     }
     return listOfUsers;
+}
+
+/**
+ * Get a User from user id.
+ * @param {string} id ID to get.
+ * @returns {Users?} User. Null if doesn't exist.
+ */
+function getUserInfo(id) {
+    return users.get(id);
 }
 
 /**
@@ -184,36 +189,68 @@ async function getRulesAccepted(id) {
 
 /**
  * Updates a user's roles depending on how many feedback points they have, based on their user id.
- * @param {Guild} guild The guild to update roles in.
+ * @param {CommandInteraction} interaction The interaction to update roles from.
  * @param {Users} user The user to update.
+ * @return {[EmbedBuilder]} Any error embeds from updating roles. If empty, no errors occurred.
  */
 async function updateRolesFromUser(interaction, user) {
     const guildMember = interaction.guild.members.cache.get(user.user_id);
-    const feedbackPoints = getPointsFromUser(user);
+    const feedbackPoints = await getPointsFromUser(user);
     const roles = await getRoles();
-    console.log(roles);
-    roles.forEach(role => {
+    let errorEmbeds = [];
+    for(const role of roles) {
         const hasRole = feedbackPoints >= role.role_requirement;
         const guildRole = interaction.guild.roles.cache.get(role.role_id);
+        let errorMessage;
         if (hasRole) {
             // User has enough points for this role
-            guildMember.roles.add(guildRole);
+            errorMessage = await handleAddRole(guildMember, guildRole);
         }
         else {
             // Not enough, remove if they had role before
-            guildMember.roles.remove(guildRole);
+            errorMessage = await handleRemoveRole(guildMember, guildRole);
         }
-    });
+        if (errorMessage) {
+            // Some error with adding/removing roles
+            const errorEmbed = new EmbedBuilder().setTimestamp().setDescription(errorMessage).setColor(Colors.Red);
+            errorEmbeds.push(errorEmbed);
+        }
+    }
+    return errorEmbeds;
 }
 
 /**
- * Updates a user's roles in the guild depending on how many feedback points they have, based on their user id.
- * @param {Guild} guild The guild to update roles in.
+ * Updates a user's roles depending on how many feedback points they have, based on their user id.
+ * @param {CommandInteraction} interaction The interaction to update roles from.
  * @param {string} id The user id of the user to update.
+ * @return {[EmbedBuilder]} Any error embeds from updating roles. If empty, no errors occurred.
  */
 async function updateRoles(interaction, id) {
-    const user = await getOrCreateUserInfo(id);
-    await updateRolesFromUser(interaction, user);
+    // Do not use getOrCreate because if null, they will have no roles
+    const user = getUserInfo(id);
+    if (!user) {
+        return [];
+    }
+    return await updateRolesFromUser(interaction, user);
+}
+
+/**
+ * Updates all users' roles dependign on how many feedback points they each have.
+ * @param {CommandInteraction} interaction The interaction to update roles from.
+ * @return {EmbedBuilder} Response embed, indicating update success or failure.
+ */
+async function updateAllUsersRoles(interaction) {
+    const allUsers = await Users.findAll();
+    for (const user of allUsers) {
+        const errorEmbeds = updateRoles(interaction, user.user_id);
+        if (errorEmbeds.length > 0) {
+            // Errored
+            return errorEmbeds[0].setDescription(constants.UPDATE_ALL_ROLES_ERROR);
+        }
+    }
+    // Success
+    const successEmbed = new EmbedBuilder().setTimestamp().setDescription(constants.UPDATE_ALL_ROLES_SUCCESS).setColor(Colors.Green);
+    return successEmbed;
 }
 
 module.exports = {
@@ -230,6 +267,7 @@ module.exports = {
     setRulesAccepted,
     updateRolesFromUser,
     updateRoles,
+    updateAllUsersRoles,
 
     /**
      * Initialize users collection from database.
