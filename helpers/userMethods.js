@@ -18,7 +18,7 @@ function getUserInfo(id) {
  * Returns a list of users that have data in the system.
  * @returns {[User]} Users that have data.
  */
-async function getUsersWithInfo() {
+async function getUsersWithInfo(interaction) {
     const allUsers = await Users.findAll();
         
     // Converts users into discord.js users
@@ -187,14 +187,14 @@ async function getRulesAccepted(id) {
  * @param {Guild} guild The guild to update roles in.
  * @param {Users} user The user to update.
  */
-async function updateRolesFromUser(guild, user) {
-    const guildMember = guild.members.cache.get(user.user_id);
+async function updateRolesFromUser(interaction, user) {
+    const guildMember = interaction.guild.members.cache.get(user.user_id);
     const feedbackPoints = getPointsFromUser(user);
     const roles = await getRoles();
     console.log(roles);
     roles.forEach(role => {
         const hasRole = feedbackPoints >= role.role_requirement;
-        const guildRole = guild.roles.cache.get(role.role_id);
+        const guildRole = interaction.guild.roles.cache.get(role.role_id);
         if (hasRole) {
             // User has enough points for this role
             guildMember.roles.add(guildRole);
@@ -211,9 +211,9 @@ async function updateRolesFromUser(guild, user) {
  * @param {Guild} guild The guild to update roles in.
  * @param {string} id The user id of the user to update.
  */
-async function updateRoles(guild, id) {
+async function updateRoles(interaction, id) {
     const user = await getOrCreateUserInfo(id);
-    await updateRolesFromUser(guild, user);
+    await updateRolesFromUser(interaction, user);
 }
 
 module.exports = {
