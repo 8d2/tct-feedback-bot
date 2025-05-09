@@ -1,4 +1,6 @@
 // Stores users by user id, including some helpful user data modification methods.
+// IMPORTANT: There is a different between a discord.js *User* and the *Users* database.
+// A database *Users* would need to be converted, such as how getUsersWithInfo does it.
 
 const { Colors, EmbedBuilder } = require("discord.js");
 
@@ -190,7 +192,7 @@ async function getRulesAccepted(id) {
 }
 
 /**
- * Updates a user's roles depending on how many feedback points they have, based on their user id.
+ * Updates a user's roles depending on how many feedback points they have.
  * @param {CommandInteraction} interaction The interaction to update roles from.
  * @param {Users} user The user to update.
  * @return {[EmbedBuilder]} Any error embeds from updating roles. If empty, no errors occurred.

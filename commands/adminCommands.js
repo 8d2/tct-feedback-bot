@@ -72,6 +72,7 @@ const COMMAND_FUNCTIONS = {
         messageEmbed.setDescription(`The requirement for the ${roleType} feedbacker role has been set to ${pluralize(newRequirement, "point")}.`);
         messageEmbed.setColor(Colors.Green);
         if (updateAllRoles) {
+            // Only update if option provided
             const responseEmbed = await userMethods.updateAllUsersRoles(interaction);
             return {followUpEmbeds: [responseEmbed]};
         }

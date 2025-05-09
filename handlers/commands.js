@@ -82,6 +82,7 @@ async function handleSubcommandExecute(interaction, commands, noEmbed = false) {
         if (result) {
             await interaction.reply({embeds: [newEmbed]});
             if (typeof(result) == "object") {
+                // Result returned as object, see custom options for following up to user
                 let followUpOptions = {};
                 if ("followUpEmbeds" in result) {
                     followUpOptions.embeds = result.followUpEmbeds;
