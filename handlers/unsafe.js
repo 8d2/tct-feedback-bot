@@ -1,4 +1,4 @@
-// Handles performing actions that may result in a bot error, possibly due to lack of permissions. 
+// Handles performing actions that may result in an error, possibly due to lack of permissions. 
 
 const { Colors } = require("discord.js");
 

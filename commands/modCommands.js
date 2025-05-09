@@ -3,7 +3,7 @@ const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOpti
     = require("discord.js");
 
 const { handleSubcommandExecute } = require("../handlers/commands.js");
-const { handleSendMessage } = require("../handlers/permissions.js");
+const { handleSendMessage } = require("../handlers/unsafe.js");
 const constants = require("../helpers/constants.js");
 const messageMethods = require("../helpers/messageMethods.js");
 const userMethods = require("../helpers/userMethods.js");

@@ -3,7 +3,7 @@
 const { Colors, EmbedBuilder } = require("discord.js");
 
 const { getRoles } = require('./settingsMethods.js');
-const { handleAddRole, handleRemoveRole } = require('../handlers/permissions.js');
+const { handleAddRole, handleRemoveRole } = require('../handlers/unsafe.js');
 const { Collection } = require('discord.js');
 const { Users } = require('../dbObjects.js');
 const constants = require("../helpers/constants.js")
