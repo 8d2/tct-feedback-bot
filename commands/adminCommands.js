@@ -1,8 +1,11 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, 
     SlashCommandStringOption, SlashCommandRoleOption, PermissionFlagsBits, Colors, ChannelType } = require("discord.js");
 
-const { handleSubcommandExecute } = require("../handlers/commands.js")
-const settingsMethods = require("../helpers/settingsMethods.js")
+const { handleSubcommandExecute } = require("../handlers/commands.js");
+const constants = require("../helpers/constants.js");
+const settingsMethods = require("../helpers/settingsMethods.js");
+const messageMethods = require("../helpers/messageMethods.js");
+const { pluralize } = require('../helpers/util.js');
 
 // Constants
 const CHANNEL_OPTION_NAME = "feedbackchannel";
@@ -20,6 +23,7 @@ const SET_CHANNEL_COMMAND_NAME = "setchannel";
 const SET_FORUM_TAG_COMMAND_NAME = "setforumtag";
 const SET_REQUIREMENT_COMMAND_NAME = "setrequirement";
 const SET_ROLE_COMMAND_NAME = "setrole";
+const GET_SETTINGS_COMMAND_NAME = "settings";
 
 const COMMAND_FUNCTIONS = {
     
@@ -62,8 +66,7 @@ const COMMAND_FUNCTIONS = {
         const newRequirement = interaction.options.getInteger(REQUIREMENT_OPTION_NAME);
         settingsMethods.setRoleRequirement(roleType, newRequirement);
         
-        // points doesn't singularize with the argument as 1, but this is such a small and unlikely scenario so i won't fix
-        messageEmbed.setDescription(`The requirement for the ${roleType} feedbacker role has been set to ${newRequirement} points.`);
+        messageEmbed.setDescription(`The requirement for the ${roleType} feedbacker role has been set to ${pluralize(newRequirement, "point")}.`);
         messageEmbed.setColor(Colors.Green);
         return true;
     },
@@ -81,6 +84,26 @@ const COMMAND_FUNCTIONS = {
 
         messageEmbed.setDescription(`The ${roleType} feedbacker role has been set to ${newRole}.`);
         messageEmbed.setColor(Colors.Green);
+        return true;
+    },
+    
+    /**
+     * Handles the '/admin settings' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [GET_SETTINGS_COMMAND_NAME]: async function handleGetSettings(interaction, messageEmbed) {
+        const channel = await settingsMethods.getFeedbackChannel(interaction.guild);
+        const tag = settingsMethods.getFeedbackForumTagId();
+        const rolesMessage = await messageMethods.getRoleRequirementMessage(interaction, true);
+        messageEmbed.setDescription(
+            "## Admin Settings\n" +
+            `Feedback Channel: ${channel ?? constants.OPTION_NULL}\n` +
+            `Feedback Tag: \`${tag ?? constants.OPTION_NULL_NO_FORMAT}\`\n` +
+            `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}`
+        );
+        messageEmbed.setColor(Colors.DarkPurple);
         return true;
     }
     
@@ -144,6 +167,11 @@ module.exports = {
                 .setDescription("The role to use for the point requirement.")
                 .setRequired(true)
             )
+        )
+        
+        .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(GET_SETTINGS_COMMAND_NAME)
+            .setDescription("Show the current settings.")
         ),
 
     async execute(interaction) {

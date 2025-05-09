@@ -91,9 +91,9 @@ const COMMAND_FUNCTIONS = {
             catch {
                 // Embed to use when the interaction failed for whatever reason
                 const failedResponseEmbed = new EmbedBuilder()
-                        .setTimestamp()
-                        .setColor(Colors.Red)
-                        .setDescription("## Cancelled \n Rules acknowledgement cancelled, you probably timed out or an unknown error occured. Run `/contract create` again.")
+                    .setTimestamp()
+                    .setColor(Colors.Red)
+                    .setDescription("## Cancelled \n Rules acknowledgement cancelled, you probably timed out or an unknown error occured. Run `/contract create` again.")
                 await interaction.editReply({embeds: [failedResponseEmbed], components: [], flags: MessageFlags.Ephemeral});
             }
             return false;
@@ -101,10 +101,10 @@ const COMMAND_FUNCTIONS = {
         else {
             // Component creation has been outsourced to handlers </3
             // Pings the thread owner if they have allow pings on.
-            const threadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread)
-            const userAllowsPings = await userMethods.getAllowPings(threadOwnerId)
-            const pingId = userAllowsPings ? threadOwnerId : null;
-            await interaction.reply(createContractMessage(interaction, pingId));
+            const threadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
+            const userAllowsPings = await userMethods.getAllowPings(threadOwner.id);
+            const pingUsers = userAllowsPings ? [threadOwner] : null;
+            await interaction.reply(createContractMessage(interaction, pingUsers));
             return true;
         }
     },
@@ -130,14 +130,14 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         else {
-            const feedbackThreadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread);
+            const feedbackThreadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
             const feedbackEnabled = await contractMethods.isFeedbackEnabled(feedbackThread);
 
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Blue)
                 .setDescription(
-                    `Builder: <@${feedbackThreadOwnerId}>
+                    `Builder: ${feedbackThreadOwner}
                     Feedback Enabled: ${bold(`${feedbackEnabled}`)}`);
 
             await interaction.reply({embeds: [responseEmbed]});

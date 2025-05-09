@@ -1,63 +1,8 @@
-const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, Colors, bold, strikethrough, blockQuote, underline, subtext } = require("discord.js");
+const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder,
+    StringSelectMenuOptionBuilder, EmbedBuilder, Colors, blockQuote } = require("discord.js");
 
-const HORIZONTAL_RULE = `\n${subtext(strikethrough("-------------------------------"))}\n`;
-const STAR_RATING_INFO = {
-    ["stars-0"]: {
-        menu_value: "stars-0",
-        menu_label: "💣",
-        menu_description: "Minimal to no feedback",
-        full_description:
-            `${bold("The user provided feedback with no clear effort or intent to help, or they just posted this agreement without sending any feedback whatsoever, for some reason.")}
-
-            ${bold(underline("EXAMPLES"))}
-            • The user simply remarked "cool tower" or "this tower sucks!", and did not provide any constructive feedback beyond that.
-            • The user did not actually provide any feedback.
-            • ${bold("DO NOT")} assign this rating if you simply disagree with the feedback.`,
-        point_value: 0,
-    },
-    ["stars-1"]: {
-        menu_value: "stars-1",
-        menu_label: "⭐",
-        menu_description: "Partial or subpar feedback",
-        full_description:
-            `${bold("The user provided partial feedback, or subpar feedback with demonstrable effort.")}
-
-            ${bold(underline("EXAMPLES"))}
-            • The user posted a few helpful screenshots showing the first few floors, but stopped sharing feedback in the middle of the tower.
-            • The user provided some helpful, constructive remarks about the tower, but did not share any examples.
-            • The user attempted to provide full feedback on the tower, but because it was far outside their difficulty range, they could not provide much help.
-            • ${bold("DO NOT")} assign this rating if you simply disagree with the feedback.`,
-        point_value: 1,
-    },
-    ["stars-2"]: {
-        menu_value: "stars-2",
-        menu_label: "⭐⭐",
-        menu_description: "Complete feedback",
-        full_description:
-            `${bold("The user provided sufficient feedback.")}
-
-            ${bold(underline("EXAMPLES"))}
-            • The user completed a full noclip run of the tower, sending screenshots along the way.
-            • The user sent only a handful of screenshots, but made up for it by providing some helpful insights.
-            • ${bold("DO NOT")} assign this rating if your tower is less than 30% complete.`,
-        point_value: 2,
-    },
-    ["stars-3"]: {
-        menu_value: "stars-3",
-        menu_label: "⭐⭐⭐",
-        menu_description: "Excellent feedback",
-        full_description:
-            `${bold("The user provided thoughtful, thorough, and/or insightful feedback; they went the extra mile, and they deserve a bonus star for their efforts.")}
-
-            ${bold(underline("EXAMPLES"))}
-            • The user attempted or completed a legit playthrough of the tower, providing numerous screenshots and insights from their experience.
-            • The user provided extensive, nuanced insights, approaching the standards of a typical curator review.
-            • The user provided additional assistance with your tower on top of usual feedback, perhaps by sending models to fix particularly tricky bugs, or by volunteering to join a team create to fix issues without the intent of collaborating.
-            • The user provided thorough feedback worthy of at least two stars, but your tower is very, very long, and the extra time spent is worthy of a third star.
-            • ${bold("DO NOT")} assign this rating if your tower is less than 60% complete.`,
-        point_value: 3,
-    },
-};
+const { HORIZONTAL_RULE, STAR_RATING_INFO } = require("../helpers/constants.js");
+const { getOriginalUser } = require("../helpers/messageMethods.js");
 
 /**
  * Creates a new confirm button.
@@ -92,51 +37,32 @@ function createContractEmbed(interaction, starRating) {
         starRatingLabel = `${starData.menu_label} ${pointValue} STAR${pointValue === 1 ? '' : 'S'}`;
     }
 
-    // Get the user (as an author) who sent the contract originally
-    // This may seem weird, but I swear it's like this for a reason
-    const contractSenderAuthor = {
-        name: interaction.user.username, 
-        iconURL: interaction.user.avatarURL(),
+    // No more drilling! Just get the original creator to use.
+    const originalUser = getOriginalUser(interaction);
+    const originalAuthor = {
+        name: originalUser.username, 
+        iconURL: originalUser.avatarURL(),
     };
-    let contractSenderUserId = interaction.user.id;
-    if (interaction.message) {
-        // Drill, baby, drill!
-        const embedData = interaction.message.embeds[0].data;
-        const authorData = embedData.author;
-        contractSenderAuthor.name = authorData.name;
-        contractSenderAuthor.iconURL = authorData.icon_url;
-
-        // Extract the contract sender's user ID from the description in the embed (THIS IS SO BAD)
-        const embedDescription = embedData.description;
-        // ^^^^^^ Example of the string we're dissecting: 
-        // '<@699811922283629313> has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.'
-        const idxA = embedDescription.indexOf('@');
-        const idxB = embedDescription.indexOf('>');
-        contractSenderUserId = embedDescription.slice(idxA + 1, idxB);
-    }
 
     // Build the embed
     const embed = new EmbedBuilder()
         .setColor(Colors.Green)
         .setTitle("Feedback Agreement")
-        .setAuthor(contractSenderAuthor)
+        .setAuthor(originalAuthor)
         .setDescription(
-            `<@${contractSenderUserId}> has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.
+            `${originalUser} has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.
             ${fullDescription ? `${HORIZONTAL_RULE}# ` + starRatingLabel + "\n" + blockQuote(fullDescription) : ""}`)
         .setTimestamp();
-    // Save original author to embed's data so it can be reused later
-    embed.original_author = contractSenderAuthor;
-    
     return embed;
 }
 
 /**
  * Constructs a complete contract message, including an embed, rating select, and confirm button.
  * @param {import("discord.js").Interaction} interaction The interaction that created/used the contract.
- * @param {string?} pingId ID of the user to ping within the contract message.
+ * @param {[User]?} pingUsers Users to ping within the contract message.
  * @returns {import("discord.js").InteractionReplyOptions} The created contract message.
  */
-function createContractMessage(interaction, pingId) {
+function createContractMessage(interaction, pingUsers) {
 
     // If no star rating is selected, this is just null
     const selectedStarRating = interaction.values ? interaction.values[0] : null;
@@ -155,12 +81,22 @@ function createContractMessage(interaction, pingId) {
         .addComponents(newConfirmButton);
     
     // Adds a thread owner ping to the message
-    const threadOwnerPing = pingId ? `<@${pingId}>` : null;
+    let threadOwnerPing;
+    if (pingUsers) {
+        // Should use in future to ping all collaborators
+        threadOwnerPing = "";
+        pingUsers.forEach((user, index) => {
+            threadOwnerPing += `${user}`;
+            if (index != (pingUsers.length - 1)) {
+                threadOwnerPing += "\n";
+            }
+        });
+    }
     // Preserves the thread owner ping between message updates
     const previousContent = interaction.message ? interaction.message.content : null;
 
     return {
-        content: threadOwnerPing || previousContent,
+        content: threadOwnerPing ? (threadOwnerPing || previousContent) : previousContent,
         embeds: [newContractEmbed],
         components: [row1, row2],
     };
@@ -196,7 +132,6 @@ async function handleContractStarSelectInteraction(interaction) {
 
     // Updates the feedback contract message
     await interaction.update(createContractMessage(interaction));
-
 }
 
 module.exports = {

@@ -16,7 +16,6 @@ const CHANNEL_OPTION_NAME = "channel";
 const BLOCK_COMMAND_NAME = "block";
 const SET_POINTS_COMMAND_NAME = "setpoints";
 const UNBLOCK_COMMAND_NAME = "unblock";
-
 const DISPLAY_INFO_COMMAND_NAME = "displaybotinfo";
 
 const COMMAND_FUNCTIONS = {
