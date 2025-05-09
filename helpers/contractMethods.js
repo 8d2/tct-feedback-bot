@@ -44,7 +44,7 @@ async function getFeedbackThreadOwnerId(thread) {
  */
 async function getFeedbackThreadOwner(thread) {
     const ownerId = await getFeedbackThreadOwnerId(thread);
-    return thread.guild.members.cache.get(ownerId).user;
+    return (await thread.guild.members.fetch(ownerId)).user;
 }
 
 module.exports = {

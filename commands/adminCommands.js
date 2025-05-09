@@ -161,7 +161,6 @@ module.exports = {
             .addBooleanOption(new SlashCommandBooleanOption()
                 .setName(UPDATE_ALL_OPTION_NAME)
                 .setDescription("If true, all users' feedback roles will be updated. False by default.")
-                .setRequired(true)
             )
         )
         

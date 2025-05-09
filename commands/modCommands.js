@@ -2,11 +2,12 @@ const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOpti
     SlashCommandChannelOption, EmbedBuilder, ChannelType, PermissionFlagsBits, Colors }
     = require("discord.js");
 
-const { handleSubcommandExecute } = require("../handlers/commands.js")
-const { handleSendMessage } = require("../handlers/permissions.js")
-const constants = require("../helpers/constants.js")
-const messageMethods = require("../helpers/messageMethods.js")
-const userMethods = require("../helpers/userMethods.js")
+const { handleSubcommandExecute } = require("../handlers/commands.js");
+const { handleSendMessage } = require("../handlers/permissions.js");
+const constants = require("../helpers/constants.js");
+const messageMethods = require("../helpers/messageMethods.js");
+const userMethods = require("../helpers/userMethods.js");
+const { pluralize } = require('../helpers/util.js');
 
 // Constants
 const USER_OPTION_NAME = "user";
@@ -76,8 +77,8 @@ const COMMAND_FUNCTIONS = {
     [SET_POINTS_COMMAND_NAME]: async function handleSetPoints(interaction, messageEmbed) {
         const user = interaction.options.getUser(USER_OPTION_NAME);
         const points = interaction.options.getInteger(POINTS_OPTION_NAME);
-        userMethods.setPoints(user.id, points);
-        messageEmbed.setDescription(`${user} now has ${points} points.`);
+        await userMethods.setPoints(user.id, points);
+        messageEmbed.setDescription(`${user} now has ${pluralize(points, "points")}.`);
         messageEmbed.setColor(Colors.Green);
         const errorEmbeds = await userMethods.updateRoles(interaction, user.id);
         return {doFollowUpPing: errorEmbeds.length > 0, followUpEmbeds: errorEmbeds};

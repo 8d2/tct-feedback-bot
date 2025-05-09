@@ -12,16 +12,17 @@ const users = new Collection();
 
 /**
  * Returns a list of users that have data in the system.
+ * @param {Guild} guild The guild to get users from.
  * @returns {[User]} Users that have data.
  */
-async function getUsersWithInfo(interaction) {
+async function getUsersWithInfo(guild) {
     const allUsers = await Users.findAll();
         
     // Converts users into discord.js users
     // I moved this into here for easy use elsewhere if needed
     var listOfUsers = []
     for (let user of allUsers) {
-        listOfUsers.push(interaction.guild.members.cache.get(user.user_id).user)
+        listOfUsers.push((await guild.members.fetch(user.user_id)).user)
     }
     return listOfUsers;
 }
@@ -194,13 +195,13 @@ async function getRulesAccepted(id) {
  * @return {[EmbedBuilder]} Any error embeds from updating roles. If empty, no errors occurred.
  */
 async function updateRolesFromUser(interaction, user) {
-    const guildMember = interaction.guild.members.cache.get(user.user_id);
+    const guildMember = await interaction.guild.members.fetch(user.user_id);
     const feedbackPoints = await getPointsFromUser(user);
     const roles = await getRoles();
     let errorEmbeds = [];
     for(const role of roles) {
         const hasRole = feedbackPoints >= role.role_requirement;
-        const guildRole = interaction.guild.roles.cache.get(role.role_id);
+        const guildRole = await interaction.guild.roles.fetch(role.role_id);
         let errorMessage;
         if (hasRole) {
             // User has enough points for this role
@@ -242,7 +243,7 @@ async function updateRoles(interaction, id) {
 async function updateAllUsersRoles(interaction) {
     const allUsers = await Users.findAll();
     for (const user of allUsers) {
-        const errorEmbeds = updateRoles(interaction, user.user_id);
+        const errorEmbeds = await updateRoles(interaction, user.user_id);
         if (errorEmbeds.length > 0) {
             // Errored
             return errorEmbeds[0].setDescription(constants.UPDATE_ALL_ROLES_ERROR);

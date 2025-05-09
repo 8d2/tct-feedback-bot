@@ -22,7 +22,7 @@ module.exports = {
         const flagsToAdd = hiddenValue ? MessageFlags.Ephemeral : [];
 
         // Get a list of users which have data
-        const listOfUsers = await userMethods.getUsersWithInfo(interaction)
+        const listOfUsers = await userMethods.getUsersWithInfo(interaction.guild);
 
         // Loop through all users and get their points
         var rawLeaderboardStats = {}
