@@ -15,7 +15,6 @@ const users = new Collection();
 /**
  * Returns a list of users that have data in the system.
  * @param {Guild} guild The guild to get users from.
- * @param {Guild} guild The guild to get users from.
  * @returns {[User]} Users that have data.
  */
 async function getUsersWithInfo(guild) {
