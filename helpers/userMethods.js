@@ -1,9 +1,21 @@
-// Stores users by user id, including some helpful user data modification methods.
+// Stores users by user id, includes some helpful user data read/write methods.
 
-const { Collection } = require('discord.js');
+const { Collection, PermissionsBitField } = require('discord.js');
 const { Users } = require('../dbObjects.js');
 
 const users = new Collection();
+
+const STAFF_PERMISSIONS = [PermissionsBitField.Flags.Administrator, PermissionsBitField.Flags.BanMembers, PermissionsBitField.Flags.KickMembers, PermissionsBitField.Flags.ManageMessages];
+
+/**
+ * Returns whether a guild member is a staff member based on ownership of any
+ * common moderative permissions. (Ban or kick members, delete messages)
+ * @param {GuildMember} the member to check for staff permissions
+ * @return {boolean} whether or not the member has any of these permissions
+ */
+function getMemberIsStaff(member) {
+    return member.permissions.any(STAFF_PERMISSIONS);
+}
 
 /**
  * Get a User from user id.
@@ -13,6 +25,7 @@ const users = new Collection();
 function getUserInfo(id) {
     return users.get(id);
 }
+
 /**
  * Returns a list of users that have data in the system.
  * @returns {[Users]} Users that have data.
@@ -165,6 +178,7 @@ async function getRulesAccepted(id) {
 }
 
 module.exports = {
+    getMemberIsStaff,
     getUserInfo,
     getUsersWithInfo,
     getPoints,
