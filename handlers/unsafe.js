@@ -4,9 +4,6 @@ const { Colors } = require("discord.js");
 
 const constants = require("../helpers/constants.js")
 
-const MISSING_ACCESS_CODE = 50001;          // For roles
-const MISSING_PERMISSIONS_CODE = 50013;     // For messages
-
 /**
  * Handles the action of sending a embed to a channel through a command.
  * Accounts for lack of permissions in failing to send the message.
@@ -23,7 +20,7 @@ async function handleSendMessage(channel, replyOptions, responseEmbed) {
     catch (error) {
         responseEmbed.setDescription(
             // Missing Permissions
-            error.code == MISSING_PERMISSIONS_CODE ? constants.MESSAGE_SENT_PERMISSION_FAILED_MESSAGE :
+            error.code == constants.MISSING_PERMISSIONS_CODE ? constants.MESSAGE_SENT_PERMISSION_FAILED_MESSAGE :
             // Other error
             constants.MESSAGE_SENT_FAILED_MESSAGE
         );
@@ -42,7 +39,7 @@ async function handleAddRole(user, role) {
         await user.roles.add(role);
     }
     catch (error) {
-        return `Could not add ${role} to ${user}` + (error.code == MISSING_ACCESS_CODE ? " due to a lack of permissions" : "") + ".";
+        return `Could not add ${role} to ${user}` + (error.code == constants.MISSING_ACCESS_CODE ? " due to a lack of permissions" : "") + ".";
     }
     return null;
 }
@@ -58,7 +55,7 @@ async function handleRemoveRole(user, role) {
         await user.roles.remove(role);
     }
     catch (error) {
-        return `Could not remove ${role} from ${user}` + (error.code == MISSING_ACCESS_CODE ? " due to a lack of permissions" : "") + ".";
+        return `Could not remove ${role} from ${user}` + (error.code == constants.MISSING_ACCESS_CODE ? " due to a lack of permissions" : "") + ".";
     }
     return null;
 }

@@ -11,6 +11,8 @@ const UPDATE_ALL_ROLES_ERROR = "Failed to update roles of users due to an error.
 const UPDATE_ALL_ROLES_SUCCESS = "Successfully updated the roles of all users.";
 const OPTION_NULL_NO_FORMAT = "N/A";
 const OPTION_NULL = "`" + OPTION_NULL_NO_FORMAT + "`";
+const MISSING_ACCESS_CODE = 50001;          // For roles
+const MISSING_PERMISSIONS_CODE = 50013;     // For messages
 const HORIZONTAL_RULE = `\n${subtext(strikethrough("-------------------------------"))}\n`;
 const STAR_RATING_INFO = {
     ["stars-0"]: {
@@ -81,6 +83,8 @@ module.exports = {
     UPDATE_ALL_ROLES_SUCCESS,
     OPTION_NULL_NO_FORMAT,
     OPTION_NULL,
+    MISSING_ACCESS_CODE,
+    MISSING_PERMISSIONS_CODE,
     HORIZONTAL_RULE,
     STAR_RATING_INFO
 }

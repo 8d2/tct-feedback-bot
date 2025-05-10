@@ -78,7 +78,7 @@ const COMMAND_FUNCTIONS = {
         const user = interaction.options.getUser(USER_OPTION_NAME);
         const points = interaction.options.getInteger(POINTS_OPTION_NAME);
         await userMethods.setPoints(user.id, points);
-        messageEmbed.setDescription(`${user} now has ${pluralize(points, "points")}.`);
+        messageEmbed.setDescription(`${user} now has ${pluralize(points, "point")}.`);
         messageEmbed.setColor(Colors.Green);
         const errorEmbeds = await userMethods.updateRoles(interaction, user.id);
         return {doFollowUpPing: errorEmbeds.length > 0, followUpEmbeds: errorEmbeds};
