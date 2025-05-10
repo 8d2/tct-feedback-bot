@@ -1,10 +1,14 @@
-const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags, CommandInteractionOptionResolver, inlineCode, SlashCommandBooleanOption, bold, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require("discord.js");
+const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags,
+        CommandInteractionOptionResolver, inlineCode, SlashCommandBooleanOption, SlashCommandUserOption,
+        bold, ButtonBuilder, ButtonStyle, ActionRowBuilder }
+        = require("discord.js");
 
 const { createContractMessage } = require("../handlers/contract");
 const { handleSubcommandExecute } = require("../handlers/commands.js")
 const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
-const messageMethods = require("../helpers/messageMethods.js")
+const messageMethods = require("../helpers/messageMethods.js");
+const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const { getFeedbackChannelId } = require("../helpers/settingsMethods.js");
 const constants = require("../helpers/constants.js")
 
@@ -12,8 +16,13 @@ const constants = require("../helpers/constants.js")
 const CREATE_COMMAND_NAME = "create";
 const GET_INFO_COMMAND_NAME = "getinfo";
 const ALLOW_PINGS_COMMAND_NAME = "allowpings";
+const ADD_BUILDER_COMMAND_NAME = "addbuilder";
+const REMOVE_BUILDER_COMMAND_NAME = "removebuilder";
 
+const USER_OPTION_NAME = "user";
 const PING_OPTION_NAME = "ping";
+
+const COLLABORATOR_LIMIT = 20;
 
 const COMMAND_FUNCTIONS = {
     /**
@@ -35,6 +44,16 @@ const COMMAND_FUNCTIONS = {
                 .setTimestamp()
                 .setColor(Colors.Red)
                 .setDescription(`You can only use ${inlineCode(`/contract ${CREATE_COMMAND_NAME}`)} within <#${realFeedbackThread}>.`);
+            
+            await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+            return false;
+        }
+        // Check if the user is a thread builder 
+        else if (collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread)) {
+            const responseEmbed = new EmbedBuilder()
+                .setTimestamp()
+                .setColor(Colors.Red)
+                .setDescription("You cannot create feedback contracts since you are a builder in this thread.");
             
             await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
             return false;
@@ -130,15 +149,19 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         else {
+            // TODO: make this command show a list of all builders
             const feedbackThreadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread);
             const feedbackEnabled = await contractMethods.isFeedbackEnabled(feedbackThread);
+            const builderCount = await collaboratorMethods.getThreadCollaboratorCount(feedbackThread);
 
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Blue)
                 .setDescription(
                     `Builder: <@${feedbackThreadOwnerId}>
-                    Feedback Enabled: ${bold(`${feedbackEnabled}`)}`);
+                    Feedback Enabled: ${bold(`${feedbackEnabled}`)}
+                    Number of builders: ${builderCount}`
+                );
 
             await interaction.reply({embeds: [responseEmbed]});
             return true;
@@ -164,6 +187,128 @@ const COMMAND_FUNCTIONS = {
         await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral})
         return true;
     },
+    
+    [ADD_BUILDER_COMMAND_NAME]: async function handleContractAddBuilder(interaction) {
+        
+        const feedbackThread = await contractMethods.getFeedbackThreadFromInteraction(interaction);
+        
+        // Check if the interaction occurred within a feedback thread
+        if (!feedbackThread) {
+            // Get the actual feedback thread ID to include in the error message
+            const realFeedbackThread = await getFeedbackChannelId();
+
+            const responseEmbed = new EmbedBuilder()
+                .setTimestamp()
+                .setColor(Colors.Red)
+                .setDescription(`You can only use ${inlineCode(`/contract ${ADD_BUILDER_COMMAND_NAME}`)} within <#${realFeedbackThread}>.`);
+            
+            await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+            return false;
+        }
+        
+        const feedbackThreadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread);
+        const builderCount = await collaboratorMethods.getThreadCollaboratorCount(feedbackThread);
+        
+        // Check that the command user is the thread owner
+        if (interaction.user.id != feedbackThreadOwnerId) {
+            const responseEmbed = new EmbedBuilder()
+                .setTimestamp()
+                .setColor(Colors.Red)
+                .setDescription(`Only the owner of this thread is allowed to add builders.`);
+
+            await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+            return false;
+        }
+        // Check that the thread builder count is below the maximum
+        else if (builderCount >= COLLABORATOR_LIMIT) {
+            const responseEmbed = new EmbedBuilder()
+                .setTimestamp()
+                .setColor(Colors.Red)
+                .setDescription(`This thread has reached the builder limit of ${COLLABORATOR_LIMIT}.`);
+
+            await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+            return false;
+        }
+        else {
+            const newBuilder = interaction.options.getUser(USER_OPTION_NAME);
+            const responseEmbed = new EmbedBuilder().setTimestamp();
+            const addResult = await collaboratorMethods.addCollaboratorToThread(newBuilder, feedbackThread)
+            
+            if (addResult) {
+                responseEmbed.setColor(Colors.Green);
+                responseEmbed.setDescription(`${newBuilder} has been added as a builder to this thread.`);
+                await interaction.reply({embeds: [responseEmbed]});
+                return true;
+            }
+            else {
+                responseEmbed.setColor(Colors.Red);
+                responseEmbed.setDescription(`${newBuilder} is already a builder in this thread.`);
+                await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+                return false;
+            }
+        }
+    },
+    
+    [REMOVE_BUILDER_COMMAND_NAME]: async function handleContractRemoveBuilder(interaction) {
+        
+        const feedbackThread = await contractMethods.getFeedbackThreadFromInteraction(interaction);
+        
+        // Check if the interaction occurred within a feedback thread
+        if (!feedbackThread) {
+            // Get the actual feedback thread ID to include in the error message
+            const realFeedbackThread = await getFeedbackChannelId();
+
+            const responseEmbed = new EmbedBuilder()
+                .setTimestamp()
+                .setColor(Colors.Red)
+                .setDescription(`You can only use ${inlineCode(`/contract ${REMOVE_BUILDER_COMMAND_NAME}`)} within <#${realFeedbackThread}>.`);
+            
+            await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+            return false;
+        }
+        
+        const builder = interaction.options.getUser(USER_OPTION_NAME);
+        const feedbackThreadOwnerId = await contractMethods.getFeedbackThreadOwnerId(feedbackThread);
+        
+        // Check that the command user is the thread owner
+        if (interaction.user.id != feedbackThreadOwnerId) {
+            const responseEmbed = new EmbedBuilder()
+                .setTimestamp()
+                .setColor(Colors.Red)
+                .setDescription(`Only the owner of this thread is allowed to remove builders.`);
+
+            await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+            return false;
+        }
+        // Check that the target user is not the thread owner
+        else if (builder.id == feedbackThreadOwnerId) {
+            const responseEmbed = new EmbedBuilder()
+                .setTimestamp()
+                .setColor(Colors.Red)
+                .setDescription(`The owner of this thread cannot be removed as a builder.`);
+
+            await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+            return false;
+        }
+        else {
+            
+            const responseEmbed = new EmbedBuilder().setTimestamp();
+            const removeResult = await collaboratorMethods.removeCollaboratorFromThread(builder, feedbackThread);
+            
+            if (removeResult) {
+                responseEmbed.setColor(Colors.Green);
+                responseEmbed.setDescription(`${builder} has been removed as a builder for this thread.`);
+                await interaction.reply({embeds: [responseEmbed]});
+                return true;
+            }
+            else {
+                responseEmbed.setColor(Colors.Red);
+                responseEmbed.setDescription(`${builder} is not a builder for this thread.`);
+                await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+                return false;
+            }
+        }
+    },
 };
 
 module.exports = {
@@ -187,6 +332,26 @@ module.exports = {
             .addBooleanOption(new SlashCommandBooleanOption()
                 .setName(PING_OPTION_NAME)
                 .setDescription("If true, you will be pinged when a contract is created in your thread")
+                .setRequired(true)
+            )
+        )
+        
+        .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(ADD_BUILDER_COMMAND_NAME)
+            .setDescription("Adds a user as a builder to this thread, allowing them to complete feedback contracts.")
+            .addUserOption(new SlashCommandUserOption()
+                .setName(USER_OPTION_NAME)
+                .setDescription("The user to add as a builder")
+                .setRequired(true)
+            )
+        )
+        
+        .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(REMOVE_BUILDER_COMMAND_NAME)
+            .setDescription("Removes a user's builder status in this thread.")
+            .addUserOption(new SlashCommandUserOption()
+                .setName(USER_OPTION_NAME)
+                .setDescription("The user to remove as a builder")
                 .setRequired(true)
             )
         ),
