@@ -25,6 +25,16 @@ function setFeedbackChannelId(id) {
 }
 
 /**
+ * Gets the feedback channel set in settings from the guild.
+ * @param {Guild} guild The guild to get channel from.
+ * @returns {GuildBaseChannel?} Currently set feedback channel. Null if not set.
+ */
+async function getFeedbackChannel(guild) {
+    const feedbackChannelId = getFeedbackChannelId();
+    return feedbackChannelId ? guild.channels.cache.get(feedbackChannelId) : null;
+}
+
+/**
  * Gets the "open for feedback" forum tag id.
  * @returns {string?} Currently set feedback channel ID. Null if not set.
  */
@@ -141,6 +151,7 @@ async function setRoleRequirement(roleType, roleRequirement) {
 module.exports = {
     getFeedbackChannelId,
     setFeedbackChannelId,
+    getFeedbackChannel,
     getFeedbackForumTagId,
     setFeedbackForumTagId,
     getRoles,
