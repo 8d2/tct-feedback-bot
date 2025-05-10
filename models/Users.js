@@ -1,8 +1,6 @@
 // Database definition for Users
 // Each user is stored by user id in userMethods
 
-const { dataTypes } = require("../dbDefinition");
-
 module.exports = (sequelize, DataTypes) => {
 	return sequelize.define('users', {
 		user_id: {
