@@ -1,10 +1,11 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, 
-    SlashCommandStringOption, SlashCommandRoleOption, PermissionFlagsBits, Colors, ChannelType } = require("discord.js");
+    SlashCommandStringOption, SlashCommandRoleOption, SlashCommandBooleanOption, PermissionFlagsBits, Colors, ChannelType } = require("discord.js");
 
 const { handleSubcommandExecute } = require("../handlers/commands.js");
 const constants = require("../helpers/constants.js");
-const settingsMethods = require("../helpers/settingsMethods.js");
 const messageMethods = require("../helpers/messageMethods.js");
+const settingsMethods = require("../helpers/settingsMethods.js");
+const userMethods = require("../helpers/userMethods.js");
 const { pluralize } = require('../helpers/util.js');
 
 // Constants
@@ -13,6 +14,7 @@ const FORUM_TAG_OPTION_NAME = "forumtag";
 const REQUIREMENT_OPTION_NAME = "requirement";
 const ROLE_OPTION_NAME = "role";
 const ROLE_TYPE_OPTION_NAME = "roletype";
+const UPDATE_ALL_OPTION_NAME = "updateallroles";
 
 const ROLE_TYPES = [
     {name: "regular", value: "regular"},
@@ -63,11 +65,17 @@ const COMMAND_FUNCTIONS = {
      */
     [SET_REQUIREMENT_COMMAND_NAME]: async function handleSetRequirement(interaction, messageEmbed) {
         const roleType = interaction.options.getString(ROLE_TYPE_OPTION_NAME);
+        const updateAllRoles = interaction.options.getBoolean(UPDATE_ALL_OPTION_NAME);
         const newRequirement = interaction.options.getInteger(REQUIREMENT_OPTION_NAME);
         settingsMethods.setRoleRequirement(roleType, newRequirement);
-        
+
         messageEmbed.setDescription(`The requirement for the ${roleType} feedbacker role has been set to ${pluralize(newRequirement, "point")}.`);
         messageEmbed.setColor(Colors.Green);
+        if (updateAllRoles) {
+            // Only update if option provided
+            const responseEmbed = await userMethods.updateAllUsersRoles(interaction);
+            return {followUpEmbeds: [responseEmbed]};
+        }
         return true;
     },
     
@@ -151,6 +159,10 @@ module.exports = {
                 .setRequired(true)
                 .setMinValue(1)
             )
+            .addBooleanOption(new SlashCommandBooleanOption()
+                .setName(UPDATE_ALL_OPTION_NAME)
+                .setDescription("If true, all users' feedback roles will be updated. False by default.")
+            )
         )
         
         .addSubcommand(new SlashCommandSubcommandBuilder()
@@ -158,7 +170,7 @@ module.exports = {
             .setDescription("Sets the role that is obtained for reaching specific feedback point requirements.")
             .addStringOption(new SlashCommandStringOption()
                 .setName(ROLE_TYPE_OPTION_NAME)
-                .setDescription("The role type to set")
+                .setDescription("The role type to set.")
                 .setRequired(true)
                 .setChoices(...ROLE_TYPES)
             )
@@ -171,7 +183,7 @@ module.exports = {
         
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(GET_SETTINGS_COMMAND_NAME)
-            .setDescription("Show the current settings.")
+            .setDescription("Show the current feedback bot admin settings.")
         ),
 
     async execute(interaction) {

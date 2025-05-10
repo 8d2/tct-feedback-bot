@@ -2,11 +2,12 @@ const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOpti
     SlashCommandChannelOption, EmbedBuilder, ChannelType, PermissionFlagsBits, Colors }
     = require("discord.js");
 
-const { handleSubcommandExecute } = require("../handlers/commands.js")
-const { handleSendMessage } = require("../handlers/messages.js")
-const constants = require("../helpers/constants.js")
-const messageMethods = require("../helpers/messageMethods.js")
-const userMethods = require("../helpers/userMethods.js")
+const { handleSubcommandExecute } = require("../handlers/commands.js");
+const { handleSendMessage } = require("../handlers/unsafe.js");
+const constants = require("../helpers/constants.js");
+const messageMethods = require("../helpers/messageMethods.js");
+const userMethods = require("../helpers/userMethods.js");
+const { pluralize } = require('../helpers/util.js');
 
 // Constants
 const USER_OPTION_NAME = "user";
@@ -15,6 +16,7 @@ const CHANNEL_OPTION_NAME = "channel";
 
 const BLOCK_COMMAND_NAME = "block";
 const SET_POINTS_COMMAND_NAME = "setpoints";
+const UPDATE_ROLES_COMMAND_NAME = "updateroles";
 const UNBLOCK_COMMAND_NAME = "unblock";
 const DISPLAY_INFO_COMMAND_NAME = "displaybotinfo";
 
@@ -75,8 +77,27 @@ const COMMAND_FUNCTIONS = {
     [SET_POINTS_COMMAND_NAME]: async function handleSetPoints(interaction, messageEmbed) {
         const user = interaction.options.getUser(USER_OPTION_NAME);
         const points = interaction.options.getInteger(POINTS_OPTION_NAME);
-        userMethods.setPoints(user.id, points);
-        messageEmbed.setDescription(`${user} now has ${points} points.`);
+        await userMethods.setPoints(user.id, points);
+        messageEmbed.setDescription(`${user} now has ${pluralize(points, "point")}.`);
+        messageEmbed.setColor(Colors.Green);
+        const errorEmbeds = await userMethods.updateRoles(interaction, user.id);
+        return {doFollowUpPing: errorEmbeds.length > 0, followUpEmbeds: errorEmbeds};
+    },
+
+    /**
+     * Handles the '/mod updateroles' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [UPDATE_ROLES_COMMAND_NAME]: async function handleUpdateRoles(interaction, messageEmbed) {
+        const updatingUser = interaction.options.getUser(USER_OPTION_NAME);
+        const errorEmbeds = await userMethods.updateRoles(interaction, updatingUser.id);
+        if (errorEmbeds.length > 0) {
+            // Error occured, show errors
+            return {followUpEmbeds: errorEmbeds};
+        }
+        messageEmbed.setDescription(`Successfully updated feedbacker roles for ${updatingUser}.`);
         messageEmbed.setColor(Colors.Green);
         return true;
     },
@@ -146,6 +167,16 @@ module.exports = {
                 .setDescription("Points to set user to")
                 .setRequired(true)
                 .setMinValue(0)
+            )
+        )
+
+        .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(UPDATE_ROLES_COMMAND_NAME)
+            .setDescription("Updates the feedbacker roles of a user.")
+            .addUserOption(new SlashCommandUserOption()
+                .setName(USER_OPTION_NAME)
+                .setDescription("The user to update roles of")
+                .setRequired(true)
             )
         )
         

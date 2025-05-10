@@ -7,8 +7,12 @@ const MESSAGE_SENT_FAILED_MESSAGE = "The message failed to send."
 const MESSAGE_SENT_PERMISSION_FAILED_MESSAGE = "The message failed to send due to lack of permissions."
 const ALLOW_PINGS_MESSAGE_TRUE = "You will now recieve pings when a contract is created in your feedback thread.";
 const ALLOW_PINGS_MESSAGE_FALSE = "You will no longer recieve pings when a contract is created in your feedback thread.";
+const UPDATE_ALL_ROLES_ERROR = "Failed to update roles of users due to an error. Make sure the bot has the correct permissions.";
+const UPDATE_ALL_ROLES_SUCCESS = "Successfully updated the roles of all users.";
 const OPTION_NULL_NO_FORMAT = "N/A";
 const OPTION_NULL = "`" + OPTION_NULL_NO_FORMAT + "`";
+const MISSING_ACCESS_CODE = 50001;          // For roles
+const MISSING_PERMISSIONS_CODE = 50013;     // For messages
 const HORIZONTAL_RULE = `\n${subtext(strikethrough("-------------------------------"))}\n`;
 const STAR_RATING_INFO = {
     ["stars-0"]: {
@@ -75,8 +79,12 @@ module.exports = {
     MESSAGE_SENT_PERMISSION_FAILED_MESSAGE,
     ALLOW_PINGS_MESSAGE_TRUE,
     ALLOW_PINGS_MESSAGE_FALSE,
+    UPDATE_ALL_ROLES_ERROR,
+    UPDATE_ALL_ROLES_SUCCESS,
     OPTION_NULL_NO_FORMAT,
     OPTION_NULL,
+    MISSING_ACCESS_CODE,
+    MISSING_PERMISSIONS_CODE,
     HORIZONTAL_RULE,
     STAR_RATING_INFO
 }

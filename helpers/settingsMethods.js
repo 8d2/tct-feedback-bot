@@ -31,7 +31,7 @@ function setFeedbackChannelId(id) {
  */
 async function getFeedbackChannel(guild) {
     const feedbackChannelId = getFeedbackChannelId();
-    return feedbackChannelId ? (await guild.channels.fetch(feedbackChannelId)) : null;
+    return feedbackChannelId ? guild.channels.cache.get(feedbackChannelId) : null;
 }
 
 /**
