@@ -29,10 +29,16 @@ const COMMAND_FUNCTIONS = {
      * @return {boolean} true if the command succeeded, false if it failed.
      */
     [BLOCK_COMMAND_NAME]: async function handleBlock(interaction, messageEmbed) {
-        const blockee = interaction.options.getUser(USER_OPTION_NAME);
+        const blockee = interaction.options.getMember(USER_OPTION_NAME);
         const isBlocked = await userMethods.getIsBlocked(blockee.id);
+        const isStaff = userMethods.getMemberIsStaff(blockee);
+        let success = false;
         
-        if (isBlocked) {
+        if (isStaff) {
+            messageEmbed.setDescription(`${blockee} is a staff member and is protected from this command.`);
+            messageEmbed.setColor(Colors.Yellow);
+        }
+        else if (isBlocked) {
             messageEmbed.setDescription(`${blockee} is already blocked.`);
             messageEmbed.setColor(Colors.Yellow);
         }
@@ -40,9 +46,10 @@ const COMMAND_FUNCTIONS = {
             userMethods.setIsBlocked(blockee.id, true);
             messageEmbed.setDescription(`${blockee} has been blocked from creating feedback contracts.`);
             messageEmbed.setColor(Colors.Red);
+            success = true;
         }
         
-        return !isBlocked;
+        return success;
     },
 
     /**
@@ -75,11 +82,20 @@ const COMMAND_FUNCTIONS = {
      * @return {boolean} true if the command succeeded, false if it failed.
      */
     [SET_POINTS_COMMAND_NAME]: async function handleSetPoints(interaction, messageEmbed) {
-        const user = interaction.options.getUser(USER_OPTION_NAME);
+        const user = interaction.options.getMember(USER_OPTION_NAME);
         const points = interaction.options.getInteger(POINTS_OPTION_NAME);
-        await userMethods.setPoints(user.id, points);
-        messageEmbed.setDescription(`${user} now has ${pluralize(points, "point")}.`);
-        messageEmbed.setColor(Colors.Green);
+        const isStaff = userMethods.getMemberIsStaff(user);
+        
+        if (isStaff) {
+            messageEmbed.setDescription(`${user} is a staff member and is protected from this command.`);
+            messageEmbed.setColor(Colors.Yellow);
+        }
+        else {
+            await userMethods.setPoints(user.id, points);
+            messageEmbed.setDescription(`${user} now has ${pluralize(points, "point")}.`);
+            messageEmbed.setColor(Colors.Green);
+        }
+        
         const errorEmbeds = await userMethods.updateRoles(interaction, user.id);
         return {doFollowUpPing: errorEmbeds.length > 0, followUpEmbeds: errorEmbeds};
     },

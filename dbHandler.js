@@ -12,6 +12,8 @@ const SETTINGS_MAIN_IDENTIFIER = "main";
 const Roles = require('./models/Roles.js')(sequelize, dataTypes);
 const Settings = require('./models/Settings.js')(sequelize, dataTypes);
 const Users = require('./models/Users.js')(sequelize, dataTypes);
+const Threads = require('./models/Threads.js')(sequelize, dataTypes);
+const Collaborators = require('./models/Collaborators.js')(sequelize, dataTypes);
 
 // Command arguments
 const force = process.argv.includes('--force') || process.argv.includes('-f');
@@ -40,5 +42,7 @@ module.exports = {
 	SETTINGS_MAIN_IDENTIFIER,
 	Roles,
 	Settings,
-	Users
+	Users,
+    Threads,
+    Collaborators
 }
