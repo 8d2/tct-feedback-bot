@@ -6,11 +6,23 @@ const { Colors, EmbedBuilder } = require("discord.js");
 
 const { getRoles } = require('./settingsMethods.js');
 const { handleAddRole, handleRemoveRole } = require('../handlers/unsafe.js');
-const { Collection } = require('discord.js');
+const { Collection, PermissionsBitField } = require('discord.js');
 const { Users } = require('../dbObjects.js');
 const constants = require("../helpers/constants.js")
 
 const users = new Collection();
+
+const STAFF_PERMISSIONS = [PermissionsBitField.Flags.Administrator, PermissionsBitField.Flags.BanMembers, PermissionsBitField.Flags.KickMembers, PermissionsBitField.Flags.ManageMessages];
+
+/**
+ * Returns whether a guild member is a staff member based on ownership of any
+ * common moderative permissions. (Ban or kick members, delete messages)
+ * @param {GuildMember} the member to check for staff permissions
+ * @return {boolean} whether or not the member has any of these permissions
+ */
+function getMemberIsStaff(member) {
+    return member.permissions.any(STAFF_PERMISSIONS);
+}
 
 /**
  * Returns a list of users that have data in the system.
@@ -257,6 +269,7 @@ async function updateAllUsersRoles(interaction) {
 }
 
 module.exports = {
+    getMemberIsStaff,
     getUserInfo,
     getUsersWithInfo,
     getPointsFromUser,

@@ -1,5 +1,5 @@
-const { ThreadChannel } = require('discord.js');
-const { getFeedbackChannelId, getFeedbackForumTagId } = require('./settingsMethods');
+const { ThreadChannel, MessageFlags, inlineCode, EmbedBuilder, Colors } = require('discord.js');
+const { getFeedbackChannel, getFeedbackChannelId, getFeedbackForumTagId } = require('./settingsMethods');
 
 /**
  * Returns `true` if the thread has the "open for feedback" tag.
@@ -38,6 +38,29 @@ async function getFeedbackThreadOwnerId(thread) {
 }
 
 /**
+ * Responds to an interaction with an error embed with the given description.
+ * @param {CommandInteraction} the command that generated this interaction
+ * @param {string} the description to use in the embed
+ */
+async function showCommandError(interaction, description) {
+    const responseEmbed = new EmbedBuilder()
+        .setTimestamp()
+        .setColor(Colors.Red)
+        .setDescription(description);
+            
+    await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+}
+
+/**
+ * Responds to an interaction with an error regarding the correct feedback channel.
+ * @param {CommandInteraction} the command that generated this interaction
+ */
+async function showIncorrectChannelError(interaction) {
+    const realFeedbackChannel = await getFeedbackChannel(interaction.guild);
+    showCommandError(interaction, `You can only use ${inlineCode(`/contract ${interaction.options.getSubcommand()}`)} within ${realFeedbackChannel}.`);
+}
+
+/**
  * Gets the owner of a feedback thread in the guild or `null` if not a feedback thread.
  * @param {ThreadChannel} thread The thread.
  * @returns {User?} The thread owner's user.
@@ -51,5 +74,7 @@ module.exports = {
     isFeedbackEnabled,
     getFeedbackThreadFromInteraction,
     getFeedbackThreadOwnerId,
+    showCommandError,
+    showIncorrectChannelError,
     getFeedbackThreadOwner
 }
