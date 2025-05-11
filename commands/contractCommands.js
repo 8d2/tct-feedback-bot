@@ -137,7 +137,7 @@ const COMMAND_FUNCTIONS = {
                 .setColor(Colors.Blue)
                 .setDescription(
                     `Builder: ${feedbackThreadOwner}
-                    Feedback Enabled: ${bold(`${feedbackEnabled}`)});
+                    Feedback Enabled: ${bold(`${feedbackEnabled}`)}
                     Number of builders: ${builderCount}`
                 );
             await interaction.reply({embeds: [responseEmbed]});
