@@ -60,10 +60,21 @@ async function showIncorrectChannelError(interaction) {
     showCommandError(interaction, `You can only use ${inlineCode(`/contract ${interaction.options.getSubcommand()}`)} within ${realFeedbackChannel}.`);
 }
 
+/**
+ * Gets the owner of a feedback thread in the guild or `null` if not a feedback thread.
+ * @param {ThreadChannel} thread The thread.
+ * @returns {User?} The thread owner's user.
+ */
+async function getFeedbackThreadOwner(thread) {
+    const ownerId = await getFeedbackThreadOwnerId(thread);
+    return (await thread.guild.members.fetch(ownerId)).user;
+}
+
 module.exports = {
     isFeedbackEnabled,
     getFeedbackThreadFromInteraction,
     getFeedbackThreadOwnerId,
     showCommandError,
     showIncorrectChannelError,
+    getFeedbackThreadOwner
 }

@@ -1,7 +1,14 @@
-// Stores users by user id, includes some helpful user data read/write methods.
+// Stores users by user id, including some helpful user data modification methods.
+// IMPORTANT: There is a different between a discord.js *User* and the *Users* database.
+// A database *Users* would need to be converted, such as how getUsersWithInfo does it.
 
+const { Colors, EmbedBuilder } = require("discord.js");
+
+const { getRoles } = require('./settingsMethods.js');
+const { handleAddRole, handleRemoveRole } = require('../handlers/unsafe.js');
 const { Collection, PermissionsBitField } = require('discord.js');
 const { Users } = require('../dbObjects.js');
+const constants = require("../helpers/constants.js")
 
 const users = new Collection();
 
@@ -18,20 +25,29 @@ function getMemberIsStaff(member) {
 }
 
 /**
+ * Returns a list of users that have data in the system.
+ * @param {Guild} guild The guild to get users from.
+ * @returns {[User]} Users that have data.
+ */
+async function getUsersWithInfo(guild) {
+    const allUsers = await Users.findAll();
+        
+    // Converts users into discord.js users
+    // I moved this into here for easy use elsewhere if needed
+    var listOfUsers = []
+    for (let user of allUsers) {
+        listOfUsers.push((await guild.members.fetch(user.user_id)).user)
+    }
+    return listOfUsers;
+}
+
+/**
  * Get a User from user id.
  * @param {string} id ID to get.
  * @returns {Users?} User. Null if doesn't exist.
  */
 function getUserInfo(id) {
     return users.get(id);
-}
-
-/**
- * Returns a list of users that have data in the system.
- * @returns {[Users]} Users that have data.
- */
-async function getUsersWithInfo() {
-    return await Users.findAll()
 }
 
 /**
@@ -50,13 +66,22 @@ async function getOrCreateUserInfo(id) {
 }
 
 /**
+ * Get how many feedback points a user has.
+ * @param {Users} user User to get.
+ * @returns {int} User's points.
+ */
+async function getPointsFromUser(user) {
+    return user ? user.feedback_points : 0;
+}
+
+/**
  * Get how many feedback points a user has from their user id.
  * @param {string} id ID to get.
  * @returns {int} User's points.
  */
 async function getPoints(id) {
     const user = await getOrCreateUserInfo(id);
-    return user ? user.feedback_points : 0;
+    return getPointsFromUser(user);
 }
 
 /**
@@ -91,28 +116,6 @@ async function setPointsFromUser(user, points) {
 }
 
 /**
- * Sets a user's blocked state for creating contracts.
- * @param {Users} user User to set the blocked state of.
- * @param {boolean} the new blocked state to set.
- * @returns {Users} the user.
- */
-async function setIsBlockedFromUser(user, isBlocked) {
-    user.is_blocked = isBlocked;
-    return user.save();
-}
-
-/**
- * Set value of allowpings setting.
- * @param {Users} user User to set for.
- * @param {int} allow Value to set.
- * @returns {Users} User.
- */
-async function setAllowPingsFromUser(user, allow) {
-    user.allow_pings = allow;
-    return user.save();
-}
-
-/**
  * Set how many feedback points a user has based on their user id.
  * @param {string} id ID to set points of.
  * @param {int} points Points to set.
@@ -135,6 +138,17 @@ async function addPoints(id, amount) {
 }
 
 /**
+ * Sets a user's blocked state for creating contracts.
+ * @param {Users} user User to set the blocked state of.
+ * @param {boolean} the new blocked state to set.
+ * @returns {Users} the user.
+ */
+async function setIsBlockedFromUser(user, isBlocked) {
+    user.is_blocked = isBlocked;
+    return user.save();
+}
+
+/**
  * Sets a user's blocked state for creating contracts, based on their user ID.
  * @param {string} the user ID to set the blocked state of
  * @param {boolean} the new blocked state (true -> blocked, false -> unblocked)
@@ -143,6 +157,17 @@ async function addPoints(id, amount) {
 async function setIsBlocked(id, isBlocked) {
     const user = await getOrCreateUserInfo(id);
     return setIsBlockedFromUser(user, isBlocked);
+}
+
+/**
+ * Set value of allowpings setting.
+ * @param {Users} user User to set for.
+ * @param {int} allow Value to set.
+ * @returns {Users} User.
+ */
+async function setAllowPingsFromUser(user, allow) {
+    user.allow_pings = allow;
+    return user.save();
 }
 
 /**
@@ -177,10 +202,77 @@ async function getRulesAccepted(id) {
     return user ? user.accepted_rules : false;
 }
 
+/**
+ * Updates a user's roles depending on how many feedback points they have.
+ * @param {CommandInteraction} interaction The interaction to update roles from.
+ * @param {Users} user The user to update.
+ * @return {[EmbedBuilder]} Any error embeds from updating roles. If empty, no errors occurred.
+ */
+async function updateRolesFromUser(interaction, user) {
+    const guildMember = await interaction.guild.members.fetch(user.user_id);
+    const feedbackPoints = await getPointsFromUser(user);
+    const roles = await getRoles();
+    let errorEmbeds = [];
+    for(const role of roles) {
+        const hasRole = feedbackPoints >= role.role_requirement;
+        const guildRole = await interaction.guild.roles.fetch(role.role_id);
+        let errorMessage;
+        if (hasRole) {
+            // User has enough points for this role
+            errorMessage = await handleAddRole(guildMember, guildRole);
+        }
+        else {
+            // Not enough, remove if they had role before
+            errorMessage = await handleRemoveRole(guildMember, guildRole);
+        }
+        if (errorMessage) {
+            // Some error with adding/removing roles
+            const errorEmbed = new EmbedBuilder().setTimestamp().setDescription(errorMessage).setColor(Colors.Red);
+            errorEmbeds.push(errorEmbed);
+        }
+    }
+    return errorEmbeds;
+}
+
+/**
+ * Updates a user's roles depending on how many feedback points they have, based on their user id.
+ * @param {CommandInteraction} interaction The interaction to update roles from.
+ * @param {string} id The user id of the user to update.
+ * @return {[EmbedBuilder]} Any error embeds from updating roles. If empty, no errors occurred.
+ */
+async function updateRoles(interaction, id) {
+    // Do not use getOrCreate because if null, they will have no roles
+    const user = getUserInfo(id);
+    if (!user) {
+        return [];
+    }
+    return await updateRolesFromUser(interaction, user);
+}
+
+/**
+ * Updates all users' roles dependign on how many feedback points they each have.
+ * @param {CommandInteraction} interaction The interaction to update roles from.
+ * @return {EmbedBuilder} Response embed, indicating update success or failure.
+ */
+async function updateAllUsersRoles(interaction) {
+    const allUsers = await Users.findAll();
+    for (const user of allUsers) {
+        const errorEmbeds = await updateRoles(interaction, user.user_id);
+        if (errorEmbeds.length > 0) {
+            // Errored
+            return errorEmbeds[0].setDescription(constants.UPDATE_ALL_ROLES_ERROR);
+        }
+    }
+    // Success
+    const successEmbed = new EmbedBuilder().setTimestamp().setDescription(constants.UPDATE_ALL_ROLES_SUCCESS).setColor(Colors.Green);
+    return successEmbed;
+}
+
 module.exports = {
     getMemberIsStaff,
     getUserInfo,
     getUsersWithInfo,
+    getPointsFromUser,
     getPoints,
     getIsBlocked,
     getAllowPings,
@@ -189,6 +281,9 @@ module.exports = {
     setIsBlocked,
     setAllowPings,
     setRulesAccepted,
+    updateRolesFromUser,
+    updateRoles,
+    updateAllUsersRoles,
 
     /**
      * Initialize users collection from database.

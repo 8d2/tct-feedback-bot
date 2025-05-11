@@ -1,8 +1,12 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, 
-    SlashCommandStringOption, SlashCommandRoleOption, PermissionFlagsBits, Colors, ChannelType } = require("discord.js");
+    SlashCommandStringOption, SlashCommandRoleOption, SlashCommandBooleanOption, PermissionFlagsBits, Colors, ChannelType } = require("discord.js");
 
-const { handleSubcommandExecute } = require("../handlers/commands.js")
-const settingsMethods = require("../helpers/settingsMethods.js")
+const { handleSubcommandExecute } = require("../handlers/commands.js");
+const constants = require("../helpers/constants.js");
+const messageMethods = require("../helpers/messageMethods.js");
+const settingsMethods = require("../helpers/settingsMethods.js");
+const userMethods = require("../helpers/userMethods.js");
+const { pluralize } = require('../helpers/util.js');
 
 // Constants
 const CHANNEL_OPTION_NAME = "feedbackchannel";
@@ -10,6 +14,7 @@ const FORUM_TAG_OPTION_NAME = "forumtag";
 const REQUIREMENT_OPTION_NAME = "requirement";
 const ROLE_OPTION_NAME = "role";
 const ROLE_TYPE_OPTION_NAME = "roletype";
+const UPDATE_ALL_OPTION_NAME = "updateallroles";
 
 const ROLE_TYPES = [
     {name: "regular", value: "regular"},
@@ -20,6 +25,7 @@ const SET_CHANNEL_COMMAND_NAME = "setchannel";
 const SET_FORUM_TAG_COMMAND_NAME = "setforumtag";
 const SET_REQUIREMENT_COMMAND_NAME = "setrequirement";
 const SET_ROLE_COMMAND_NAME = "setrole";
+const GET_SETTINGS_COMMAND_NAME = "settings";
 
 const COMMAND_FUNCTIONS = {
     
@@ -59,12 +65,17 @@ const COMMAND_FUNCTIONS = {
      */
     [SET_REQUIREMENT_COMMAND_NAME]: async function handleSetRequirement(interaction, messageEmbed) {
         const roleType = interaction.options.getString(ROLE_TYPE_OPTION_NAME);
+        const updateAllRoles = interaction.options.getBoolean(UPDATE_ALL_OPTION_NAME);
         const newRequirement = interaction.options.getInteger(REQUIREMENT_OPTION_NAME);
         settingsMethods.setRoleRequirement(roleType, newRequirement);
-        
-        // points doesn't singularize with the argument as 1, but this is such a small and unlikely scenario so i won't fix
-        messageEmbed.setDescription(`The requirement for the ${roleType} feedbacker role has been set to ${newRequirement} points.`);
+
+        messageEmbed.setDescription(`The requirement for the ${roleType} feedbacker role has been set to ${pluralize(newRequirement, "point")}.`);
         messageEmbed.setColor(Colors.Green);
+        if (updateAllRoles) {
+            // Only update if option provided
+            const responseEmbed = await userMethods.updateAllUsersRoles(interaction);
+            return {followUpEmbeds: [responseEmbed]};
+        }
         return true;
     },
     
@@ -81,6 +92,26 @@ const COMMAND_FUNCTIONS = {
 
         messageEmbed.setDescription(`The ${roleType} feedbacker role has been set to ${newRole}.`);
         messageEmbed.setColor(Colors.Green);
+        return true;
+    },
+    
+    /**
+     * Handles the '/admin settings' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [GET_SETTINGS_COMMAND_NAME]: async function handleGetSettings(interaction, messageEmbed) {
+        const channel = await settingsMethods.getFeedbackChannel(interaction.guild);
+        const tag = settingsMethods.getFeedbackForumTagId();
+        const rolesMessage = await messageMethods.getRoleRequirementMessage(interaction, true);
+        messageEmbed.setDescription(
+            "## Admin Settings\n" +
+            `Feedback Channel: ${channel ?? constants.OPTION_NULL}\n` +
+            `Feedback Tag: \`${tag ?? constants.OPTION_NULL_NO_FORMAT}\`\n` +
+            `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}`
+        );
+        messageEmbed.setColor(Colors.DarkPurple);
         return true;
     }
     
@@ -128,6 +159,10 @@ module.exports = {
                 .setRequired(true)
                 .setMinValue(1)
             )
+            .addBooleanOption(new SlashCommandBooleanOption()
+                .setName(UPDATE_ALL_OPTION_NAME)
+                .setDescription("If true, all users' feedback roles will be updated. False by default.")
+            )
         )
         
         .addSubcommand(new SlashCommandSubcommandBuilder()
@@ -135,7 +170,7 @@ module.exports = {
             .setDescription("Sets the role that is obtained for reaching specific feedback point requirements.")
             .addStringOption(new SlashCommandStringOption()
                 .setName(ROLE_TYPE_OPTION_NAME)
-                .setDescription("The role type to set")
+                .setDescription("The role type to set.")
                 .setRequired(true)
                 .setChoices(...ROLE_TYPES)
             )
@@ -144,6 +179,11 @@ module.exports = {
                 .setDescription("The role to use for the point requirement.")
                 .setRequired(true)
             )
+        )
+        
+        .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(GET_SETTINGS_COMMAND_NAME)
+            .setDescription("Show the current feedback bot admin settings.")
         ),
 
     async execute(interaction) {
