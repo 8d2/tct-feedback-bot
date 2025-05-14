@@ -65,6 +65,18 @@ async function getUserIsCollaborator(user, thread) {
 }
 
 /**
+ * Checks whether a user owns the thread OR if they are a collaborator.
+ * @param {User} the user to check
+ * @param {ThreadChannel} the thread to check in
+ * @return {boolean} whether the user is a collaborator in the thread
+ */
+async function getUserIsCollaboratorOrOwner(user, thread) {
+    const ownerId = await getFeedbackThreadOwnerId(thread);
+    return (ownerId === user.userId)
+        || (await getUserIsCollaborator(user, thread));
+}
+
+/**
  * Attempts to add a user as a collaborator to a thread.
  * @param {User} the user to add
  * @param {ThreadChannel} the thread to add as collaborator to
@@ -112,6 +124,7 @@ async function removeCollaboratorFromThread(user, thread) {
 
 module.exports = {
     getUserIsCollaborator,
+    getUserIsCollaboratorOrOwner,
     getThreadCollaboratorCount,
     addCollaboratorToThread,
     removeCollaboratorFromThread,
