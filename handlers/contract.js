@@ -150,7 +150,7 @@ async function detectContractInteractionAllowed(interaction) {
  */
 async function handleContractStarSelectInteraction(interaction) {
     // Updates the feedback contract message if interaction allowed
-    if (detectContractInteractionAllowed(interaction)) {
+    if (await detectContractInteractionAllowed(interaction)) {
         await interaction.update(createContractMessage(interaction));
     }
 }
@@ -161,7 +161,7 @@ async function handleContractStarSelectInteraction(interaction) {
  */
 async function handleContractConfirmInteraction(interaction) {
     // Confirms the contract if interaction allowed
-    if (detectContractInteractionAllowed(interaction)) {
+    if (await detectContractInteractionAllowed(interaction)) {
         await contractMethods.showCommandError(interaction, "The contract should be accepted here (not implemented yet).");
     }
 }
