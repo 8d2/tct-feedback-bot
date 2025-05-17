@@ -62,7 +62,7 @@ function loadCommands() {
  */
 async function handleSubcommandExecute(interaction, commands, noEmbed = false) {
     const subcommandName = interaction.options.getSubcommand();
-    const command = (subcommandName in commands) ? commands[subcommandName] : null;
+    const command = commands[subcommandName];
 
     // Subcommand isn't in commands map!
     if (!command) {

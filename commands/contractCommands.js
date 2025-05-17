@@ -71,7 +71,7 @@ const COMMAND_FUNCTIONS = {
                 .setDescription(messages[3])
                 .setColor(Colors.Orange);
             const acceptButton = new ButtonBuilder()
-                .setCustomId("accept")
+                .setCustomId(constants.CONTRACT_RULES_ACCEPT_ID)
                 .setLabel("Accept")
                 .setStyle(ButtonStyle.Success)
             const row = new ActionRowBuilder()
@@ -81,7 +81,7 @@ const COMMAND_FUNCTIONS = {
             try {
                 // Await for the response with a time limit
                 const confirmation = await response.resource.message.awaitMessageComponent({ time: 600_000 });
-                if (confirmation.customId === "accept") {
+                if (confirmation.customId === constants.CONTRACT_RULES_ACCEPT_ID) {
                     // Changes accepted_rules to true to stop this from triggering again
                     await userMethods.setRulesAccepted(interaction.user.id);
 
