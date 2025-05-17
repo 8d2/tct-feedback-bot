@@ -41,13 +41,13 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         // Check if the user is a thread builder 
-        else if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
-            contractMethods.showCommandError(
-                interaction,
-                "You cannot create feedback contracts since you are a builder in this thread."
-            );
-            return false;
-        }
+        // else if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
+        //     contractMethods.showCommandError(
+        //         interaction,
+        //         "You cannot create feedback contracts since you are a builder in this thread."
+        //     );
+        //     return false;
+        // }
         // Check if the feedback thread is open for feedback
         else if (!(await contractMethods.isFeedbackEnabled(feedbackThread))) {
             contractMethods.showCommandError(

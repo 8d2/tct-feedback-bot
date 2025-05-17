@@ -162,7 +162,7 @@ async function handleContractStarSelectInteraction(interaction) {
 async function handleContractConfirmInteraction(interaction) {
     // Confirms the contract if interaction allowed
     if (detectContractInteractionAllowed(interaction)) {
-        await contractMethods.showCommandError(interaction, "The contract should be accepted here (not implemented yet).");
+        console.log(interaction);
     }
 }
 
