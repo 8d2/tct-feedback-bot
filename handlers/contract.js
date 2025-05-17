@@ -3,6 +3,8 @@ const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder,
 
 const { HORIZONTAL_RULE, STAR_RATING_INFO } = require("../helpers/constants.js");
 const { getOriginalUser } = require("../helpers/messageMethods.js");
+const collaboratorMethods = require("../helpers/collaboratorMethods.js");
+const contractMethods = require("../helpers/contractMethods.js");
 
 /**
  * Creates a new confirm button.
@@ -130,8 +132,20 @@ function createStarSelectDropdown(selected) {
  */
 async function handleContractStarSelectInteraction(interaction) {
 
+    // Only collaborators can interact with the star select menu!
+    // If the user is not a collaborator, display an error message.
+    const user = interaction.user;
+    const thread = interaction.channel;
+    if (!(await collaboratorMethods.getUserIsCollaborator(user, thread))) {
+        await contractMethods.showCommandError(
+            interaction,
+            "You cannot interact with feedback contracts since you are not a builder in this thread."
+        );
+    }
     // Updates the feedback contract message
-    await interaction.update(createContractMessage(interaction));
+    else {
+        await interaction.update(createContractMessage(interaction));
+    }
 }
 
 module.exports = {

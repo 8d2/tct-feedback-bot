@@ -42,8 +42,8 @@ async function getOrCreateThreadInfo(thread) {
 
 /**
  * Gets the number of collaborators participating in a specific thread.
- * @param {ThreadChannel} the thread
- * @return {int} the number of collaborators
+ * @param {ThreadChannel} thread The thread
+ * @return {int} The number of collaborators
  */
 async function getThreadCollaboratorCount(thread) {
     const threadInfo = await getOrCreateThreadInfo(thread);
@@ -51,10 +51,11 @@ async function getThreadCollaboratorCount(thread) {
 }
 
 /**
- * Checks whether a user is a collaborator in a thread.
- * @param {User} the user to check
- * @param {ThreadChannel} the thread to check in
- * @return {boolean} whether the user is a collaborator in the thread
+ * Checks whether a user is a collaborator in a thread. Also returns true
+ * if the user owns the thread.
+ * @param {User} user The user to check
+ * @param {ThreadChannel} thread The thread to check in
+ * @return {boolean} Whether the user is a collaborator in the thread
  */
 async function getUserIsCollaborator(user, thread) {
     await getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
@@ -66,9 +67,9 @@ async function getUserIsCollaborator(user, thread) {
 
 /**
  * Attempts to add a user as a collaborator to a thread.
- * @param {User} the user to add
- * @param {ThreadChannel} the thread to add as collaborator to
- * @return {boolean} true if this succeeded, false if the user is already a collaborator.
+ * @param {User} user The user to add
+ * @param {ThreadChannel} thread The thread to add as collaborator to
+ * @return {boolean} `true` if this succeeded, `false` if the user is already a collaborator.
  */
 async function addCollaboratorToThread(user, thread) {
     const threadInfo = await getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
@@ -89,9 +90,9 @@ async function addCollaboratorToThread(user, thread) {
 
 /**
  * Attempts to remove a user as collaborator from a thread.
- * @param {User} the user to remove
- * @param {ThreadChannel} the thread to remove as collaborator from
- * @return {boolean} true if this succeeded, false if the user cannot be removed.
+ * @param {User} user The user to remove
+ * @param {ThreadChannel} thread The thread to remove as collaborator from
+ * @return {boolean} `true` if this succeeded, `false` if the user cannot be removed.
  */
 async function removeCollaboratorFromThread(user, thread) {
     const threadInfo = await getOrCreateThreadInfo(thread);
