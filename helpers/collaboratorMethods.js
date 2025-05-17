@@ -51,7 +51,8 @@ async function getThreadCollaboratorCount(thread) {
 }
 
 /**
- * Checks whether a user is a collaborator in a thread.
+ * Checks whether a user is a collaborator in a thread. Also returns true
+ * if the user owns the thread.
  * @param {User} the user to check
  * @param {ThreadChannel} the thread to check in
  * @return {boolean} whether the user is a collaborator in the thread
@@ -62,18 +63,6 @@ async function getUserIsCollaborator(user, thread) {
     const collabInstance = collaborators.get(collabKey);
     
     return collabInstance ? true : false
-}
-
-/**
- * Checks whether a user owns the thread OR if they are a collaborator.
- * @param {User} the user to check
- * @param {ThreadChannel} the thread to check in
- * @return {boolean} whether the user is a collaborator in the thread
- */
-async function getUserIsCollaboratorOrOwner(user, thread) {
-    const ownerId = await getFeedbackThreadOwnerId(thread);
-    return (ownerId === user.userId)
-        || (await getUserIsCollaborator(user, thread));
 }
 
 /**
@@ -124,7 +113,6 @@ async function removeCollaboratorFromThread(user, thread) {
 
 module.exports = {
     getUserIsCollaborator,
-    getUserIsCollaboratorOrOwner,
     getThreadCollaboratorCount,
     addCollaboratorToThread,
     removeCollaboratorFromThread,
