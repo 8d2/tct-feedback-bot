@@ -71,6 +71,10 @@ const STAR_RATING_INFO = {
         point_value: 3,
     },
 };
+const INTERACTION_NOT_BUILDER_ERROR = "You cannot interact with feedback contracts since you are not a builder in this thread."
+const INTERACTION_FAILED_ERROR = "There was an error while updating this interaction!"
+const CONTRACT_STAR_SELECT_CUSTOM_ID = "feedback-contract-star-select"
+const CONTRACT_CONFIRM_CUSTOM_ID = "feedback-contract-confirm"
 
 module.exports = {
     COMMAND_NOT_IMPLEMENTED_DESC,
@@ -86,5 +90,9 @@ module.exports = {
     MISSING_ACCESS_CODE,
     MISSING_PERMISSIONS_CODE,
     HORIZONTAL_RULE,
-    STAR_RATING_INFO
+    STAR_RATING_INFO,
+    INTERACTION_NOT_BUILDER_ERROR,
+    INTERACTION_FAILED_ERROR,
+    CONTRACT_STAR_SELECT_CUSTOM_ID,
+    CONTRACT_CONFIRM_CUSTOM_ID
 }
