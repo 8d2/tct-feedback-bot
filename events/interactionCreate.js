@@ -2,7 +2,42 @@
 // https://discordjs.guide/creating-your-bot/event-handling.html
 
 const { Events, MessageFlags } = require('discord.js');
-const { handleContractStarSelectInteraction } = require('../handlers/contract');
+const { handleContractStarSelectInteraction, handleContractConfirmInteraction } = require('../handlers/contract');
+const constants = require("../helpers/constants.js");
+
+const BUTTON_HANDLERS = {
+    [constants.CONTRACT_CONFIRM_CUSTOM_ID]: handleContractConfirmInteraction
+};
+const STRING_SELECT_HANDLERS = {
+    [constants.CONTRACT_STAR_SELECT_CUSTOM_ID]: handleContractStarSelectInteraction
+};
+
+/**
+ * Handles a interaction with handlers mapped to different custom IDs.
+ * @param {import("discord.js").Interaction} interaction The interaction to handle.
+ * @param {Map} handlers Map from custom ID to function handler. Each handler takes in an interaction.
+ */
+async function handleInteractionByCustomId(interaction, handlers) {
+    const customId = interaction.customId;
+    try {
+        // Respond to the interaction using the handler for this customId
+
+        const handler = handlers[customId];
+        if (!handler) {
+            // The handler for this custom ID does not exist.
+            console.log(`[WARNING] No handler exists for the interaction with custom ID "${customId}".`);
+        }
+        else {
+            // Run handler
+            await handler(interaction);
+        }
+    } 
+    catch (error) {
+        // An error occured with finding or running the handler.
+        // Do not error here in the case this interaction is handled elsewhere, or not currently detected by the system.
+        console.log(`[WARNING] Error occurred with running handler for custom id "${customId}".`);
+    }
+}
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -30,40 +65,14 @@ module.exports = {
             }
         } 
 
-        // We will need this in the future
-        /*
         else if (interaction.isButton()) {
 			// Respond to buttons
+            handleInteractionByCustomId(interaction, BUTTON_HANDLERS);
 		}
-        */
 
         else if (interaction.isStringSelectMenu()) {
             // Respond to select menus
-
-            const select_menu_id = interaction.customId;
-            try {
-                // Respond to the interaction based on the select menu's customId
-                switch (select_menu_id) {
-                    case ('feedback-contract-star-select'):
-                        await handleContractStarSelectInteraction(interaction);
-                        break;
-                    default:
-                        // If you've reached this line, that means the string select menu's customId
-                        // is not included in this switch statement.
-                        // We may need to refactor this in the future to keep things centralized...
-                        console.error(`Select menu ${select_menu_id} is not registered.`);
-                        break;
-                }
-            } 
-            catch (error) {
-                console.error(error);
-                if (interaction.replied || interaction.deferred) {
-                    await interaction.followUp({ content: 'There was an error while updating this string select!', flags: MessageFlags.Ephemeral });
-                } 
-                else {
-                    await interaction.reply({ content: 'There was an error while updating this string select!', flags: MessageFlags.Ephemeral });
-                }
-            }
+            handleInteractionByCustomId(interaction, STRING_SELECT_HANDLERS);
         }
     },
 };

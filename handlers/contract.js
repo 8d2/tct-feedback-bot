@@ -1,23 +1,10 @@
 const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder, EmbedBuilder, Colors, blockQuote } = require("discord.js");
 
-const { HORIZONTAL_RULE, STAR_RATING_INFO } = require("../helpers/constants.js");
+const constants = require("../helpers/constants.js");
 const { getOriginalUser } = require("../helpers/messageMethods.js");
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const contractMethods = require("../helpers/contractMethods.js");
-
-/**
- * Creates a new confirm button.
- * @param {boolean?} disabled Whether the button is disabled. (Default: true)
- * @returns {ButtonBuilder} The created confirm button.
- */
-function createConfirmButton(disabled = true) {
-    return new ButtonBuilder()
-        .setCustomId('feedback-contract-confirm')
-        .setLabel('Confirm')
-        .setStyle(ButtonStyle.Success)
-        .setDisabled(disabled);
-}
 
 /**
  * Creates a new embed corresponding to the selected star rating.
@@ -28,7 +15,7 @@ function createConfirmButton(disabled = true) {
 function createContractEmbed(interaction, starRating) {
 
     // Get star rating info from star rating
-    const starData = STAR_RATING_INFO[starRating];
+    const starData = constants.STAR_RATING_INFO[starRating];
 
     // Assign description and star rating label
     let fullDescription = null;
@@ -53,7 +40,7 @@ function createContractEmbed(interaction, starRating) {
         .setAuthor(originalAuthor)
         .setDescription(
             `${originalUser} has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.
-            ${fullDescription ? `${HORIZONTAL_RULE}# ` + starRatingLabel + "\n" + blockQuote(fullDescription) : ""}`)
+            ${fullDescription ? `${constants.HORIZONTAL_RULE}# ` + starRatingLabel + "\n" + blockQuote(fullDescription) : ""}`)
         .setTimestamp();
     return embed;
 }
@@ -111,11 +98,11 @@ function createContractMessage(interaction, pingUsers) {
  */
 function createStarSelectDropdown(selected) {
     return new StringSelectMenuBuilder()
-        .setCustomId('feedback-contract-star-select')
-        .setPlaceholder(STAR_RATING_INFO[selected] ? STAR_RATING_INFO[selected].menu_label : "Select one...")
+        .setCustomId(constants.CONTRACT_STAR_SELECT_CUSTOM_ID)
+        .setPlaceholder(constants.STAR_RATING_INFO[selected] ? constants.STAR_RATING_INFO[selected].menu_label : "Select one...")
         .addOptions(
             // Create a menu option for each star rating
-            Object.values(STAR_RATING_INFO).map(rating => 
+            Object.values(constants.STAR_RATING_INFO).map(rating => 
                 new StringSelectMenuOptionBuilder()
                     .setLabel(rating.menu_label)
                     .setDescription(rating.menu_description)
@@ -125,30 +112,62 @@ function createStarSelectDropdown(selected) {
 }
 
 /**
- * The function name of all time. Yes, it probably needs to be that way...
- * 
- * Handles feedback contract star select interactions.
- * @param {import("discord.js").Interaction} interaction The interaction that used this string select menu.
+ * Creates a new confirm button.
+ * @param {boolean?} disabled Whether the button is disabled. (Default: true)
+ * @returns {ButtonBuilder} The created confirm button.
  */
-async function handleContractStarSelectInteraction(interaction) {
+function createConfirmButton(disabled = true) {
+    return new ButtonBuilder()
+        .setCustomId(constants.CONTRACT_CONFIRM_CUSTOM_ID)
+        .setLabel('Confirm')
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(disabled);
+}
 
-    // Only collaborators can interact with the star select menu!
+/**
+ * Get whether the interaction with the feedback contract is allowed. Replies to the interaction with an error if not allowed.
+ * @param {import("discord.js").Interaction} interaction The interaction trying to do something with a contract.
+ * @returns {boolean} Whether the interaction was allowed to interact or not.
+ */
+async function detectContractInteractionAllowed(interaction) {
+
+    // Only collaborators can interact with contracts!
     // If the user is not a collaborator, display an error message.
     const user = interaction.user;
     const thread = interaction.channel;
     if (!(await collaboratorMethods.getUserIsCollaborator(user, thread))) {
-        await contractMethods.showCommandError(
-            interaction,
-            "You cannot interact with feedback contracts since you are not a builder in this thread."
-        );
+        await contractMethods.showCommandError(interaction, constants.INTERACTION_NOT_BUILDER_ERROR);
+        return false;
     }
-    // Updates the feedback contract message
-    else {
+
+    // Allowed!
+    return true;
+}
+
+/**
+ * Handles feedback contract star select interactions.
+ * @param {import("discord.js").Interaction} interaction The interaction that used this string select menu.
+ */
+async function handleContractStarSelectInteraction(interaction) {
+    // Updates the feedback contract message if interaction allowed
+    if (await detectContractInteractionAllowed(interaction)) {
         await interaction.update(createContractMessage(interaction));
+    }
+}
+
+/**
+ * Handles feedback contract confirm button interaction.
+ * @param {import("discord.js").Interaction} interaction The interaction that used the confirm button.
+ */
+async function handleContractConfirmInteraction(interaction) {
+    // Confirms the contract if interaction allowed
+    if (await detectContractInteractionAllowed(interaction)) {
+        await contractMethods.showCommandError(interaction, "The contract should be accepted here (not implemented yet).");
     }
 }
 
 module.exports = {
     createContractMessage,
     handleContractStarSelectInteraction,
+    handleContractConfirmInteraction
 }
