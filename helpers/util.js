@@ -32,7 +32,7 @@ function concat(array, separator = ",", trimEnd = 0) {
 /**
  * Concats every item of the array together in a list format, using "and" and comma separators.
  * Ex: concatList([item1, item2, item3]) -> item1, item2 & item3
- *     concatList([item1, item2]) -> item2 & item3
+ *     concatList([item1, item2]) -> item1 & item2
  * @param {Array} array Array to concat.
  * @param {string} empty String to use if no elements are within the array.
  * @param {string} separator The separator to use between each item. "," by default.
