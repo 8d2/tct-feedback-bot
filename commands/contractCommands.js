@@ -112,10 +112,15 @@ const COMMAND_FUNCTIONS = {
         else {
             // Component creation has been outsourced to handlers </3
             // Pings the thread owner if they have allow pings on.
-            const threadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
-            const userAllowsPings = await userMethods.getAllowPings(threadOwner.id);
-            const pingUsers = userAllowsPings ? [threadOwner] : null;
-            await interaction.reply(createContractMessage(interaction, pingUsers));
+            const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, false);
+            const usersToPing = []
+            for (let user of collaborators) {
+                const userAllowsPings = await userMethods.getAllowPings(user.id);
+                if (userAllowsPings) {
+                    usersToPing.push(user)
+                }
+            }
+            await interaction.reply(createContractMessage(interaction, usersToPing));
             return true;
         }
     },
