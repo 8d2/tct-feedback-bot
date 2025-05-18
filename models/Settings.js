@@ -15,6 +15,12 @@ module.exports = (sequelize, DataTypes) => {
         feedback_tag_id: {
             // The forum tag that enables feedback contracts in the thread.
             type: DataTypes.STRING
+        },
+        staff_is_protected: {
+            // Whether staff are protected from data modifying commands, 1 = yes, 0 = no
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+            allowNull: false
         }
 	}, {
 		timestamps: false,

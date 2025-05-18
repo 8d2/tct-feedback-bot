@@ -148,6 +148,27 @@ async function setRoleRequirement(roleType, roleRequirement) {
     return setRoleRequirementFromRole(role, roleRequirement);
 }
 
+/**
+ * Returns whether staff members are protected from data modifying commands.
+ * This includes /mod setpoints, /mod block.
+ * @returns {boolean} whether staff is protected from data modifying commands.
+ */
+async function getStaffIsProtected() {
+    return settings ? settings.staff_is_protected : true;
+}
+
+/**
+ * Sets whether staff are protected from data modifying commands.
+ * This includes /mod setpoints, /mod block.
+ * @param {boolean} whether staff should be protected
+ */
+async function setStaffIsProtected(protect) {
+    if (settings) {
+        settings.staff_is_protected = protect;
+        settings.save();
+    }
+}
+
 module.exports = {
     getFeedbackChannelId,
     setFeedbackChannelId,
@@ -163,6 +184,8 @@ module.exports = {
     getRoleRequirement,
     setRoleRequirementFromRole,
     setRoleRequirement,
+    getStaffIsProtected,
+    setStaffIsProtected,
 
     /**
      * Initialize main settings database.
