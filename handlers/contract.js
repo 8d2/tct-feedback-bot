@@ -4,6 +4,7 @@ const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder,
 const constants = require("../helpers/constants.js");
 const { getOriginalUser, getAuthorOptions, getGainedRolesMessage } = require("../helpers/messageMethods.js");
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
+const { showCommandError } = require("../helpers/messageMethods.js");
 const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
 const { pluralize } = require('../helpers/util.js');
@@ -134,7 +135,7 @@ async function detectContractInteractionAllowed(interaction) {
     const user = interaction.user;
     const thread = interaction.channel;
     if (!(await collaboratorMethods.getUserIsCollaborator(user, thread))) {
-        await contractMethods.showCommandError(interaction, constants.INTERACTION_NOT_BUILDER_ERROR);
+        await showCommandError(interaction, constants.INTERACTION_NOT_BUILDER_ERROR);
         return false;
     }
 

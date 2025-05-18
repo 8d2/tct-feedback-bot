@@ -7,9 +7,8 @@ const { createContractMessage } = require("../handlers/contract");
 const { handleSubcommandExecute } = require("../handlers/commands.js")
 const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
-const messageMethods = require("../helpers/messageMethods.js");
+const { showCommandError } = require("../helpers/js");
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
-const { getFeedbackChannel } = require("../helpers/settingsMethods.js");
 const constants = require("../helpers/constants.js")
 
 // Constants
@@ -42,7 +41,7 @@ const COMMAND_FUNCTIONS = {
         }
         // Check if the user is a thread builder 
         else if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
-            contractMethods.showCommandError(
+            showCommandError(
                 interaction,
                 "You cannot create feedback contracts since you are a builder in this thread."
             );
@@ -50,7 +49,7 @@ const COMMAND_FUNCTIONS = {
         }
         // Check if the feedback thread is open for feedback
         else if (!(await contractMethods.isFeedbackEnabled(feedbackThread))) {
-            contractMethods.showCommandError(
+            showCommandError(
                 interaction,
                 "This feedback thread is not currently open for feedback contracts."
             );
@@ -58,7 +57,7 @@ const COMMAND_FUNCTIONS = {
         }
         // Check if the user is blocked
         else if (await userMethods.getIsBlocked(interaction.user.id)) {
-            contractMethods.showCommandError(
+            showCommandError(
                 interaction,
                 "You have been blocked from creating feedback contracts for spam or abuse."
             );
@@ -66,7 +65,7 @@ const COMMAND_FUNCTIONS = {
         }
         // Check if user has read and accepted the rules
         else if (!acceptedRules) {
-            const messages = await messageMethods.getPointsInfoDisplayMessages(interaction);
+            const messages = await getPointsInfoDisplayMessages(interaction);
             const rulesEmbed = new EmbedBuilder()
                 .setDescription(messages[3])
                 .setColor(Colors.Orange);
@@ -185,7 +184,7 @@ const COMMAND_FUNCTIONS = {
         
         // Check that the command user is the thread owner
         if (interaction.user.id != feedbackThreadOwnerId) {
-            contractMethods.showCommandError(
+            showCommandError(
                 interaction,
                 `Only the owner of this thread is allowed to add builders.`
             );
@@ -193,7 +192,7 @@ const COMMAND_FUNCTIONS = {
         }
         // Check that the thread builder count is below the maximum
         else if (builderCount >= COLLABORATOR_LIMIT) {
-            contractMethods.showCommandError(
+            showCommandError(
                 interaction,
                 `This thread has reached the builder limit of ${COLLABORATOR_LIMIT}.`
             );
@@ -211,7 +210,7 @@ const COMMAND_FUNCTIONS = {
                 return true;
             }
             else {
-                contractMethods.showCommandError(
+                showCommandError(
                     interaction,
                     `${newBuilder} is already a builder in this thread.`
                 );
@@ -235,7 +234,7 @@ const COMMAND_FUNCTIONS = {
         
         // Check that the command user is the thread owner
         if (interaction.user.id != feedbackThreadOwnerId) {
-            contractMethods.showCommandError(
+            showCommandError(
                 interaction,
                 `Only the owner of this thread is allowed to remove builders.`
             );
@@ -243,7 +242,7 @@ const COMMAND_FUNCTIONS = {
         }
         // Check that the target user is not the thread owner
         else if (builder.id == feedbackThreadOwnerId) {
-            contractMethods.showCommandError(
+            showCommandError(
                 interaction,
                 `The owner of this thread cannot be removed as a builder.`
             );
@@ -261,7 +260,7 @@ const COMMAND_FUNCTIONS = {
                 return true;
             }
             else {
-                contractMethods.showCommandError(
+                showCommandError(
                     interaction,
                     `${builder} is not a builder for this thread.`
                 );

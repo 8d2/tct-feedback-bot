@@ -1,5 +1,5 @@
 // Constant values
-const { bold, strikethrough, underline, subtext } = require("discord.js");
+const { bold, strikethrough, underline, subtext, inlineCode } = require("discord.js");
 
 const COMMAND_NOT_IMPLEMENTED_DESC = "This command has not been fully implemented."
 const MESSAGE_SENT_CONFIRM_MESSAGE = "The message has been sent."
@@ -10,7 +10,7 @@ const ALLOW_PINGS_MESSAGE_FALSE = "You will no longer recieve pings for contract
 const UPDATE_ALL_ROLES_ERROR = "Failed to update roles of users due to an error. Make sure the bot has the correct permissions.";
 const UPDATE_ALL_ROLES_SUCCESS = "Successfully updated the roles of all users.";
 const OPTION_NULL_NO_FORMAT = "N/A";
-const OPTION_NULL = "`" + OPTION_NULL_NO_FORMAT + "`";
+const OPTION_NULL = inlineCode(OPTION_NULL_NO_FORMAT);
 const MISSING_ACCESS_CODE = 50001;          // For roles
 const MISSING_PERMISSIONS_CODE = 50013;     // For messages
 const FEEDBACK_AGREEMENT_TITLE = "Feedback Agreement"

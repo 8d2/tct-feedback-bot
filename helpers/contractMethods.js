@@ -1,5 +1,6 @@
 const { ThreadChannel, MessageFlags, inlineCode, EmbedBuilder, Colors } = require('discord.js');
-const { getFeedbackChannel, getFeedbackChannelId, getFeedbackForumTagId } = require('./settingsMethods');
+const { getFeedbackChannels, getFeedbackForumTagIds } = require('./settingsMethods');
+const { showCommandError } = require('./messageMethods.js');
 
 const constants = require("../helpers/constants.js");
 
@@ -10,9 +11,19 @@ const constants = require("../helpers/constants.js");
  */
 async function isFeedbackEnabled(thread) {
     const feedbackForumTags = thread.appliedTags;
-    const feedbackEnabledTag = await getFeedbackForumTagId();
-    if (!feedbackEnabledTag) return false;
-    return feedbackForumTags.includes(feedbackEnabledTag);
+    const feedbackTagIds = await getFeedbackForumTagIds();
+    return feedbackTagIds.some(tagId => feedbackForumTags.includes(tagId));
+}
+
+/**
+ * Gets whether the channel is a thread within a feedback channel.
+ * @param {BaseGuildTextChannel} channel The channel to check.
+ * @returns {bool} Whether the channel is a valid feedback thread.
+ */
+async function isChannelFeedbackThread(channel) {
+    // Get that any of the assigned feedback channel IDs are the parent of this channel.
+    const feedbackChannels = await getFeedbackChannels(channel.guild);
+    return feedbackChannels.some(feedbackChannel => channel.parentId == feedbackChannel.id);
 }
 
 /**
@@ -23,9 +34,7 @@ async function isFeedbackEnabled(thread) {
  * @returns {ThreadChannel?} The feedback thread if it exists, or null if invalid.
  */
 async function getFeedbackThreadFromInteraction(interaction) {
-    const feedbackChannelId = await getFeedbackChannelId();
-    if (interaction.channel.parentId != feedbackChannelId) return null;
-    return interaction.channel;
+    return isChannelFeedbackThread(interaction.channel) ? interaction.channel : null;
 }
 
 /**
@@ -34,23 +43,7 @@ async function getFeedbackThreadFromInteraction(interaction) {
  * @returns {string?} The user ID of the thread owner.
  */
 async function getFeedbackThreadOwnerId(thread) {
-    const feedbackChannelId = await getFeedbackChannelId();
-    if (thread.parentId != feedbackChannelId) return null;
-    return thread.ownerId;
-}
-
-/**
- * Responds to an interaction with an error embed with the given description.
- * @param {CommandInteraction} the command that generated this interaction
- * @param {string} the description to use in the embed
- */
-async function showCommandError(interaction, description) {
-    const responseEmbed = new EmbedBuilder()
-        .setTimestamp()
-        .setColor(Colors.Red)
-        .setDescription(description);
-            
-    await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+    return isChannelFeedbackThread(thread) ? thread.ownerId : null;
 }
 
 /**
@@ -58,8 +51,8 @@ async function showCommandError(interaction, description) {
  * @param {CommandInteraction} the command that generated this interaction
  */
 async function showIncorrectChannelError(interaction) {
-    const realFeedbackChannel = await getFeedbackChannel(interaction.guild);
-    showCommandError(interaction, `You can only use ${inlineCode(`/contract ${interaction.options.getSubcommand()}`)} within ${realFeedbackChannel}.`);
+    const feedbackChannels = await getFeedbackChannels(interaction.guild);
+    showCommandError(interaction, `You can only use ${inlineCode(`/contract ${interaction.options.getSubcommand()}`)} within ${concatList(feedbackChannels)}.`);
 }
 
 /**
@@ -91,7 +84,6 @@ module.exports = {
     isFeedbackEnabled,
     getFeedbackThreadFromInteraction,
     getFeedbackThreadOwnerId,
-    showCommandError,
     showIncorrectChannelError,
     getFeedbackThreadOwner,
     parseRatingLabelToPoints

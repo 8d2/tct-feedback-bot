@@ -1,72 +1,123 @@
 // Stores settings set by admin commands, including getter + setter methods.
 
 const { Collection } = require('discord.js');
-const { SETTINGS_MAIN_IDENTIFIER, Roles, Settings } = require('../dbObjects.js');
+const { SETTINGS_MAIN_IDENTIFIER, Channels, Roles, Settings, Tags } = require('../dbObjects.js');
 
 let settings;
 
 /**
- * Gets the feedback channel id.
- * @returns {string?} Currently set feedback channel ID. Null if not set.
+ * Gets the feedback channels for settings in database.
+ * @returns {[Channels]} Database channels. Empty if no channels set.
  */
-function getFeedbackChannelId() {
-    return settings ? settings.feedback_channel_id : null;
+async function getDatabaseFeedbackChannels() {
+    return settings ? await settings.getChannels() : [];
 }
 
 /**
- * Sets the feedback channel to the id.
- * @param {string} id Channel ID to set.
- */
-function setFeedbackChannelId(id) {
-    if (settings) {
-        settings.feedback_channel_id = id;
-        settings.save();
-    }
-}
-
-/**
- * Gets the feedback channel set in settings from the guild.
+ * Gets the feedback channels set in settings from the guild.
  * @param {Guild} guild The guild to get channel from.
- * @returns {GuildBaseChannel?} Currently set feedback channel. Null if not set.
+ * @returns {[GuildBaseChannel]} Feedback channel. Empty if no channels set.
  */
-async function getFeedbackChannel(guild) {
-    const feedbackChannelId = getFeedbackChannelId();
-    return feedbackChannelId ? guild.channels.cache.get(feedbackChannelId) : null;
+async function getFeedbackChannels(guild) {
+    const feedbackChannels = await getDatabaseFeedbackChannels();
+    return feedbackChannels.map(channel => guild.channels.cache.get(channel_id));
 }
 
 /**
- * Gets the "open for feedback" forum tag id.
- * @returns {string?} Currently set feedback channel ID. Null if not set.
+ * Adds the feedback channel of the id.
+ * @param {string} id Channel ID to add.
+ * @returns {bool} Whether the channel ID was added. False if already in database.
  */
-function getFeedbackForumTagId() {
-    return settings ? settings.feedback_tag_id : null;
-}
-
-/**
- * Sets the "open for feedback" tag to the id.
- * @param {string} id Channel ID to set.
- */
-function setFeedbackForumTagId(id) {
+async function addFeedbackChannelId(id) {
     if (settings) {
-        settings.feedback_tag_id = id;
-        settings.save();
+        const added = await settings.addChannel(id);
+        if (added) {
+            settings.save();
+        }
+        return added;
     }
+    return false;
 }
 
 /**
- * Get roles for settings.
+ * Removes the feedback channel of the id.
+ * @param {string} id Channel ID to remove.
+ * @returns {bool} Whether the channel ID was removed. False if not in database.
+ */
+async function removeFeedbackChannelId(id) {
+    if (settings) {
+        const removed = await settings.removeChannel(id);
+        if (removed) {
+            settings.save();
+        }
+        return removed;
+    }
+    return false;
+}
+
+/**
+ * Gets the all forum tags for settings in database.
+ * @returns {[Tags]} Database tags. Empty if no tags set.
+ */
+async function getDatabaseFeedbackForumTags() {
+    return settings ? await settings.getTags() : [];
+}
+
+/**
+ * Gets the all forum tag ids for settings in database.
+ * @returns {[int]} Tag IDs. Empty if no tags set.
+ */
+async function getFeedbackForumTagIds() {
+    const tags = await getDatabaseFeedbackForumTags();
+    return tags.map(tag => tag.tag_id);
+}
+
+/**
+ * Adds a forum tag of the id.
+ * @param {string} id Tag ID to add.
+ * @returns {bool} Whether the tag ID was added. False if already in database.
+ */
+async function addFeedbackForumTagId(id) {
+    if (settings) {
+        const added = await settings.addTag(id);
+        if (added) {
+            settings.save();
+        }
+        return added;
+    }
+    return false;
+}
+
+/**
+ * Remove a forum tag of the id.
+ * @param {string} id Tag ID to add.
+ * @returns {bool} Whether the tag ID was removed. False if not in database.
+ */
+async function removeFeedbackForumTagId(id) {
+    if (settings) {
+        const removed = await settings.removeTag(id);
+        if (removed) {
+            settings.save();
+        }
+        return removed;
+    }
+    return false;
+}
+
+/**
+ * Get roles for settings in database.
  * @returns {[Roles]} Roles. Empty if no roles set.
  */
-async function getRoles() {
+async function getDatabaseRoles() {
     return settings ? await settings.getRoles() : [];
 }
 
 /**
- * Get role from given role type.
+ * Get role from given role type in database.
  * @param {string} roleType Type of role to get.
  * @returns {Roles?} Role. Null if no role found.
  */
-async function getRole(roleType) {
+async function getDatabaseRole(roleType) {
     return settings ? settings.getRole(roleType) : null;
 }
 
@@ -75,8 +126,8 @@ async function getRole(roleType) {
  * @param {string} roleType Type of role to get.
  * @returns {Roles} Role.
  */
-async function getOrCreateRole(roleType) {
-    const role = await getRole(roleType);
+async function getOrCreateDatabaseRole(roleType) {
+    const role = await getDatabaseRole(roleType);
     if (role) {
         return role;
     }
@@ -90,7 +141,7 @@ async function getOrCreateRole(roleType) {
  * @returns {string?} Role ID. Null if not set.
  */
 async function getRoleId(roleType, roleId) {
-    const role = await getOrCreateRole(roleType);
+    const role = await getOrCreateDatabaseRole(roleType);
     return role.role_id;
 }
 
@@ -170,14 +221,17 @@ async function setStaffIsProtected(protect) {
 }
 
 module.exports = {
-    getFeedbackChannelId,
-    setFeedbackChannelId,
-    getFeedbackChannel,
-    getFeedbackForumTagId,
-    setFeedbackForumTagId,
-    getRoles,
-    getRole,
-    getOrCreateRole,
+    getDatabaseFeedbackChannels,
+    getFeedbackChannels,
+    addFeedbackChannelId,
+    removeFeedbackChannelId,
+    getDatabaseFeedbackForumTags,
+    getFeedbackForumTagIds,
+    addFeedbackForumTagId,
+    removeFeedbackForumTagId,
+    getDatabaseRoles,
+    getDatabaseRole,
+    getOrCreateDatabaseRole,
     getRoleId,
     setRoleIdFromRole,
     setRoleId,
