@@ -2,7 +2,7 @@
 
 const { PermissionFlagsBits, Collection } = require("discord.js");
 const { Threads, Collaborators } = require('../dbObjects.js');
-const { getFeedbackThreadOwnerId } = require("./contractMethods.js");
+const { getFeedbackThreadOwner } = require("./contractMethods.js");
 
 const threads = new Collection();
 const collaborators = new Collection();
@@ -48,6 +48,36 @@ async function getOrCreateThreadInfo(thread) {
 async function getThreadCollaboratorCount(thread) {
     const threadInfo = await getOrCreateThreadInfo(thread);
     return threadInfo.collaborator_count;
+}
+
+/**
+ * Returns users that have collaborator in a specific thread.
+ * @param {ThreadChannel} thread The thread
+ * @return {[User]} List of users
+ */
+async function getThreadCollaboratorUsers(thread) {
+    await getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
+    const collabData = await Collaborators.findAll();
+
+    const threadOwner = await getFeedbackThreadOwner(thread);
+
+    var listOfUsers = []
+    for (let dataInstance of collabData) {
+        const collabKey = dataInstance.collaboration_id
+        
+        // If the data belongs to this thread id
+        if (collabKey.match(`_${thread.id}`)) {
+            // All we need now is the user, discard the rest
+            const userId = collabKey.replace(`_${thread.id}`, "");
+            const user = (await thread.guild.members.fetch(userId)).user;
+
+            // No need to show that the thread owner is a builder again
+            if (user != threadOwner) {
+                listOfUsers.push(user)
+            }
+        }
+    }
+    return listOfUsers;
 }
 
 /**
@@ -114,6 +144,7 @@ async function removeCollaboratorFromThread(user, thread) {
 module.exports = {
     getUserIsCollaborator,
     getThreadCollaboratorCount,
+    getThreadCollaboratorUsers,
     addCollaboratorToThread,
     removeCollaboratorFromThread,
 

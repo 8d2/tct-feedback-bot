@@ -10,7 +10,8 @@ const userMethods = require("../helpers/userMethods.js");
 const messageMethods = require("../helpers/messageMethods.js");
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const { getFeedbackChannel } = require("../helpers/settingsMethods.js");
-const constants = require("../helpers/constants.js")
+const constants = require("../helpers/constants.js");
+const { col } = require("sequelize");
 
 // Constants
 const CREATE_COMMAND_NAME = "create";
@@ -41,13 +42,13 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         // Check if the user is a thread builder 
-        else if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
+      /*  else if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
             contractMethods.showCommandError(
                 interaction,
                 "You cannot create feedback contracts since you are a builder in this thread."
             );
             return false;
-        }
+        }*/
         // Check if the feedback thread is open for feedback
         else if (!(await contractMethods.isFeedbackEnabled(feedbackThread))) {
             contractMethods.showCommandError(
