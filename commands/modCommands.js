@@ -88,7 +88,7 @@ const COMMAND_FUNCTIONS = {
         const points = interaction.options.getInteger(POINTS_OPTION_NAME);
         const isStaff = userMethods.getMemberIsStaff(user);
         const staffIsProtected = await getStaffIsProtected();
-        let errorEmbeds = [];
+        let result = false;
         
         if (isStaff && staffIsProtected) {
             messageEmbed.setDescription(`${user} is a staff member and is protected from this command.`);
@@ -96,12 +96,14 @@ const COMMAND_FUNCTIONS = {
         }
         else {
             await userMethods.setPoints(user.id, points);
-            errorEmbeds = await userMethods.updateRoles(interaction, user.id);
+            // hacky
+            result = await userMethods.updateRoles(interaction, user.id);
+            result = {doFollowUpPing: result.length > 0, followUpEmbeds: result}
             messageEmbed.setDescription(`${user} now has ${pluralize(points, "point")}.`);
             messageEmbed.setColor(Colors.Green);
         }
         
-        return {doFollowUpPing: errorEmbeds.length > 0, followUpEmbeds: errorEmbeds};
+        return result;
     },
 
     /**
