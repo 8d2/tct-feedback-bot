@@ -136,7 +136,7 @@ const COMMAND_FUNCTIONS = {
             // TODO: make this command show a list of all builders
             const feedbackThreadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
             const feedbackEnabled = await contractMethods.isFeedbackEnabled(feedbackThread);
-            const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread);
+            const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, true);
 
             // Format list of collaborators message
             var collaboratorsMessage = ""

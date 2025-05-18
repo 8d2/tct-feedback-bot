@@ -55,7 +55,7 @@ async function getThreadCollaboratorCount(thread) {
  * @param {ThreadChannel} thread The thread
  * @return {[User]} List of users
  */
-async function getThreadCollaboratorUsers(thread) {
+async function getThreadCollaboratorUsers(thread, discardOwner) {
     await getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
     const collabData = await Collaborators.findAll();
 
@@ -71,8 +71,7 @@ async function getThreadCollaboratorUsers(thread) {
             const userId = collabKey.replace(`_${thread.id}`, "");
             const user = (await thread.guild.members.fetch(userId)).user;
 
-            // No need to show that the thread owner is a builder again
-            if (user != threadOwner) {
+            if (!(user == threadOwner && discardOwner)) {
                 listOfUsers.push(user)
             }
         }
