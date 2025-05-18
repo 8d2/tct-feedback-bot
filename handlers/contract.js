@@ -71,7 +71,6 @@ function createContractMessage(interaction, pingUsers) {
     // Adds a thread owner ping to the message
     let threadOwnerPing;
     if (pingUsers) {
-        // Should use in future to ping all collaborators
         threadOwnerPing = "";
         pingUsers.forEach((user, index) => {
             threadOwnerPing += `${user}`;

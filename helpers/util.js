@@ -22,33 +22,34 @@ function pluralize(amount, str) {
  * Concats every item of the array together using a separator.
  * @param {Array} array Array to concat.
  * @param {string} separator The separator to use between each item.
- * @param {int} indexTrim How much off the end of the array to exclude from the separator (1 = last item is not concatenated).
+ * @param {int} trimEnd How much off the end of the array to exclude from the separator (1 = last item is not concatenated).
  * @return {string} The produced concatenated array.
  */
-function concat(array, separator = ",", indexTrim = 0) {
-    return array.reduce(
-        (str, item, index) =>
-            index >= array.length - indexTrim ? str : str + `${item}` + (index < array.length - indexTrim - 1 ? separator + " " : ""), ""
-    );
+function concat(array, separator = ",", trimEnd = 0) {
+    return array.slice(0, array.length - trimEnd).join(separator + " ");
 }
 
 /**
  * Concats every item of the array together in a list format, using "and" and comma separators.
+ * Ex: concatList([item1, item2, item3]) -> item1, item2 & item3
+ *     concatList([item1, item2]) -> item2 & item3
  * @param {Array} array Array to concat.
- * @param {string} emptyPhrase String to use if no elements are within the array.
+ * @param {string} empty String to use if no elements are within the array.
+ * @param {string} separator The separator to use between each item. "," by default.
+ * @param {string} and The separator to use between the second to last and last item. "&" by default.
  * @return {string} The produced concatenated array in list format.
  */
-function concatList(array, emptyPhrase = constants.OPTION_NULL, andPhrase = "&") {
+function concatList(array, empty = constants.OPTION_NULL, separator = ",", and = "&") {
     if (array.length == 0) {
         // No elements, use empty phrase
-        return emptyPhrase;
+        return empty;
     }
     if (array.length == 1) {
         // Only one element, return that
         return `${array[0]}`;
     }
     // Concat in a list all elements but the last, then add last using "and"
-    return concat(array, ",", 1) + " " + andPhrase + " " + `${array[array.length - 1]}`;
+    return concat(array, ",", 1) + " " + and + " " + `${array[array.length - 1]}`;
 }
 
 module.exports = {
