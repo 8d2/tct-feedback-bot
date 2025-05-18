@@ -173,7 +173,7 @@ async function handleContractConfirmInteraction(interaction) {
             userMethods.setPoints(originalUser.id, newPoints);
         }
 
-        // Award points and lock original contract message
+        // Edit original contract message
         const lockedResponseEmbed = new EmbedBuilder()
             .setTitle(constants.FEEDBACK_AGREEMENT_TITLE)
             .setColor(Colors.Blue)
@@ -187,8 +187,7 @@ async function handleContractConfirmInteraction(interaction) {
         await interaction.update({content: message.content, embeds: [lockedResponseEmbed], components: []});
 
         // Follow up with a ping to original user if they have pings enabled
-        const pingOriginalUser = await userMethods.getAllowPings(originalUser.id);
-        if (pingOriginalUser) {
+        if (await userMethods.getAllowPings(originalUser.id)) {
             await interaction.followUp({content: `${originalUser}`});
         }
     }
