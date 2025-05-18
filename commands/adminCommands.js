@@ -16,6 +16,7 @@ const REQUIREMENT_OPTION_NAME = "requirement";
 const ROLE_OPTION_NAME = "role";
 const ROLE_TYPE_OPTION_NAME = "roletype";
 const UPDATE_ALL_OPTION_NAME = "updateallroles";
+const PROTECTED_OPTION_NAME = "protected";
 
 const ROLE_TYPES = [
     {name: "regular", value: "regular"},
@@ -27,6 +28,7 @@ const SET_FORUM_TAG_COMMAND_NAME = "setforumtag";
 const SET_REQUIREMENT_COMMAND_NAME = "setrequirement";
 const SET_ROLE_COMMAND_NAME = "setrole";
 const GET_SETTINGS_COMMAND_NAME = "settings";
+const SET_STAFF_PROTECTED_COMMAND_NAME = "setstaffprotection";
 
 const COMMAND_FUNCTIONS = {
     
@@ -106,13 +108,38 @@ const COMMAND_FUNCTIONS = {
         const channel = await settingsMethods.getFeedbackChannel(interaction.guild);
         const tag = settingsMethods.getFeedbackForumTagId();
         const rolesMessage = await messageMethods.getRoleRequirementMessage(interaction, true);
+        const staffIsProtected = await settingsMethods.getStaffIsProtected();
+        
         messageEmbed.setDescription(
             heading("Admin Settings:", HeadingLevel.Two) +
             `\nFeedback Channel: ${channel ?? constants.OPTION_NULL}\n` +
             `Feedback Tag: ${inlineCode(tag ?? constants.OPTION_NULL_NO_FORMAT)}\n` +
-            `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}`
+            `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}\n` +
+            `Staff is protected: ${staffIsProtected}`
         );
         messageEmbed.setColor(Colors.DarkPurple);
+        return true;
+    },
+    
+    /**
+     * Handles the '/admin setstaffprotection' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [SET_STAFF_PROTECTED_COMMAND_NAME]: async function handleSetStaffProtection(interaction, messageEmbed) {
+        
+        const protect = interaction.options.getBoolean(PROTECTED_OPTION_NAME);
+        await settingsMethods.setStaffIsProtected(protect);
+        
+        messageEmbed.setColor(Colors.Green);
+        if (protect) {
+            messageEmbed.setDescription("Staff members are now protected from data modifying commands.");
+        }
+        else {
+            messageEmbed.setDescription("Staff members are no longer protected from data modifying commands.");
+        }
+        
         return true;
     }
     
@@ -185,6 +212,16 @@ module.exports = {
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(GET_SETTINGS_COMMAND_NAME)
             .setDescription("Show the current feedback bot admin settings.")
+        )
+        
+        .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(SET_STAFF_PROTECTED_COMMAND_NAME)
+            .setDescription("Sets whether staff are protected from data modifying commands (/mod setpoints, /mod block).")
+            .addBooleanOption(new SlashCommandBooleanOption()
+                .setName(PROTECTED_OPTION_NAME)
+                .setDescription("Whether staff should be protected")
+                .setRequired(true)
+            )
         ),
 
     async execute(interaction) {
