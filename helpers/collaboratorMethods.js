@@ -1,8 +1,10 @@
 // Stores information about feedback threads and collaborators.
 
-const { PermissionFlagsBits, Collection } = require("discord.js");
+const { Collection } = require("discord.js");
 const { Threads, Collaborators } = require('../dbObjects.js');
-const { getFeedbackThreadOwnerId } = require("./contractMethods.js");
+const { getFeedbackThreadOwner } = require("./contractMethods.js");
+
+const userMethods = require("./userMethods.js");
 
 const threads = new Collection();
 const collaborators = new Collection();
@@ -48,6 +50,27 @@ async function getOrCreateThreadInfo(thread) {
 async function getThreadCollaboratorCount(thread) {
     const threadInfo = await getOrCreateThreadInfo(thread);
     return threadInfo.collaborator_count;
+}
+
+/**
+ * Returns users that have collaborator in a specific thread.
+ * @param {ThreadChannel} thread The thread
+ * @param {boolean} discardOwner If true, will remove the thread owner from the returned results
+ * @return {[User]} List of users
+ */
+async function getThreadCollaboratorUsers(thread, discardOwner) {
+    await getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
+    const users = await userMethods.getUsersWithInfo(thread.guild);
+
+    const threadOwner = await getFeedbackThreadOwner(thread);
+
+    var listOfUsers = []
+    for (let user of users) {
+        if (await getUserIsCollaborator(user, thread) && !(user == threadOwner && discardOwner)) {
+            listOfUsers.push(user);
+        }
+    }
+    return listOfUsers;
 }
 
 /**
@@ -114,6 +137,7 @@ async function removeCollaboratorFromThread(user, thread) {
 module.exports = {
     getUserIsCollaborator,
     getThreadCollaboratorCount,
+    getThreadCollaboratorUsers,
     addCollaboratorToThread,
     removeCollaboratorFromThread,
 

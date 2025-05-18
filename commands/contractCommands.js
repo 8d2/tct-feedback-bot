@@ -9,7 +9,7 @@ const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
 const { getPointsInfoDisplayMessages, showCommandError } = require("../helpers/messageMethods.js");
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
-const constants = require("../helpers/constants.js")
+const constants = require("../helpers/constants.js");
 
 // Constants
 const CREATE_COMMAND_NAME = "create";
@@ -110,15 +110,20 @@ const COMMAND_FUNCTIONS = {
             }
             return false;
         }
-        
-        // Passed all checks, make a contract!
-        // Component creation has been outsourced to handlers </3
-        // Pings the thread owner if they have allow pings on.
-        const threadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
-        const userAllowsPings = await userMethods.getAllowPings(threadOwner.id);
-        const pingUsers = userAllowsPings ? [threadOwner] : null;
-        await interaction.reply(createContractMessage(interaction, pingUsers));
-        return true;
+        else {
+            // Pings the thread collaborators if they have allow pings on.
+            const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, false);
+            const usersToPing = []
+            for (let user of collaborators) {
+                const userAllowsPings = await userMethods.getAllowPings(user.id);
+                if (userAllowsPings) {
+                    usersToPing.push(user)
+                }
+            }
+
+            await interaction.reply(createContractMessage(interaction, usersToPing));
+            return true;
+        }
     },
 
     /**
@@ -134,10 +139,31 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         else {
-            // TODO: make this command show a list of all builders
             const feedbackThreadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
             const feedbackEnabled = await contractMethods.isFeedbackEnabled(feedbackThread);
-            const builderCount = await collaboratorMethods.getThreadCollaboratorCount(feedbackThread);
+            const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, true);
+
+            // Format list of collaborators message
+            var collaboratorsMessage = ""
+            if (collaborators.length == 0) {
+                collaboratorsMessage = "No other users added!"
+            }
+            else {
+                var count = 0
+                for (let user of collaborators) {
+                    count += 1
+
+                    if (count == collaborators.length) {
+                        collaboratorsMessage += `${user}`
+                    }
+                    else if (count == collaborators.length - 1) {
+                        collaboratorsMessage += `${user} & `
+                    }
+                    else {
+                        collaboratorsMessage += `${user}, `
+                    }
+                }
+            }
 
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
@@ -145,7 +171,7 @@ const COMMAND_FUNCTIONS = {
                 .setDescription(
                     `Builder: ${feedbackThreadOwner}
                     Feedback Enabled: ${bold(`${feedbackEnabled}`)}
-                    Number of builders: ${builderCount}`
+                    Collaborators: ${collaboratorsMessage}`
                 );
             await interaction.reply({embeds: [responseEmbed]});
             return true;
