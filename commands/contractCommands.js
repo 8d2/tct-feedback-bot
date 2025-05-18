@@ -136,7 +136,29 @@ const COMMAND_FUNCTIONS = {
             // TODO: make this command show a list of all builders
             const feedbackThreadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
             const feedbackEnabled = await contractMethods.isFeedbackEnabled(feedbackThread);
-            const builderCount = await collaboratorMethods.getThreadCollaboratorCount(feedbackThread);
+            const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread);
+
+            // Format list of collaborators message
+            var collaboratorsMessage = ""
+            if (collaborators.length == 0) {
+                collaboratorsMessage = "No other users added!"
+            }
+            else {
+                var count = 0
+                for (let user of collaborators) {
+                    count += 1
+
+                    if (count == collaborators.length) {
+                        collaboratorsMessage += `${user}`
+                    }
+                    else if (count == collaborators.length - 1) {
+                        collaboratorsMessage += `${user} & `
+                    }
+                    else {
+                        collaboratorsMessage += `${user}, `
+                    }
+                }
+            }
 
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
@@ -144,7 +166,7 @@ const COMMAND_FUNCTIONS = {
                 .setDescription(
                     `Builder: ${feedbackThreadOwner}
                     Feedback Enabled: ${bold(`${feedbackEnabled}`)}
-                    Number of builders: ${builderCount}`
+                    Collaborators: ${collaboratorsMessage}`
                 );
             await interaction.reply({embeds: [responseEmbed]});
             return true;
