@@ -192,6 +192,52 @@ async function getRulesAccepted(id) {
 }
 
 /**
+ * Gets the ownership status of all defined role IDs from the amount of points.
+ * @param {int} feedbackPoints How many points to check ownership from.
+ * @return {Map} A map from every role ID to boolean, stating whether the role is owned or not.
+ */
+async function getRoleIdsOwnershipStatus(feedbackPoints) {
+    let ownershipStatus = {};
+    const roles = await getRoles();
+    for(const role of roles) {
+        const hasRole = feedbackPoints >= role.role_requirement;
+        ownershipStatus[role.role_id] = hasRole;
+    }
+    return ownershipStatus;
+}
+
+/**
+ * Gets the owned role IDs from the amount of points.
+ * @param {int} feedbackPoints How many points to get roles from.
+ * @return {[string]} All role IDs owned.
+ */
+async function getRoleIdsOwned(feedbackPoints) {
+    const ownershipStatus = await getRoleIdsOwnershipStatus(feedbackPoints);
+    return Object.keys(ownershipStatus).filter(roleId => ownershipStatus[roleId]);
+}
+
+/**
+ * Gets a list of all the discord roles gained going from `originalPoints` to `newPoints`.
+ * @param {import("discord.js").Interaction} interaction The interaction to get gained roles from.
+ * @param {int} originalPoints The original points amount.
+ * @param {int} newPoints The new points amount.
+ * @return {[Role]} Roles gained.
+ */
+async function getGainedRoles(interaction, originalPoints, newPoints) {
+    // Get roles ownership status for 
+    const originalOwnedRoleIds = await getRoleIdsOwned(originalPoints);
+    const newOwnedRoleIds = await getRoleIdsOwned(newPoints);
+    let gainedRoles = [];
+    for (const roleId of newOwnedRoleIds) {
+        if (!originalOwnedRoleIds.includes(roleId)) {
+            // Role not in original owned roles, new role!
+            gainedRoles.push(await interaction.guild.roles.fetch(roleId));
+        }
+    }
+    return gainedRoles;
+}
+
+/**
  * Updates a user's roles depending on how many feedback points they have.
  * @param {CommandInteraction} interaction The interaction to update roles from.
  * @param {Users} user The user to update.
@@ -200,11 +246,11 @@ async function getRulesAccepted(id) {
 async function updateRolesFromUser(interaction, user) {
     const guildMember = await interaction.guild.members.fetch(user.user_id);
     const feedbackPoints = await getPointsFromUser(user);
-    const roles = await getRoles();
     let errorEmbeds = [];
-    for(const role of roles) {
-        const hasRole = feedbackPoints >= role.role_requirement;
-        const guildRole = await interaction.guild.roles.fetch(role.role_id);
+    const ownershipStatus = await getRoleIdsOwnershipStatus(feedbackPoints);
+    for (const roleId in ownershipStatus) {
+        const guildRole = await interaction.guild.roles.fetch(roleId);
+        const hasRole = ownershipStatus[roleId];
         let errorMessage;
         if (hasRole) {
             // User has enough points for this role
@@ -270,6 +316,9 @@ module.exports = {
     setIsBlocked,
     setAllowPings,
     setRulesAccepted,
+    getRoleIdsOwnershipStatus,
+    getRoleIdsOwned,
+    getGainedRoles,
     updateRolesFromUser,
     updateRoles,
     updateAllUsersRoles,

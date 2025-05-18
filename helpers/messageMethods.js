@@ -2,6 +2,7 @@
 const { heading, bold, italic, inlineCode, HeadingLevel } = require("discord.js");
 
 const { getRoles } = require('./settingsMethods.js');
+const { getGainedRoles } = require('./userMethods.js');
 const { pluralize } = require('./util.js');
 
 /**
@@ -73,6 +74,20 @@ async function getPointsInfoDisplayMessages(interaction) {
 }
 
 /**
+ * Gets a message listing all the roles gained going from `originalPoints` to `newPoints`.
+ * @param {import("discord.js").Interaction} interaction The interaction to get gained roles message from.
+ * @param {int} originalPoints The original points amount.
+ * @param {int} newPoints The new points amount.
+ * @return {string?} Roles gained, or null if no roles were gained.
+ */
+async function getGainedRolesMessage(interaction, originalPoints, newPoints) {
+    const gainedRoles = await getGainedRoles(interaction, originalPoints, newPoints);
+    return gainedRoles.length > 0 ? gainedRoles.reduce(
+        (str, role, index) => str + `${role}` + (index < gainedRoles.length - 1 ? ", " : ""), ""
+    ) : null;
+}
+
+/**
  * Get the original user who supplied the root of this interaction.
  * @param {import('discord.js').Interaction} interaction The interaction to analyze.
  * @returns {User} The original root of this interaction.
@@ -102,6 +117,7 @@ module.exports = {
     getRatingPointsMessage,
     getRoleRequirementMessage,
     getPointsInfoDisplayMessages,
+    getGainedRolesMessage,
     getOriginalUser,
     getAuthorOptions
 }

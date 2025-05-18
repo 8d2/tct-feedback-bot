@@ -89,6 +89,7 @@ const COMMAND_FUNCTIONS = {
         if (isStaff) {
             messageEmbed.setDescription(`${user} is a staff member and is protected from this command.`);
             messageEmbed.setColor(Colors.Yellow);
+            return false;
         }
         else {
             await userMethods.setPoints(user.id, points);
@@ -111,6 +112,8 @@ const COMMAND_FUNCTIONS = {
         const errorEmbeds = await userMethods.updateRoles(interaction, updatingUser.id);
         if (errorEmbeds.length > 0) {
             // Error occured, show errors
+            messageEmbed.setDescription(`Failed to update feedbacker roles for ${updatingUser}.`);
+            messageEmbed.setColor(Colors.Red);
             return {followUpEmbeds: errorEmbeds};
         }
         messageEmbed.setDescription(`Successfully updated feedbacker roles for ${updatingUser}.`);

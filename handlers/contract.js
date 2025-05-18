@@ -2,7 +2,7 @@ const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder, EmbedBuilder, Colors, blockQuote } = require("discord.js");
 
 const constants = require("../helpers/constants.js");
-const { getOriginalUser, getAuthorOptions } = require("../helpers/messageMethods.js");
+const { getOriginalUser, getAuthorOptions, getGainedRolesMessage } = require("../helpers/messageMethods.js");
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
@@ -171,6 +171,7 @@ async function handleContractConfirmInteraction(interaction) {
         const newPoints = originalPoints + awardPoints;
         if (newPoints != originalPoints) {
             userMethods.setPoints(originalUser.id, newPoints);
+            userMethods.updateRoles(interaction, originalUser.id);
         }
 
         // Edit original contract message
@@ -188,7 +189,11 @@ async function handleContractConfirmInteraction(interaction) {
 
         // Follow up with a ping to original user if they have pings enabled
         if (await userMethods.getAllowPings(originalUser.id)) {
-            await interaction.followUp({content: `${originalUser}`});
+            const gainedRolesMessage = await getGainedRolesMessage(interaction, originalPoints, newPoints);
+            const followUpMessage =
+                `${originalUser} Your feedback contract has been accepted.` +
+                (gainedRolesMessage ? ` You have earned new roles: ${gainedRolesMessage}` : "");
+            await interaction.followUp({content: followUpMessage});
         }
     }
 }
