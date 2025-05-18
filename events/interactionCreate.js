@@ -19,23 +19,23 @@ const STRING_SELECT_HANDLERS = {
  */
 async function handleInteractionByCustomId(interaction, handlers) {
     const customId = interaction.customId;
-    try {
-        // Respond to the interaction using the handler for this customId
 
-        const handler = handlers[customId];
-        if (!handler) {
-            // The handler for this custom ID does not exist.
-            console.log(`[WARNING] No handler exists for the interaction with custom ID "${customId}".`);
-        }
-        else {
+    // Respond to the interaction using the handler for this customId
+    const handler = handlers[customId];
+    if (handler) {
+        try {
             // Run handler
             await handler(interaction);
         }
-    } 
-    catch (error) {
-        // An error occured with finding or running the handler.
-        // Do not error here in the case this interaction is handled elsewhere, or not currently detected by the system.
-        console.log(`[WARNING] Error occurred with running handler for custom id "${customId}".`);
+        catch (error) {
+            // An error occured with finding or running the handler.
+            console.log(`[WARNING] Error occurred with running handler for custom id "${customId}":`);
+            console.error(error);
+        }
+    }
+    else {
+        // The handler for this custom ID does not exist.
+        console.log(`[WARNING] No handler exists for the interaction with custom ID "${customId}".`);
     }
 }
 

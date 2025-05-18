@@ -5,14 +5,15 @@ const COMMAND_NOT_IMPLEMENTED_DESC = "This command has not been fully implemente
 const MESSAGE_SENT_CONFIRM_MESSAGE = "The message has been sent."
 const MESSAGE_SENT_FAILED_MESSAGE = "The message failed to send."
 const MESSAGE_SENT_PERMISSION_FAILED_MESSAGE = "The message failed to send due to lack of permissions."
-const ALLOW_PINGS_MESSAGE_TRUE = "You will now recieve pings when a contract is created in your feedback thread.";
-const ALLOW_PINGS_MESSAGE_FALSE = "You will no longer recieve pings when a contract is created in your feedback thread.";
+const ALLOW_PINGS_MESSAGE_TRUE = "You will now recieve pings for contract actions, including contracts posted in your threads, or when your contracts are accepted.";
+const ALLOW_PINGS_MESSAGE_FALSE = "You will no longer recieve pings for contract related actions.";
 const UPDATE_ALL_ROLES_ERROR = "Failed to update roles of users due to an error. Make sure the bot has the correct permissions.";
 const UPDATE_ALL_ROLES_SUCCESS = "Successfully updated the roles of all users.";
 const OPTION_NULL_NO_FORMAT = "N/A";
 const OPTION_NULL = "`" + OPTION_NULL_NO_FORMAT + "`";
 const MISSING_ACCESS_CODE = 50001;          // For roles
 const MISSING_PERMISSIONS_CODE = 50013;     // For messages
+const FEEDBACK_AGREEMENT_TITLE = "Feedback Agreement"
 const HORIZONTAL_RULE = `\n${subtext(strikethrough("-------------------------------"))}\n`;
 const STAR_RATING_INFO = {
     ["stars-0"]: {
@@ -89,6 +90,7 @@ module.exports = {
     OPTION_NULL,
     MISSING_ACCESS_CODE,
     MISSING_PERMISSIONS_CODE,
+    FEEDBACK_AGREEMENT_TITLE,
     HORIZONTAL_RULE,
     STAR_RATING_INFO,
     INTERACTION_NOT_BUILDER_ERROR,

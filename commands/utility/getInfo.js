@@ -1,6 +1,7 @@
-const { Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption } = require("discord.js");
+const { Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption, bold } = require("discord.js");
 
 const userMethods = require("../../helpers/userMethods.js")
+const { getAuthorOptions } = require("../../helpers/messageMethods.js")
 
 const USER_OPTION_NAME = "user";
 
@@ -17,11 +18,11 @@ module.exports = {
         let user = interaction.options.getUser(USER_OPTION_NAME);
         const embed = new EmbedBuilder()
             .setColor(Colors.Blue)
-            .setAuthor({
-                name: user.username, 
-                iconURL: user.avatarURL(),
-            })
-            .setDescription(`Feedback Points: ${await userMethods.getPoints(user.id)}\nAllow Pings: ${await userMethods.getAllowPings(user.id)}`);
+            .setAuthor(getAuthorOptions(user))
+            .setDescription(
+                `Feedback Points: ${await userMethods.getPoints(user.id)}\n` +
+                `Allow Pings: ${bold(await userMethods.getAllowPings(user.id))}`
+            );
     
         await interaction.reply({
             embeds: [embed],

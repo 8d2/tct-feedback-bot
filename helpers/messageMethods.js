@@ -84,9 +84,22 @@ function getOriginalUser(interaction) {
     return interaction.user;
 }
 
+/**
+ * Gets the options to use for an author from the user.
+ * @param {User} user The user to make the author.
+ * @returns {EmbedAuthorOptions} The author to use.
+ */
+function getAuthorOptions(user) {
+    return {
+        name: user.username, 
+        iconURL: user.avatarURL(),
+    };
+}
+
 module.exports = {
     getRatingPointsMessage,
     getRoleRequirementMessage,
     getPointsInfoDisplayMessages,
-    getOriginalUser
+    getOriginalUser,
+    getAuthorOptions
 }

@@ -127,17 +127,6 @@ async function setPoints(id, points) {
 }
 
 /**
- * Add to a user's feedback points based on their user id.
- * @param {string} id ID to set points of.
- * @param {amount} amount Points to add.
- * @returns {Users} User.
- */
-async function addPoints(id, amount) {
-    const user = await getOrCreateUserInfo(id);
-    return setPointsFromUser(user, user.feedback_points + amount);
-}
-
-/**
  * Sets a user's blocked state for creating contracts.
  * @param {Users} user User to set the blocked state of.
  * @param {boolean} the new blocked state to set.

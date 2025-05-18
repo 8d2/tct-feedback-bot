@@ -41,13 +41,13 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         // Check if the user is a thread builder 
-        // else if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
-        //     contractMethods.showCommandError(
-        //         interaction,
-        //         "You cannot create feedback contracts since you are a builder in this thread."
-        //     );
-        //     return false;
-        // }
+        else if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
+            contractMethods.showCommandError(
+                interaction,
+                "You cannot create feedback contracts since you are a builder in this thread."
+            );
+            return false;
+        }
         // Check if the feedback thread is open for feedback
         else if (!(await contractMethods.isFeedbackEnabled(feedbackThread))) {
             contractMethods.showCommandError(
@@ -283,10 +283,10 @@ module.exports = {
 
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(ALLOW_PINGS_COMMAND_NAME)
-            .setDescription("Change whether you will receive pings on contract creation")
+            .setDescription("Change whether you will receive pings for contract related actions")
             .addBooleanOption(new SlashCommandBooleanOption()
                 .setName(PING_OPTION_NAME)
-                .setDescription("If true, you will be pinged when a contract is created in your thread")
+                .setDescription("If true, you will be pinged for contract related actions")
                 .setRequired(true)
             )
         )
