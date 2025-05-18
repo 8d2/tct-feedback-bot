@@ -17,7 +17,7 @@ Furthermore, user stories that may apply to a command will be listed below their
   > **B.2.** As a *builder*, I want to *assign a star rating (0-3) to feedback contracts* so that I can *reward users based on the quality and effort of their feedback*.
   > 
   > **B.3.** As a *builder*, I want to *sign off on feedback contracts* so that I can *reward users for providing feedback on my tower*.
-- [x] `/contract allowpings <ping>` - Determines whether you will be pinged when feedback contracts are posted that you can accept, as the main builder or the collaborator.
+- [x] `/contract allowpings <ping>` - Determines whether you will be pinged for contract related actions. This includes when a contract is posted in a thread you are a builder for, or a contract you posted is accepted.
 - [x] `/contract addbuilder <user>` - Adds another user as a collaborator for your feedback thread. They will be allowed to accept feedback contracts on your behalf.
   > **B.4.** As a *builder*, I want to *give builder permissions to my collaborators* so that *they can accept feedback contracts on my behalf*.
 - [x] `/contract removebuilder <user>` - Removes a collaborator from your feedback thread.
@@ -32,10 +32,14 @@ Furthermore, user stories that may apply to a command will be listed below their
 - [x] `/mod displaybotinfo <channel>` - Creates a messages showing usage info for the bot, including earning and giving feedback points and general rules.
 
 ## Admin Commands
-- [x] `/admin setchannel <channel>` - Sets the feedback forum channel where users can create contracts.
+- [x] `/admin addchannel <channel>` - Adds this channel as a feedback forum channel where users can create contracts.
   > **D.1.** As an *administrator*, I want to *assign a forum channel (or channels) to be the official "tower feedback" channel* so that *the feedback bot is only used within that channel*.
-- [x] `/admin setforumtag <id>` - Sets the feedback tag builders must add to their thread when they are ready for feedback. Otherwise, contracts cannot be made in their thread.
+- [x] `/admin removechannel <channel>` - Removes this feedback channel from allowing contracts.
+- [x] `/admin removeallchannels` - Removes all current feedback channels from allowing contracts.
+- [x] `/admin addforumtag <id>` - Adds a feedback tag as one that allows for builders to make their thread open for feedback. If none of the added tags are present, contracts cannot be made in the thread. Only 1 tag is required.
   > **B.1.** As a *builder*, I want to *add a forum tag to enable feedback contracts* so that I can *receive feedback only when my tower is ready*.
+- [x] `/admin removeforumtag <id>` -  Removes a feedback tag with the id.
+- [x] `/admin removeallforumtags` -  Removes all feedback tags.
 - [x] `/admin setrequirement <roletype> <requirement> <updateallroles>` - Sets the requirement for reaching a certain role type, which will automatically be assigned when users earn that many feedback points.
 If `updateallroles` is true, all members will have their roles updated based on this new requirement.
   > **D.2.** As an *administrator*, I want to *assign a role to each point milestone* so that *the bot is able to assign these roles automatically*.
