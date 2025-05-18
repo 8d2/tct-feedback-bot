@@ -1,6 +1,8 @@
 // For bot related messages
+const { heading, bold, italic, inlineCode, HeadingLevel } = require("discord.js");
 
 const { getRoles } = require('./settingsMethods.js');
+const { getGainedRoles } = require('./userMethods.js');
 const { pluralize } = require('./util.js');
 
 /**
@@ -41,33 +43,48 @@ async function getRoleRequirementMessage(interaction, displayRoleType = false) {
 async function getPointsInfoDisplayMessages(interaction) {
     // Array of strings for each embed
     return [
-        "# Feedback Guidelines\n" +
-        `When making a tower, one of the most important things is getting player feedback. Here's some steps on how to use our ${interaction.client.user} to streamline the process!`,
+        heading("Feedback Guidelines:", HeadingLevel.One) +
+        `\nWhen making a tower, one of the most important things is getting player feedback. Here's some steps on how to use our ${interaction.client.user} to streamline the process!`,
 
         // Use + concat because using `` multiline string breaks the headers
-        `## Getting Feedback:\n`+
-        "`1. Create a feedback post` - Include the name of your tower, intended difficulty or anything else to know!\n" +
-        "`2. Add \"open for feedback\" tag when you're ready for feedback` - This will allow feedbackers to create feedback contracts, where they can claim rewards for giving you feedback.\n" +
-        "\`3. Rate contracts appropriately\` - When a feedback contract is made, give it an appropriate score from the dropdown. *Please try to be accurate and as fair as possible!*\n" +
-        "### Other Helpful Commands:\n" +
-        "- `/contract addbuilder` + `/contract removebuilder` - Add or remove collaborators to be able to accept contracts for you.\n" +
-        "- `/contract allowpings` - Toggles whether you will be pinged when a contract you need to accept is posted." +
-        "- `/contract getinfo` - Get info about the tower's builders.",
+        heading("Getting Feedback:", HeadingLevel.Two) +
+        `\n${inlineCode("1. Create a feedback post")} - Include the name of your tower, intended difficulty or anything else to know!\n` +
+        `${inlineCode("2. Add \"open for feedback\" tag when you're ready for feedback")} - This will allow feedbackers to create feedback contracts, where they can claim rewards for giving you feedback.\n` +
+        `${inlineCode("3. Rate contracts appropriately")} - When a feedback contract is made, give it an appropriate score from the dropdown. ${italic("Please try to be accurate and as fair as possible!")}\n` +
+        heading("Other Helpful Commands:", HeadingLevel.Three) +
+        `\n- ${inlineCode("/contract addbuilder")} + ${inlineCode("/contract removebuilder")} - Add or remove collaborators to be able to accept contracts for you.\n` +
+        `- ${inlineCode("/contract allowpings")} - Toggles whether you will be pinged when a contract you need to accept is posted.\n` +
+        `- ${inlineCode("/contract getinfo")} - Get info about the tower's builders.`,
 
-        "## Giving Feedback:\n" +
-        "After giving a tower feedback, run the `/contract create` command in the thread. The builder will then rate your feedback, which will give you *feedback points*:\n" +
+        heading("Giving Feedback:", HeadingLevel.Two) +
+        `\nAfter giving a tower feedback, run the ${inlineCode("/contract create")} command in the thread. The builder will then rate your feedback, which will give you ${italic("feedback points")}:\n` +
         `${getRatingPointsMessage()}\n\n` +
-        "**If you get enough feedback points, you can earn exclusive roles:**\n" +
-        `${await getRoleRequirementMessage(interaction)}`,
+        bold("If you get enough feedback points, you can earn exclusive roles:") +
+        `\n${await getRoleRequirementMessage(interaction)}`,
 
-        "## Rules:\n" +
-        "This bot is a powerful tool for giving and receiving feedback and as such, we have the power to punish those who misuse it. Along with common sense, here is a list of DONTS:\n" +
+        heading("Rules:", HeadingLevel.Two) +
+        "\nThis bot is a powerful tool for giving and receiving feedback and as such, we have the power to punish those who misuse it. Along with common sense, here is a list of DONTS:\n" +
         "- DONT submit empty feedback\n" +
         "- DONT be unfair/biased when feedbacking\n" +
         "- DONT offer bribes (robux, feedback, etc) in return for positive feedback\n" +
-        "**If you are found to be breaking these rules or abusing the bot in any other way, we will block you from using the bot, denying your ability to make feedback contracts and receive feedback points.**\n\n" +
-        "*Happy feedbacking!*"
+        bold("If you are found to be breaking these rules or abusing the bot in any other way, we will block you from using the bot, denying your ability to make feedback contracts and receive feedback points.") +
+        "\n\n" +
+        italic("Happy feedbacking!")
     ];
+}
+
+/**
+ * Gets a message listing all the roles gained going from `originalPoints` to `newPoints`.
+ * @param {import("discord.js").Interaction} interaction The interaction to get gained roles message from.
+ * @param {int} originalPoints The original points amount.
+ * @param {int} newPoints The new points amount.
+ * @return {string?} Roles gained, or null if no roles were gained.
+ */
+async function getGainedRolesMessage(interaction, originalPoints, newPoints) {
+    const gainedRoles = await getGainedRoles(interaction, originalPoints, newPoints);
+    return gainedRoles.length > 0 ? gainedRoles.reduce(
+        (str, role, index) => str + `${role}` + (index < gainedRoles.length - 1 ? ", " : ""), ""
+    ) : null;
 }
 
 /**
@@ -84,9 +101,23 @@ function getOriginalUser(interaction) {
     return interaction.user;
 }
 
+/**
+ * Gets the options to use for an author from the user.
+ * @param {User} user The user to make the author.
+ * @returns {EmbedAuthorOptions} The author to use.
+ */
+function getAuthorOptions(user) {
+    return {
+        name: user.username, 
+        iconURL: user.avatarURL(),
+    };
+}
+
 module.exports = {
     getRatingPointsMessage,
     getRoleRequirementMessage,
     getPointsInfoDisplayMessages,
-    getOriginalUser
+    getGainedRolesMessage,
+    getOriginalUser,
+    getAuthorOptions
 }

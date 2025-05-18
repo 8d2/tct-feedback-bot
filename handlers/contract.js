@@ -2,9 +2,11 @@ const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder, EmbedBuilder, Colors, blockQuote } = require("discord.js");
 
 const constants = require("../helpers/constants.js");
-const { getOriginalUser } = require("../helpers/messageMethods.js");
+const { getOriginalUser, getAuthorOptions, getGainedRolesMessage } = require("../helpers/messageMethods.js");
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const contractMethods = require("../helpers/contractMethods.js");
+const userMethods = require("../helpers/userMethods.js");
+const { pluralize } = require('../helpers/util.js');
 
 /**
  * Creates a new embed corresponding to the selected star rating.
@@ -28,16 +30,12 @@ function createContractEmbed(interaction, starRating) {
 
     // No more drilling! Just get the original creator to use.
     const originalUser = getOriginalUser(interaction);
-    const originalAuthor = {
-        name: originalUser.username, 
-        iconURL: originalUser.avatarURL(),
-    };
 
     // Build the embed
     const embed = new EmbedBuilder()
         .setColor(Colors.Green)
-        .setTitle("Feedback Agreement")
-        .setAuthor(originalAuthor)
+        .setTitle(constants.FEEDBACK_AGREEMENT_TITLE)
+        .setAuthor(getAuthorOptions(originalUser))
         .setDescription(
             `${originalUser} has completed their feedback! Please use the dropdown menu to rate their feedback's quality, and click "Confirm" to submit.
             ${fullDescription ? `${constants.HORIZONTAL_RULE}# ` + starRatingLabel + "\n" + blockQuote(fullDescription) : ""}`)
@@ -119,7 +117,7 @@ function createStarSelectDropdown(selected) {
 function createConfirmButton(disabled = true) {
     return new ButtonBuilder()
         .setCustomId(constants.CONTRACT_CONFIRM_CUSTOM_ID)
-        .setLabel('Confirm')
+        .setLabel("Confirm")
         .setStyle(ButtonStyle.Success)
         .setDisabled(disabled);
 }
@@ -162,7 +160,42 @@ async function handleContractStarSelectInteraction(interaction) {
 async function handleContractConfirmInteraction(interaction) {
     // Confirms the contract if interaction allowed
     if (await detectContractInteractionAllowed(interaction)) {
-        await contractMethods.showCommandError(interaction, "The contract should be accepted here (not implemented yet).");
+        // Get the star select menu's value to determine awarding points
+        const message = interaction.message;
+        const starRatingLabel = message.components[0].components[0].placeholder;
+        const awardPoints = contractMethods.parseRatingLabelToPoints(starRatingLabel);
+
+        // Get original user's points and add awarding points
+        const originalUser = getOriginalUser(interaction);
+        const originalPoints = await userMethods.getPoints(originalUser.id);
+        const newPoints = originalPoints + awardPoints;
+        if (newPoints != originalPoints) {
+            // New point amount, set and update user
+            userMethods.setPoints(originalUser.id, newPoints);
+            userMethods.updateRoles(interaction, originalUser.id);
+        }
+
+        // Edit original contract message
+        const lockedResponseEmbed = new EmbedBuilder()
+            .setTitle(constants.FEEDBACK_AGREEMENT_TITLE)
+            .setColor(Colors.Blue)
+            .setAuthor(getAuthorOptions(originalUser))
+            .setDescription(
+                `This feedback contract has been accepted and rated ${starRatingLabel} by ${interaction.user}.\n` +
+                `${originalUser} has earned ${pluralize(awardPoints, "feedback point")}` +
+                (awardPoints != 0 ? ` and they now have ${pluralize(newPoints, "point")}` : "") + "."
+            )
+            .setTimestamp();
+        await interaction.update({content: message.content, embeds: [lockedResponseEmbed], components: []});
+
+        // Follow up with a ping to original user if they have pings enabled
+        if (await userMethods.getAllowPings(originalUser.id)) {
+            const gainedRolesMessage = await getGainedRolesMessage(interaction, originalPoints, newPoints);
+            const followUpMessage =
+                `${originalUser} Your feedback contract has been accepted.` +
+                (gainedRolesMessage ? ` You have earned new roles: ${gainedRolesMessage}` : "");
+            await interaction.followUp({content: followUpMessage});
+        }
     }
 }
 

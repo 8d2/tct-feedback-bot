@@ -1,6 +1,8 @@
 const { ThreadChannel, MessageFlags, inlineCode, EmbedBuilder, Colors } = require('discord.js');
 const { getFeedbackChannel, getFeedbackChannelId, getFeedbackForumTagId } = require('./settingsMethods');
 
+const constants = require("../helpers/constants.js");
+
 /**
  * Returns `true` if the thread has the "open for feedback" tag.
  * @param {ThreadChannel} thread The thread.
@@ -70,11 +72,27 @@ async function getFeedbackThreadOwner(thread) {
     return (await thread.guild.members.fetch(ownerId)).user;
 }
 
+/**
+ * Parses a label rating string (bomb or star emojis) into a value based on star rating definitions.
+ * @param {string} label The label rating string to parse.
+ * @returns {int} The points to award from this rating.
+ */
+function parseRatingLabelToPoints(label) {
+    const matchedRatings = Object.values(constants.STAR_RATING_INFO).filter(rating => rating.menu_label == label);
+    if (matchedRatings.length > 0) {
+        // Rating has this label
+        return matchedRatings[0].point_value;
+    }
+    // No rating found, no points
+    return 0;
+}
+
 module.exports = {
     isFeedbackEnabled,
     getFeedbackThreadFromInteraction,
     getFeedbackThreadOwnerId,
     showCommandError,
     showIncorrectChannelError,
-    getFeedbackThreadOwner
+    getFeedbackThreadOwner,
+    parseRatingLabelToPoints
 }

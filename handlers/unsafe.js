@@ -39,6 +39,7 @@ async function handleAddRole(user, role) {
         await user.roles.add(role);
     }
     catch (error) {
+        console.error(error);
         return `Could not add ${role} to ${user}` + (error.code == constants.MISSING_ACCESS_CODE ? " due to a lack of permissions" : "") + ".";
     }
     return null;
