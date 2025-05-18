@@ -7,7 +7,7 @@ const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const { showCommandError } = require("../helpers/messageMethods.js");
 const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
-const { pluralize } = require('../helpers/util.js');
+const { concat, pluralize } = require('../helpers/util.js');
 
 /**
  * Creates a new embed corresponding to the selected star rating.
@@ -69,16 +69,8 @@ function createContractMessage(interaction, pingUsers) {
         .addComponents(newConfirmButton);
     
     // Adds a thread owner ping to the message
-    let threadOwnerPing;
-    if (pingUsers) {
-        threadOwnerPing = "";
-        pingUsers.forEach((user, index) => {
-            threadOwnerPing += `${user}`;
-            if (index != (pingUsers.length - 1)) {
-                threadOwnerPing += "\n";
-            }
-        });
-    }
+    const threadOwnerPing = pingUsers ? concat(pingUsers, " ") : null;
+
     // Preserves the thread owner ping between message updates
     const previousContent = interaction.message ? interaction.message.content : null;
 

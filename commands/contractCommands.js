@@ -10,6 +10,7 @@ const userMethods = require("../helpers/userMethods.js");
 const { getPointsInfoDisplayMessages, showCommandError } = require("../helpers/messageMethods.js");
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const constants = require("../helpers/constants.js");
+const { concatList } = require('../helpers/util.js');
 
 // Constants
 const CREATE_COMMAND_NAME = "create";
@@ -111,6 +112,7 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         else {
+            // Passed all checks, make a contract!
             // Pings the thread collaborators if they have allow pings on.
             const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, false);
             const usersToPing = []
@@ -143,28 +145,8 @@ const COMMAND_FUNCTIONS = {
             const feedbackEnabled = await contractMethods.isFeedbackEnabled(feedbackThread);
             const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, true);
 
-            // Format list of collaborators message
-            var collaboratorsMessage = ""
-            if (collaborators.length == 0) {
-                collaboratorsMessage = "No other users added!"
-            }
-            else {
-                var count = 0
-                for (let user of collaborators) {
-                    count += 1
-
-                    if (count == collaborators.length) {
-                        collaboratorsMessage += `${user}`
-                    }
-                    else if (count == collaborators.length - 1) {
-                        collaboratorsMessage += `${user} & `
-                    }
-                    else {
-                        collaboratorsMessage += `${user}, `
-                    }
-                }
-            }
-
+            // Format list of collaborators message + respond
+            const collaboratorsMessage = concatList(collaborators, "No other users added!");
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Blue)
@@ -199,7 +181,6 @@ const COMMAND_FUNCTIONS = {
     },
     
     [ADD_BUILDER_COMMAND_NAME]: async function handleContractAddBuilder(interaction) {
-        
         const feedbackThread = await contractMethods.getFeedbackThreadFromInteraction(interaction);
         
         // Check if the interaction occurred within a feedback thread

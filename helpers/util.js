@@ -25,8 +25,8 @@ function pluralize(amount, str) {
  * @param {int} trimEnd How much off the end of the array to exclude from the separator (1 = last item is not concatenated).
  * @return {string} The produced concatenated array.
  */
-function concat(array, separator = ",", trimEnd = 0) {
-    return array.slice(0, array.length - trimEnd).join(separator + " ");
+function concat(array, separator = ", ", trimEnd = 0) {
+    return array.slice(0, array.length - trimEnd).join(separator);
 }
 
 /**
@@ -39,7 +39,7 @@ function concat(array, separator = ",", trimEnd = 0) {
  * @param {string} and The separator to use between the second to last and last item. "&" by default.
  * @return {string} The produced concatenated array in list format.
  */
-function concatList(array, empty = constants.OPTION_NULL, separator = ",", and = "&") {
+function concatList(array, empty = constants.OPTION_NULL, separator = ", ", and = "&") {
     if (array.length == 0) {
         // No elements, use empty phrase
         return empty;
@@ -49,7 +49,7 @@ function concatList(array, empty = constants.OPTION_NULL, separator = ",", and =
         return `${array[0]}`;
     }
     // Concat in a list all elements but the last, then add last using "and"
-    return concat(array, ",", 1) + " " + and + " " + `${array[array.length - 1]}`;
+    return concat(array, separator, 1) + " " + and + " " + `${array[array.length - 1]}`;
 }
 
 module.exports = {

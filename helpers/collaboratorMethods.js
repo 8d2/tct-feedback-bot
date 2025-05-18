@@ -11,8 +11,8 @@ const collaborators = new Collection();
 
 /**
  * Generates and returns a formatted key for a collaboration instance.
- * @param {string} the user id to use in the key
- * @param {string} the thread id to use in the key
+ * @param {string} userId the user id to use in the key
+ * @param {string} threadId the thread id to use in the key
  * @return {string} the collaborator key
  */
 function getCollaboratorKey(userId, threadId) {
@@ -20,9 +20,23 @@ function getCollaboratorKey(userId, threadId) {
 }
 
 /**
+ * Gets the user ID and thread ID associated with the collaborator key.
+ * @param {string} collaboratorKey The collaborator key
+ * @return {[string, string]?} Tuple [userId, threadId] that this collaborator key matches, or null if not matching.
+ */
+function getUserIdAndThreadIdFromKey(collaboratorKey) {
+    const items = collaboratorKey.split("_");
+    if (items.length == 2) {
+        // User ID and thread ID
+        return [items[0], items[1]];
+    }
+    return null;
+}
+
+/**
  * Returns a thread info for a given thread.
  * If there isn't one in the database, it is created along with a collaboration instance for the thread owner.
- * @param {ThreadChannel} the thread to get the thread info of
+ * @param {ThreadChannel} thread the thread to get the thread info of
  * @return {Threads} the thread
  */
 async function getOrCreateThreadInfo(thread) {
@@ -59,15 +73,21 @@ async function getThreadCollaboratorCount(thread) {
  * @return {[User]} List of users
  */
 async function getThreadCollaboratorUsers(thread, discardOwner) {
+    // Replaced to more reflect the original because `usersWithInfo` does not account for users without data in database
     await getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
-    const users = await userMethods.getUsersWithInfo(thread.guild);
-
+    const collabData = await Collaborators.findAll();
     const threadOwner = await getFeedbackThreadOwner(thread);
+    let listOfUsers = [];
+    for (let dataInstance of collabData) {
+        // For every collaborator key, see if the thread is this one
+        const [userId, threadId] = getUserIdAndThreadIdFromKey(dataInstance.collaboration_id);
+        if (threadId == thread.id && userId) {
+            const user = (await thread.guild.members.fetch(userId)).user;
 
-    var listOfUsers = []
-    for (let user of users) {
-        if (await getUserIsCollaborator(user, thread) && !(user == threadOwner && discardOwner)) {
-            listOfUsers.push(user);
+            // No need to show that the thread owner is a builder again
+            if (!discardOwner || user != threadOwner) {
+                listOfUsers.push(user)
+            }
         }
     }
     return listOfUsers;
