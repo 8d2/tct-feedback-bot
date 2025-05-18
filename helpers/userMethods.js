@@ -217,7 +217,7 @@ async function getRoleIdsOwned(feedbackPoints) {
 }
 
 /**
- * Gets a list of all the discord roles gained going from `originalPoints` to `newPoints`.
+ * Gets a list of all the feedbacker roles gained going from `originalPoints` to `newPoints`.
  * @param {import("discord.js").Interaction} interaction The interaction to get gained roles from.
  * @param {int} originalPoints The original points amount.
  * @param {int} newPoints The new points amount.
