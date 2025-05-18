@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, 
-    SlashCommandStringOption, SlashCommandRoleOption, SlashCommandBooleanOption, PermissionFlagsBits, Colors, ChannelType } = require("discord.js");
+    SlashCommandStringOption, SlashCommandRoleOption, SlashCommandBooleanOption, PermissionFlagsBits,
+    Colors, ChannelType, HeadingLevel, inlineCode, heading } = require("discord.js");
 
 const { handleSubcommandExecute } = require("../handlers/commands.js");
 const constants = require("../helpers/constants.js");
@@ -106,9 +107,9 @@ const COMMAND_FUNCTIONS = {
         const tag = settingsMethods.getFeedbackForumTagId();
         const rolesMessage = await messageMethods.getRoleRequirementMessage(interaction, true);
         messageEmbed.setDescription(
-            "## Admin Settings\n" +
-            `Feedback Channel: ${channel ?? constants.OPTION_NULL}\n` +
-            `Feedback Tag: \`${tag ?? constants.OPTION_NULL_NO_FORMAT}\`\n` +
+            heading("Admin Settings:", HeadingLevel.Two) +
+            `\nFeedback Channel: ${channel ?? constants.OPTION_NULL}\n` +
+            `Feedback Tag: ${inlineCode(tag ?? constants.OPTION_NULL_NO_FORMAT)}\n` +
             `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}`
         );
         messageEmbed.setColor(Colors.DarkPurple);

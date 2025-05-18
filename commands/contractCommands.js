@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags,
         CommandInteractionOptionResolver, SlashCommandBooleanOption, SlashCommandUserOption,
-        bold, ButtonBuilder, ButtonStyle, ActionRowBuilder }
+        bold, ButtonBuilder, ButtonStyle, ActionRowBuilder, HeadingLevel, inlineCode, heading }
         = require("discord.js");
 
 const { createContractMessage } = require("../handlers/contract");
@@ -89,7 +89,9 @@ const COMMAND_FUNCTIONS = {
                     const updatedResponseEmbed = new EmbedBuilder()
                         .setTimestamp()
                         .setColor(Colors.Green)
-                        .setDescription("## Rules accepted \n Run the `/contract create` command again to get started!")
+                        .setDescription(
+                            heading("Rules Accepted", HeadingLevel.Two) +
+                            `\nRun the ${inlineCode("/contract create")} command again to get started!`)
                     await confirmation.update({embeds: [updatedResponseEmbed], components: [], flags: MessageFlags.Ephemeral});
                 }
             }
@@ -98,7 +100,10 @@ const COMMAND_FUNCTIONS = {
                 const failedResponseEmbed = new EmbedBuilder()
                     .setTimestamp()
                     .setColor(Colors.Red)
-                    .setDescription("## Cancelled \n Rules acknowledgement cancelled, you probably timed out or an unknown error occured. Run `/contract create` again.")
+                    .setDescription(
+                        heading("Cancelled", HeadingLevel.Two) +
+                        `\nRules acknowledgement cancelled, you probably timed out or an unknown error occured. Run ${inlineCode("/contract create")} again.`
+                    );
                 await interaction.editReply({embeds: [failedResponseEmbed], components: [], flags: MessageFlags.Ephemeral});
             }
             return false;

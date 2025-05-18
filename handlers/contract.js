@@ -117,7 +117,7 @@ function createStarSelectDropdown(selected) {
 function createConfirmButton(disabled = true) {
     return new ButtonBuilder()
         .setCustomId(constants.CONTRACT_CONFIRM_CUSTOM_ID)
-        .setLabel('Confirm')
+        .setLabel("Confirm")
         .setStyle(ButtonStyle.Success)
         .setDisabled(disabled);
 }
