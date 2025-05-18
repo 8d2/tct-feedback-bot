@@ -20,7 +20,7 @@ async function getDatabaseFeedbackChannels() {
  */
 async function getFeedbackChannels(guild) {
     const feedbackChannels = await getDatabaseFeedbackChannels();
-    return feedbackChannels.map(channel => guild.channels.cache.get(channel_id));
+    return feedbackChannels.map(channel => guild.channels.cache.get(channel.channel_id));
 }
 
 /**
@@ -47,6 +47,21 @@ async function addFeedbackChannelId(id) {
 async function removeFeedbackChannelId(id) {
     if (settings) {
         const removed = await settings.removeChannel(id);
+        if (removed) {
+            settings.save();
+        }
+        return removed;
+    }
+    return false;
+}
+
+/**
+ * Removes all feedback channels.
+ * @returns {bool} Whether channels were removed. False if none in database.
+ */
+async function removeAllFeedbackChannels() {
+    if (settings) {
+        const removed = await settings.removeAllChannels();
         if (removed) {
             settings.save();
         }
@@ -96,6 +111,21 @@ async function addFeedbackForumTagId(id) {
 async function removeFeedbackForumTagId(id) {
     if (settings) {
         const removed = await settings.removeTag(id);
+        if (removed) {
+            settings.save();
+        }
+        return removed;
+    }
+    return false;
+}
+
+/**
+ * Removes all feedback forum tags.
+ * @returns {bool} Whether tags were removed. False if none in database.
+ */
+async function removeAllFeedbackForumTags() {
+    if (settings) {
+        const removed = await settings.removeAllTags();
         if (removed) {
             settings.save();
         }
@@ -163,7 +193,7 @@ async function setRoleIdFromRole(role, roleId) {
  * @returns {Roles} Role.
  */
 async function setRoleId(roleType, roleId) {
-    const role = await getOrCreateRole(roleType);
+    const role = await getOrCreateDatabaseRole(roleType);
     return setRoleIdFromRole(role, roleId);
 }
 
@@ -173,7 +203,7 @@ async function setRoleId(roleType, roleId) {
  * @returns {int?} Role requirement. Null if not set.
  */
 async function getRoleRequirement(roleType, roleRequirement) {
-    const role = await getOrCreateRole(roleType);
+    const role = await getOrCreateDatabaseRole(roleType);
     return role.role_requirement;
 }
 
@@ -195,7 +225,7 @@ async function setRoleRequirementFromRole(role, roleRequirement) {
  * @returns {Roles} Role.
  */
 async function setRoleRequirement(roleType, roleRequirement) {
-    const role = await getOrCreateRole(roleType);
+    const role = await getOrCreateDatabaseRole(roleType);
     return setRoleRequirementFromRole(role, roleRequirement);
 }
 
@@ -225,10 +255,12 @@ module.exports = {
     getFeedbackChannels,
     addFeedbackChannelId,
     removeFeedbackChannelId,
+    removeAllFeedbackChannels,
     getDatabaseFeedbackForumTags,
     getFeedbackForumTagIds,
     addFeedbackForumTagId,
     removeFeedbackForumTagId,
+    removeAllFeedbackForumTags,
     getDatabaseRoles,
     getDatabaseRole,
     getOrCreateDatabaseRole,

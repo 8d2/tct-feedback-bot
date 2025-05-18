@@ -27,7 +27,8 @@ function pluralize(amount, str) {
  */
 function concat(array, separator = ",", indexTrim = 0) {
     return array.reduce(
-        (str, item, index) => str + `${item}` + (index < array.length - indexTrim - 1 ? separator + " " : ""), ""
+        (str, item, index) =>
+            index >= array.length - indexTrim ? str : str + `${item}` + (index < array.length - indexTrim - 1 ? separator + " " : ""), ""
     );
 }
 
@@ -37,7 +38,7 @@ function concat(array, separator = ",", indexTrim = 0) {
  * @param {string} emptyPhrase String to use if no elements are within the array.
  * @return {string} The produced concatenated array in list format.
  */
-function concatList(array, emptyPhrase = constants.OPTION_NULL) {
+function concatList(array, emptyPhrase = constants.OPTION_NULL, andPhrase = "&") {
     if (array.length == 0) {
         // No elements, use empty phrase
         return emptyPhrase;
@@ -47,7 +48,7 @@ function concatList(array, emptyPhrase = constants.OPTION_NULL) {
         return `${array[0]}`;
     }
     // Concat in a list all elements but the last, then add last using "and"
-    return concat(array, ",", 1) + " and " + `${array[array.length - 1]}`;
+    return concat(array, ",", 1) + " " + andPhrase + " " + `${array[array.length - 1]}`;
 }
 
 module.exports = {

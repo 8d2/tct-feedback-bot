@@ -1,5 +1,5 @@
 // For bot related messages
-const { heading, bold, italic, inlineCode, HeadingLevel } = require("discord.js");
+const { EmbedBuilder, Colors, MessageFlags, heading, bold, italic, inlineCode, HeadingLevel } = require("discord.js");
 
 const { getDatabaseRoles } = require('./settingsMethods.js');
 const { getGainedRoles } = require('./userMethods.js');

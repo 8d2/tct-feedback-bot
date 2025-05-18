@@ -7,7 +7,7 @@ const { createContractMessage } = require("../handlers/contract");
 const { handleSubcommandExecute } = require("../handlers/commands.js")
 const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
-const { showCommandError } = require("../helpers/js");
+const { getPointsInfoDisplayMessages, showCommandError } = require("../helpers/messageMethods.js");
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const constants = require("../helpers/constants.js")
 
@@ -33,38 +33,41 @@ const COMMAND_FUNCTIONS = {
 
         // Check if the interaction occurred within a feedback thread
         const feedbackThread = await contractMethods.getFeedbackThreadFromInteraction(interaction);
-        // Check if user has read and accepted the rules
-        const acceptedRules = await userMethods.getRulesAccepted(interaction.user.id)
         if (!feedbackThread) {
             contractMethods.showIncorrectChannelError(interaction);
             return false;
         }
-        // Check if the user is a thread builder 
-        else if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
-            showCommandError(
-                interaction,
-                "You cannot create feedback contracts since you are a builder in this thread."
-            );
-            return false;
-        }
-        // Check if the feedback thread is open for feedback
-        else if (!(await contractMethods.isFeedbackEnabled(feedbackThread))) {
-            showCommandError(
-                interaction,
-                "This feedback thread is not currently open for feedback contracts."
-            );
-            return false;
-        }
+
         // Check if the user is blocked
-        else if (await userMethods.getIsBlocked(interaction.user.id)) {
+        if (await userMethods.getIsBlocked(interaction.user.id)) {
             showCommandError(
                 interaction,
                 "You have been blocked from creating feedback contracts for spam or abuse."
             );
             return false;
         }
+
+        // Check if the user is a thread builder 
+        if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
+            showCommandError(
+                interaction,
+                "You cannot create feedback contracts since you are a builder in this thread."
+            );
+            return false;
+        }
+
+        // Check if the feedback thread is open for feedback
+        if (!(await contractMethods.isFeedbackEnabled(feedbackThread))) {
+            showCommandError(
+                interaction,
+                "This feedback thread is not currently open for feedback contracts."
+            );
+            return false;
+        }
+
         // Check if user has read and accepted the rules
-        else if (!acceptedRules) {
+        const acceptedRules = await userMethods.getRulesAccepted(interaction.user.id)
+        if (!acceptedRules) {
             const messages = await getPointsInfoDisplayMessages(interaction);
             const rulesEmbed = new EmbedBuilder()
                 .setDescription(messages[3])
@@ -107,15 +110,15 @@ const COMMAND_FUNCTIONS = {
             }
             return false;
         }
-        else {
-            // Component creation has been outsourced to handlers </3
-            // Pings the thread owner if they have allow pings on.
-            const threadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
-            const userAllowsPings = await userMethods.getAllowPings(threadOwner.id);
-            const pingUsers = userAllowsPings ? [threadOwner] : null;
-            await interaction.reply(createContractMessage(interaction, pingUsers));
-            return true;
-        }
+        
+        // Passed all checks, make a contract!
+        // Component creation has been outsourced to handlers </3
+        // Pings the thread owner if they have allow pings on.
+        const threadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
+        const userAllowsPings = await userMethods.getAllowPings(threadOwner.id);
+        const pingUsers = userAllowsPings ? [threadOwner] : null;
+        await interaction.reply(createContractMessage(interaction, pingUsers));
+        return true;
     },
 
     /**

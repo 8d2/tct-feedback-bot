@@ -1,6 +1,7 @@
-const { ThreadChannel, MessageFlags, inlineCode, EmbedBuilder, Colors } = require('discord.js');
+const { inlineCode, EmbedBuilder, Colors } = require('discord.js');
 const { getFeedbackChannels, getFeedbackForumTagIds } = require('./settingsMethods');
 const { showCommandError } = require('./messageMethods.js');
+const { concatList } = require('./util.js');
 
 const constants = require("../helpers/constants.js");
 
@@ -34,7 +35,7 @@ async function isChannelFeedbackThread(channel) {
  * @returns {ThreadChannel?} The feedback thread if it exists, or null if invalid.
  */
 async function getFeedbackThreadFromInteraction(interaction) {
-    return isChannelFeedbackThread(interaction.channel) ? interaction.channel : null;
+    return await isChannelFeedbackThread(interaction.channel) ? interaction.channel : null;
 }
 
 /**
@@ -43,7 +44,7 @@ async function getFeedbackThreadFromInteraction(interaction) {
  * @returns {string?} The user ID of the thread owner.
  */
 async function getFeedbackThreadOwnerId(thread) {
-    return isChannelFeedbackThread(thread) ? thread.ownerId : null;
+    return await isChannelFeedbackThread(thread) ? thread.ownerId : null;
 }
 
 /**
@@ -82,6 +83,7 @@ function parseRatingLabelToPoints(label) {
 
 module.exports = {
     isFeedbackEnabled,
+    isChannelFeedbackThread,
     getFeedbackThreadFromInteraction,
     getFeedbackThreadOwnerId,
     showIncorrectChannelError,

@@ -1,13 +1,13 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, 
     SlashCommandStringOption, SlashCommandRoleOption, SlashCommandBooleanOption, PermissionFlagsBits,
-    Colors, ChannelType, HeadingLevel, inlineCode, heading } = require("discord.js");
+    Colors, ChannelType, HeadingLevel, bold, inlineCode, heading } = require("discord.js");
 
 const { handleSubcommandExecute } = require("../handlers/commands.js");
 const constants = require("../helpers/constants.js");
 const messageMethods = require("../helpers/messageMethods.js");
 const settingsMethods = require("../helpers/settingsMethods.js");
 const userMethods = require("../helpers/userMethods.js");
-const { pluralize } = require('../helpers/util.js');
+const { pluralize, concatList } = require('../helpers/util.js');
 
 // Constants
 const CHANNEL_OPTION_NAME = "feedbackchannel";
@@ -25,8 +25,10 @@ const ROLE_TYPES = [
 
 const ADD_CHANNEL_COMMAND_NAME = "addchannel";
 const REMOVE_CHANNEL_COMMAND_NAME = "removechannel";
+const REMOVE_ALL_CHANNELS_COMMAND_NAME = "removeallchannels";
 const ADD_FORUM_TAG_COMMAND_NAME = "addforumtag";
 const REMOVE_FORUM_TAG_COMMAND_NAME = "removeforumtag";
+const REMOVE_ALL_TAGS_COMMAND_NAME = "removeallforumtags";
 const SET_REQUIREMENT_COMMAND_NAME = "setrequirement";
 const SET_ROLE_COMMAND_NAME = "setrole";
 const GET_SETTINGS_COMMAND_NAME = "settings";
@@ -42,7 +44,8 @@ const COMMAND_FUNCTIONS = {
      */
     [ADD_CHANNEL_COMMAND_NAME]: async function handleAddChannel(interaction, messageEmbed) {
         const feedbackChannel = interaction.options.getChannel(CHANNEL_OPTION_NAME);
-        if (!settingsMethods.addFeedbackChannelId(feedbackChannel.id)) {
+        const added = await settingsMethods.addFeedbackChannelId(feedbackChannel.id);
+        if (!added) {
             // Already in database
             messageEmbed.setDescription(`${feedbackChannel} is already a feedback forum channel.`);
             messageEmbed.setColor(Colors.Yellow);
@@ -61,13 +64,33 @@ const COMMAND_FUNCTIONS = {
      */
     [REMOVE_CHANNEL_COMMAND_NAME]: async function handleRemoveChannel(interaction, messageEmbed) {
         const feedbackChannel = interaction.options.getChannel(CHANNEL_OPTION_NAME);
-        if (!settingsMethods.removeFeedbackChannelId(feedbackChannel.id)) {
+        const removed = await settingsMethods.removeFeedbackChannelId(feedbackChannel.id);
+        if (!removed) {
             // Not in database
             messageEmbed.setDescription(`${feedbackChannel} is not a feedback forum channel.`);
             messageEmbed.setColor(Colors.Yellow);
             return false;
         };
         messageEmbed.setDescription(`${feedbackChannel} has been removed as a feedback forum channel.`);
+        messageEmbed.setColor(Colors.Green);
+        return true;
+    },
+    
+    /**
+     * Handles the '/admin removeallchannels' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [REMOVE_ALL_CHANNELS_COMMAND_NAME]: async function handleRemoveAllChannels(interaction, messageEmbed) {
+        const removed = await settingsMethods.removeAllFeedbackChannels();
+        if (!removed) {
+            // None removed
+            messageEmbed.setDescription("No feedback channels could be removed.");
+            messageEmbed.setColor(Colors.Yellow);
+            return false;
+        };
+        messageEmbed.setDescription("All feedback channels have been removed.");
         messageEmbed.setColor(Colors.Green);
         return true;
     },
@@ -80,7 +103,8 @@ const COMMAND_FUNCTIONS = {
      */
     [ADD_FORUM_TAG_COMMAND_NAME]: async function handleSetForumTag(interaction, messageEmbed) {
         const forumTagId = interaction.options.getString(FORUM_TAG_OPTION_NAME);
-        if (!settingsMethods.addFeedbackForumTagId(forumTagId)) {
+        const added = await settingsMethods.addFeedbackForumTagId(forumTagId);
+        if (!added) {
             // Already in database
             messageEmbed.setDescription(`${forumTagId} is already a feedback forum tag.`);
             messageEmbed.setColor(Colors.Yellow);
@@ -97,15 +121,35 @@ const COMMAND_FUNCTIONS = {
      * @param {EmbedBuilder} the embed to modify and reply with
      * @return {boolean} true if the command succeeded, false if it failed.
      */
-    [ADD_FORUM_TAG_COMMAND_NAME]: async function handleSetForumTag(interaction, messageEmbed) {
+    [REMOVE_FORUM_TAG_COMMAND_NAME]: async function handleSetForumTag(interaction, messageEmbed) {
         const forumTagId = interaction.options.getString(FORUM_TAG_OPTION_NAME);
-        if (!settingsMethods.removeFeedbackForumTagId(forumTagId)) {
+        const removed = await settingsMethods.removeFeedbackForumTagId(forumTagId);
+        if (!removed) {
             // Not in database
             messageEmbed.setDescription(`${forumTagId} is not a feedback forum tag.`);
             messageEmbed.setColor(Colors.Yellow);
             return false;
         };
         messageEmbed.setDescription(`${forumTagId} has been removed as a feedback forum tag.`);
+        messageEmbed.setColor(Colors.Green);
+        return true;
+    },
+    
+    /**
+     * Handles the '/admin removeallforumtags' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [REMOVE_ALL_TAGS_COMMAND_NAME]: async function handleRemoveAllChannels(interaction, messageEmbed) {
+        const removed = await settingsMethods.removeAllFeedbackForumTags();
+        if (!removed) {
+            // None removed
+            messageEmbed.setDescription("No feedback forum tags could be removed.");
+            messageEmbed.setColor(Colors.Yellow);
+            return false;
+        };
+        messageEmbed.setDescription("All feedback forum tags have been removed.");
         messageEmbed.setColor(Colors.Green);
         return true;
     },
@@ -156,7 +200,7 @@ const COMMAND_FUNCTIONS = {
      */
     [GET_SETTINGS_COMMAND_NAME]: async function handleGetSettings(interaction, messageEmbed) {
         const channels = await settingsMethods.getFeedbackChannels(interaction.guild);
-        const tagIds = settingsMethods.getFeedbackForumTagIds();
+        const tagIds = await settingsMethods.getFeedbackForumTagIds();
         const rolesMessage = await messageMethods.getRoleRequirementMessage(interaction, true);
         const staffIsProtected = await settingsMethods.getStaffIsProtected();
         
@@ -165,7 +209,7 @@ const COMMAND_FUNCTIONS = {
             `\nFeedback Channels: ${concatList(channels)}\n` +
             `Feedback Tags: ${inlineCode(concatList(tagIds, constants.OPTION_NULL_NO_FORMAT))}\n` +
             `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}\n` +
-            `Staff Potected: ${staffIsProtected}`
+            `Staff Potected: ${bold(staffIsProtected)}`
         );
         messageEmbed.setColor(Colors.DarkPurple);
         return true;
@@ -224,6 +268,11 @@ module.exports = {
         )
 
         .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(REMOVE_ALL_CHANNELS_COMMAND_NAME)
+            .setDescription("Removes all current forum channels from being feedback channels.")
+        )
+
+        .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(ADD_FORUM_TAG_COMMAND_NAME)
             .setDescription("Adds a forum tag as a \"open for feedback\" tag, allowing feedback contracts to be posted.")
             .addStringOption(new SlashCommandStringOption()
@@ -241,6 +290,11 @@ module.exports = {
                 .setDescription("The ID of the forum tag to remove as a \"open for feedback\" tag.")
                 .setRequired(true)
             )
+        )
+
+        .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(REMOVE_ALL_TAGS_COMMAND_NAME)
+            .setDescription("Removes all current forum tags from being \"open for feedback\" tags.")
         )
 
         .addSubcommand(new SlashCommandSubcommandBuilder()

@@ -37,9 +37,10 @@ Reflect.defineProperty(Settings.prototype, 'getChannels', {
  */
 Reflect.defineProperty(Settings.prototype, 'addChannel', {
 	value: async id => {
-		await Channels.findOrCreate({
+		const [channel, created] = await Channels.findOrCreate({
 			where: { channel_id: id }
 		});
+		return created;
 	},
 });
 
@@ -48,9 +49,26 @@ Reflect.defineProperty(Settings.prototype, 'addChannel', {
  */
 Reflect.defineProperty(Settings.prototype, 'removeChannel', {
 	value: async id => {
-		await Channels.destroy({
+		const destroyed = await Channels.destroy({
 			where: { channel_id: id }
-		})
+		});
+		return destroyed > 0;
+	},
+});
+
+/**
+ * Allows for `Settings.removeAllChannels()` to remove all channels in Channels database.
+ */
+Reflect.defineProperty(Settings.prototype, 'removeAllChannels', {
+	value: async () => {
+		const channels = await Channels.findAll();
+		let destroyed = 0;
+		for (const channel of channels) {
+			destroyed += await Channels.destroy({
+				where: { channel_id: channel.channel_id }
+			})
+		}
+		return destroyed > 0;
 	},
 });
 
@@ -68,9 +86,11 @@ Reflect.defineProperty(Settings.prototype, 'getTags', {
  */
 Reflect.defineProperty(Settings.prototype, 'addTag', {
 	value: async id => {
-		await Tags.findOrCreate({
+		const [tag, created] = await Tags.findOrCreate({
 			where: { tag_id: id }
 		});
+		return created;
+		
 	},
 });
 
@@ -79,9 +99,26 @@ Reflect.defineProperty(Settings.prototype, 'addTag', {
  */
 Reflect.defineProperty(Settings.prototype, 'removeTag', {
 	value: async id => {
-		await Tags.destroy({
+		const destroyed = await Tags.destroy({
 			where: { tag_id: id }
 		})
+		return destroyed > 0;
+	},
+});
+
+/**
+ * Allows for `Settings.removeAllTags()` to remove all tags in Tags database.
+ */
+Reflect.defineProperty(Settings.prototype, 'removeAllTags', {
+	value: async () => {
+		const tags = await Tags.findAll();
+		let destroyed = 0;
+		for (const tag of tags) {
+			destroyed += await Tags.destroy({
+				where: { tag_id: tag.tag_id }
+			})
+		}
+		return destroyed > 0;
 	},
 });
 
