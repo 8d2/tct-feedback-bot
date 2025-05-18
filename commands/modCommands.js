@@ -8,6 +8,7 @@ const constants = require("../helpers/constants.js");
 const messageMethods = require("../helpers/messageMethods.js");
 const userMethods = require("../helpers/userMethods.js");
 const { pluralize } = require('../helpers/util.js');
+const { getStaffIsProtected } = require("../helpers/settingsMethods.js");
 
 // Constants
 const USER_OPTION_NAME = "user";
@@ -32,9 +33,10 @@ const COMMAND_FUNCTIONS = {
         const blockee = interaction.options.getMember(USER_OPTION_NAME);
         const isBlocked = await userMethods.getIsBlocked(blockee.id);
         const isStaff = userMethods.getMemberIsStaff(blockee);
+        const staffIsProtected = await getStaffIsProtected();
         let success = false;
         
-        if (isStaff) {
+        if (isStaff && staffIsProtected) {
             messageEmbed.setDescription(`${blockee} is a staff member and is protected from this command.`);
             messageEmbed.setColor(Colors.Yellow);
         }
@@ -85,18 +87,20 @@ const COMMAND_FUNCTIONS = {
         const user = interaction.options.getMember(USER_OPTION_NAME);
         const points = interaction.options.getInteger(POINTS_OPTION_NAME);
         const isStaff = userMethods.getMemberIsStaff(user);
+        const staffIsProtected = await getStaffIsProtected();
+        let errorEmbeds = [];
         
-        if (isStaff) {
+        if (isStaff && staffIsProtected) {
             messageEmbed.setDescription(`${user} is a staff member and is protected from this command.`);
             messageEmbed.setColor(Colors.Yellow);
         }
         else {
             await userMethods.setPoints(user.id, points);
+            errorEmbeds = await userMethods.updateRoles(interaction, user.id);
             messageEmbed.setDescription(`${user} now has ${pluralize(points, "point")}.`);
             messageEmbed.setColor(Colors.Green);
         }
         
-        const errorEmbeds = await userMethods.updateRoles(interaction, user.id);
         return {doFollowUpPing: errorEmbeds.length > 0, followUpEmbeds: errorEmbeds};
     },
 
