@@ -170,6 +170,7 @@ async function handleContractConfirmInteraction(interaction) {
         const originalPoints = await userMethods.getPoints(originalUser.id);
         const newPoints = originalPoints + awardPoints;
         if (newPoints != originalPoints) {
+            // New point amount, set and update user
             userMethods.setPoints(originalUser.id, newPoints);
             userMethods.updateRoles(interaction, originalUser.id);
         }
