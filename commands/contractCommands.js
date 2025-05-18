@@ -9,9 +9,7 @@ const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
 const messageMethods = require("../helpers/messageMethods.js");
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
-const { getFeedbackChannel } = require("../helpers/settingsMethods.js");
 const constants = require("../helpers/constants.js");
-const { col } = require("sequelize");
 
 // Constants
 const CREATE_COMMAND_NAME = "create";
@@ -42,13 +40,13 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         // Check if the user is a thread builder 
-      /*  else if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
+        else if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
             contractMethods.showCommandError(
                 interaction,
                 "You cannot create feedback contracts since you are a builder in this thread."
             );
             return false;
-        }*/
+        }
         // Check if the feedback thread is open for feedback
         else if (!(await contractMethods.isFeedbackEnabled(feedbackThread))) {
             contractMethods.showCommandError(
@@ -110,8 +108,7 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         else {
-            // Component creation has been outsourced to handlers </3
-            // Pings the thread owner if they have allow pings on.
+            // Pings the thread collaborators if they have allow pings on.
             const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, false);
             const usersToPing = []
             for (let user of collaborators) {
@@ -120,6 +117,7 @@ const COMMAND_FUNCTIONS = {
                     usersToPing.push(user)
                 }
             }
+
             await interaction.reply(createContractMessage(interaction, usersToPing));
             return true;
         }
@@ -138,7 +136,6 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
         else {
-            // TODO: make this command show a list of all builders
             const feedbackThreadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
             const feedbackEnabled = await contractMethods.isFeedbackEnabled(feedbackThread);
             const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, true);

@@ -1,8 +1,10 @@
 // Stores information about feedback threads and collaborators.
 
-const { PermissionFlagsBits, Collection } = require("discord.js");
+const { Collection } = require("discord.js");
 const { Threads, Collaborators } = require('../dbObjects.js');
 const { getFeedbackThreadOwner } = require("./contractMethods.js");
+
+const userMethods = require("./userMethods.js");
 
 const threads = new Collection();
 const collaborators = new Collection();
@@ -53,27 +55,19 @@ async function getThreadCollaboratorCount(thread) {
 /**
  * Returns users that have collaborator in a specific thread.
  * @param {ThreadChannel} thread The thread
+ * @param {boolean} discardOwner If true, will remove the thread owner from the returned results
  * @return {[User]} List of users
  */
 async function getThreadCollaboratorUsers(thread, discardOwner) {
     await getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
-    const collabData = await Collaborators.findAll();
+    const users = await userMethods.getUsersWithInfo(thread.guild);
 
     const threadOwner = await getFeedbackThreadOwner(thread);
 
     var listOfUsers = []
-    for (let dataInstance of collabData) {
-        const collabKey = dataInstance.collaboration_id
-        
-        // If the data belongs to this thread id
-        if (collabKey.match(`_${thread.id}`)) {
-            // All we need now is the user, discard the rest
-            const userId = collabKey.replace(`_${thread.id}`, "");
-            const user = (await thread.guild.members.fetch(userId)).user;
-
-            if (!(user == threadOwner && discardOwner)) {
-                listOfUsers.push(user)
-            }
+    for (let user of users) {
+        if (await getUserIsCollaborator(user, thread) && !(user == threadOwner && discardOwner)) {
+            listOfUsers.push(user);
         }
     }
     return listOfUsers;
