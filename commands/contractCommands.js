@@ -38,15 +38,6 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
 
-        // Check if the user is blocked
-        if (await userMethods.getIsBlocked(interaction.user.id)) {
-            showCommandError(
-                interaction,
-                "You have been blocked from creating feedback contracts for spam or abuse."
-            );
-            return false;
-        }
-
         // Check if the user is a thread builder 
         if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
             showCommandError(
@@ -61,6 +52,15 @@ const COMMAND_FUNCTIONS = {
             showCommandError(
                 interaction,
                 "This feedback thread is not currently open for feedback contracts."
+            );
+            return false;
+        }
+
+        // Check if the user is blocked
+        if (await userMethods.getIsBlocked(interaction.user.id)) {
+            showCommandError(
+                interaction,
+                "You have been blocked from creating feedback contracts for spam or abuse."
             );
             return false;
         }
