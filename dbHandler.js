@@ -9,11 +9,13 @@ const { sequelize, dataTypes } = require("./dbDefinition")
 const SETTINGS_MAIN_IDENTIFIER = "main";
 
 // Models
+const Channels = require('./models/Channels.js')(sequelize, dataTypes);
+const Collaborators = require('./models/Collaborators.js')(sequelize, dataTypes);
 const Roles = require('./models/Roles.js')(sequelize, dataTypes);
 const Settings = require('./models/Settings.js')(sequelize, dataTypes);
-const Users = require('./models/Users.js')(sequelize, dataTypes);
+const Tags = require('./models/Tags.js')(sequelize, dataTypes);
 const Threads = require('./models/Threads.js')(sequelize, dataTypes);
-const Collaborators = require('./models/Collaborators.js')(sequelize, dataTypes);
+const Users = require('./models/Users.js')(sequelize, dataTypes);
 
 // Command arguments
 const force = process.argv.includes('--force') || process.argv.includes('-f');
@@ -40,9 +42,12 @@ if (sync) {
 
 module.exports = {
 	SETTINGS_MAIN_IDENTIFIER,
+	Channels,
+	Collaborators,
 	Roles,
 	Settings,
+	Tags,
+	Threads,
 	Users,
-    Threads,
     Collaborators
 }

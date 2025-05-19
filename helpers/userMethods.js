@@ -4,7 +4,7 @@
 
 const { Colors, EmbedBuilder } = require("discord.js");
 
-const { getRoles } = require('./settingsMethods.js');
+const { getDatabaseRoles } = require('./settingsMethods.js');
 const { handleAddRole, handleRemoveRole } = require('../handlers/unsafe.js');
 const { Collection, PermissionsBitField } = require('discord.js');
 const { Users } = require('../dbObjects.js');
@@ -198,7 +198,7 @@ async function getRulesAccepted(id) {
  */
 async function getRoleIdsOwnershipStatus(feedbackPoints) {
     let ownershipStatus = {};
-    const roles = await getRoles();
+    const roles = await getDatabaseRoles();
     for(const role of roles) {
         const hasRole = feedbackPoints >= role.role_requirement;
         ownershipStatus[role.role_id] = hasRole;

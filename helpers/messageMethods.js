@@ -1,9 +1,9 @@
 // For bot related messages
-const { heading, bold, italic, inlineCode, HeadingLevel } = require("discord.js");
+const { EmbedBuilder, Colors, MessageFlags, heading, bold, italic, inlineCode, HeadingLevel } = require("discord.js");
 
-const { getRoles } = require('./settingsMethods.js');
+const { getDatabaseRoles } = require('./settingsMethods.js');
 const { getGainedRoles } = require('./userMethods.js');
-const { pluralize } = require('./util.js');
+const { pluralize, concatList } = require('./util.js');
 
 /**
  * Gets a message that displays what contract rating gives what points.
@@ -24,7 +24,7 @@ function getRatingPointsMessage() {
  */
 async function getRoleRequirementMessage(interaction, displayRoleType = false) {
     let message = "";
-    const roles = await getRoles();
+    const roles = await getDatabaseRoles();
     roles.forEach((role, index) => {
         const guildRole = interaction.guild.roles.cache.get(role.role_id);
         message += `- ${displayRoleType ? `${role.role_type}: ` : ""}${guildRole} - ${pluralize(role.role_requirement, "point")}`;
@@ -82,9 +82,7 @@ async function getPointsInfoDisplayMessages(interaction) {
  */
 async function getGainedRolesMessage(interaction, originalPoints, newPoints) {
     const gainedRoles = await getGainedRoles(interaction, originalPoints, newPoints);
-    return gainedRoles.length > 0 ? gainedRoles.reduce(
-        (str, role, index) => str + `${role}` + (index < gainedRoles.length - 1 ? ", " : ""), ""
-    ) : null;
+    return concatList(gainedRoles, null);
 }
 
 /**
@@ -113,11 +111,26 @@ function getAuthorOptions(user) {
     };
 }
 
+/**
+ * Responds to an interaction with an error embed with the given description.
+ * @param {CommandInteraction} the command that generated this interaction
+ * @param {string} the description to use in the embed
+ */
+async function showCommandError(interaction, description) {
+    const responseEmbed = new EmbedBuilder()
+        .setTimestamp()
+        .setColor(Colors.Red)
+        .setDescription(description);
+            
+    await interaction.reply({embeds: [responseEmbed], flags: MessageFlags.Ephemeral});
+}
+
 module.exports = {
     getRatingPointsMessage,
     getRoleRequirementMessage,
     getPointsInfoDisplayMessages,
     getGainedRolesMessage,
     getOriginalUser,
-    getAuthorOptions
+    getAuthorOptions,
+    showCommandError
 }
