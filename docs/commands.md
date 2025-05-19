@@ -36,7 +36,7 @@ Furthermore, user stories that may apply to a command will be listed below their
   > **D.1.** As an *administrator*, I want to *assign a forum channel (or channels) to be the official "tower feedback" channel* so that *the feedback bot is only used within that channel*.
 - [x] `/admin removechannel <channel>` - Removes this feedback channel from allowing contracts.
 - [x] `/admin removeallchannels` - Removes all current feedback channels from allowing contracts.
-- [x] `/admin addforumtag <id>` - Adds a feedback tag as one that allows for builders to make their thread open for feedback. If none of the added tags are present, contracts cannot be made in the thread. Only 1 tag is required.
+- [x] `/admin addforumtag <id>` - Adds a feedback tag as one that allows builders to make their thread open for feedback. If none of the added tags are present, contracts cannot be made in the thread. Only 1 tag is required.
   > **B.1.** As a *builder*, I want to *add a forum tag to enable feedback contracts* so that I can *receive feedback only when my tower is ready*.
 - [x] `/admin removeforumtag <id>` -  Removes a feedback tag with the id.
 - [x] `/admin removeallforumtags` -  Removes all feedback tags.
@@ -46,4 +46,4 @@ If `updateallroles` is true, all members will have their roles updated based on 
 - [x] `/admin setrole <roletype> <role>` - Sets the role to automatically assign when a user reaches the requirement of the role type.
 - [x] `/admin settings` - Shows all the current settings of the bot, including the set feedback forum channel, tag, and all role requirements.
 - [ ] `/admin setcontractcooldown <time>` - Sets how long a user must wait before posting another contract in the same feedback thread.
-- [ ] `/admin setstaffprotection <level>` - Sets the protection level of mod commands ran on other moderators and admins.
+- [x] `/admin setstaffprotection <level>` - Sets the protection level of mod commands ran on other moderators and admins.
