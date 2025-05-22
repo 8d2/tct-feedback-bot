@@ -209,7 +209,7 @@ const COMMAND_FUNCTIONS = {
             `\nFeedback Channels: ${concatList(channels)}\n` +
             `Feedback Tags: ${inlineCode(concatList(tagIds, constants.OPTION_NULL_NO_FORMAT))}\n` +
             `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}\n` +
-            `Staff Potected: ${bold(staffIsProtected)}`
+            `Staff Protected: ${bold(staffIsProtected)}`
         );
         messageEmbed.setColor(Colors.DarkPurple);
         return true;
