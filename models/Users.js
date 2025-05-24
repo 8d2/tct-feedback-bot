@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
 	return sequelize.define('users', {
 		user_id: {
             // User id.
-			type: DataTypes.STRING,
+			type: DataTypes.STRING(31),
 			primaryKey: true
 		},
         accepted_rules: {

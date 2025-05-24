@@ -2,6 +2,8 @@
 const { bold, strikethrough, underline, subtext, inlineCode } = require("discord.js");
 
 const COMMAND_NOT_IMPLEMENTED_DESC = "This command has not been fully implemented."
+const ID_CHARACTER_LIMIT = 30; // discord IDs are unsigned 8 byte ints, the maximum length for an ID string is 19 chars.
+const ID_CHARACTER_LIMIT_DESC = `The maximum length for this value is ${ID_CHARACTER_LIMIT} characters.`;
 const MESSAGE_SENT_CONFIRM_MESSAGE = "The message has been sent."
 const MESSAGE_SENT_FAILED_MESSAGE = "The message failed to send."
 const MESSAGE_SENT_PERMISSION_FAILED_MESSAGE = "The message failed to send due to lack of permissions."
@@ -72,10 +74,10 @@ const STAR_RATING_INFO = {
         point_value: 3,
     },
 };
-const INTERACTION_NOT_BUILDER_ERROR = "You cannot interact with feedback contracts since you are not a builder in this thread."
-const CONTRACT_STAR_SELECT_CUSTOM_ID = "feedback-contract-star-select"
-const CONTRACT_CONFIRM_CUSTOM_ID = "feedback-contract-confirm"
-const CONTRACT_RULES_ACCEPT_ID = "feedback-contract-rules-accept"
+const INTERACTION_NOT_BUILDER_ERROR = "You cannot interact with feedback contracts since you are not a builder in this thread.";
+const CONTRACT_STAR_SELECT_CUSTOM_ID = "feedback-contract-star-select";
+const CONTRACT_CONFIRM_CUSTOM_ID = "feedback-contract-confirm";
+const CONTRACT_RULES_ACCEPT_ID = "feedback-contract-rules-accept";
 
 module.exports = {
     COMMAND_NOT_IMPLEMENTED_DESC,
@@ -96,5 +98,7 @@ module.exports = {
     INTERACTION_NOT_BUILDER_ERROR,
     CONTRACT_STAR_SELECT_CUSTOM_ID,
     CONTRACT_CONFIRM_CUSTOM_ID,
-    CONTRACT_RULES_ACCEPT_ID
+    CONTRACT_RULES_ACCEPT_ID,
+    ID_CHARACTER_LIMIT,
+    ID_CHARACTER_LIMIT_DESC
 }
