@@ -69,7 +69,7 @@ module.exports = {
                     }
                     appendedLeaderboardMessage += message;
                     if (cycle < leaderboardStats.length) {
-                        // Other leaderboard entires after this one
+                        // Other leaderboard entries after this one
                         appendedLeaderboardMessage += constants.LEADERBOARD_SEPARATOR;
                     }
                 }
