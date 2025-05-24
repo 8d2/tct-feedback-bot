@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
 	return sequelize.define('collaborators', {
 		collaboration_id: {
             // Collaboration id. this is formatted as `${collaboratorUserId}_${threadId}`
-			type: DataTypes.STRING,
+			type: DataTypes.STRING(63),
 			primaryKey: true
 		}
 	}, {
