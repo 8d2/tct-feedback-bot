@@ -1,10 +1,11 @@
-const { Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandBooleanOption, MessageFlags, bold } = require("discord.js");
+const { Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandBooleanOption, MessageFlags, HeadingLevel, bold, heading }
+    = require("discord.js");
 
 const userMethods = require("../../helpers/userMethods.js")
+const constants = require("../../helpers/constants.js")
+const { pluralize } = require("../../helpers/util.js")
 
 const HIDDEN_OPTION_NAME = "hidden"
-
-const MAX_DISPLAY = 10
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -25,46 +26,60 @@ module.exports = {
         const listOfUsers = await userMethods.getUsersWithInfo(interaction.guild);
 
         // Loop through all users and get their points
-        var rawLeaderboardStats = {}
-        for (var i = 0; i < listOfUsers.length; i++) {
+        const leaderboardStats = [];
+        for (let i = 0; i < listOfUsers.length; i++) {
             const user = listOfUsers[i]
 
             // Discard users with 0 points
             const points = await userMethods.getPoints(user.id)
             if (points > 0) {
-                rawLeaderboardStats[user] = points
+                leaderboardStats.push({ user: user, points: points })
             }
         }
-        
-        // Order the dictionary by most to least points
-        const sortedLeaderboardStats = Object.fromEntries(Object.entries(rawLeaderboardStats).sort((a, b) => b[1] - a[1]));
+
+        // Order the stats by most to least points
+        leaderboardStats.sort((a, b) => b.points - a.points);
 
         // Create the contents of the leaderboard message
-        var appendedLeaderboardMessage = ""
-        var cycle = 0
-        for (let user in sortedLeaderboardStats) {
-            cycle += 1
-            var message = `${cycle}. ${user} - ${sortedLeaderboardStats[user]} points\n`
+        let appendedLeaderboardMessage = "";
+        if (leaderboardStats == 0) {
+            appendedLeaderboardMessage = constants.LEADERBOARD_EMPTY_MESSAGE;
+        }
+        else {
+            let cycle = 0;
+            for (const stat of leaderboardStats) {
+                cycle += 1;
+                const user = stat.user;
+                let message = `${cycle}. ${user} - ${pluralize(stat.points, "point")}\n`;
 
-            // If the user appears on the leaderboard, make their entry bold
-            if (user == interaction.user) {
-                message = bold(message)
-            }
+                // If the user appears on the leaderboard, make their entry bold
+                if (user == interaction.user) {
+                    message = bold(message);
+                }
 
-            // If we havent reached the max amount to display
-            if (cycle <= MAX_DISPLAY) {
-                appendedLeaderboardMessage += message
-            }
-            // Stop displaying them unless the user appears in the data, append them separately at the bottom
-            else if (user == interaction.user) {
-                appendedLeaderboardMessage += "‧‧‧\n" + message
+                // If we havent reached the max amount to display
+                if (cycle <= constants.LEADERBOARD_MAX_DISPLAY) {
+                    appendedLeaderboardMessage += message;
+                }
+                // Stop displaying them unless the user appears in the data, append them separately at the bottom
+                else if (user == interaction.user) {
+                    if (cycle > constants.LEADERBOARD_MAX_DISPLAY + 1) {
+                        // Other leaderboard entries before this one
+                        appendedLeaderboardMessage += constants.LEADERBOARD_SEPARATOR + "\n";
+                    }
+                    appendedLeaderboardMessage += message;
+                    if (cycle < leaderboardStats.length) {
+                        // Other leaderboard entires after this one
+                        appendedLeaderboardMessage += constants.LEADERBOARD_SEPARATOR;
+                    }
+                }
             }
         }
 
         const responseEmbed = new EmbedBuilder()
             .setTimestamp()
             .setColor(Colors.Purple)
-            .setDescription("## Leaderboard\n" + appendedLeaderboardMessage)
+            .setDescription(heading("Leaderboard", HeadingLevel.Two) + "\n" + appendedLeaderboardMessage);
         await interaction.reply({embeds: [responseEmbed], flags: flagsToAdd});
     },
 }
