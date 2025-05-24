@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
 	return sequelize.define('channels', {
         channel_id: {
             // The forum channel where feedback contracts can be made.
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(31),
             primaryKey: true
         }
 	}, {

@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
 	return sequelize.define('tags', {
         tag_id: {
             // The forum tag that enables feedback contracts in the thread.
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(31),
             primaryKey: true
         }
 	}, {
