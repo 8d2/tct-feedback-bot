@@ -49,28 +49,29 @@ module.exports = {
             let cycle = 0;
             for (const stat of leaderboardStats) {
                 cycle += 1;
-                const user = stat.user;
-                let message = `${cycle}. ${user} - ${pluralize(stat.points, "point")}\n`;
+                const ranCommand = stat.user == interaction.user;
 
-                // If the user appears on the leaderboard, make their entry bold
-                if (user == interaction.user) {
-                    message = bold(message);
-                }
+                // Display a message for this user if they are in the top spots, or ran the command.
+                if (cycle <= constants.LEADERBOARD_MAX_DISPLAY || ranCommand) {
+                    let message = `${cycle}. ${stat.user} - ${pluralize(stat.points, "pt")}\n`;
 
-                // If we havent reached the max amount to display
-                if (cycle <= constants.LEADERBOARD_MAX_DISPLAY) {
-                    appendedLeaderboardMessage += message;
-                }
-                // Stop displaying them unless the user appears in the data, append them separately at the bottom
-                else if (user == interaction.user) {
-                    if (cycle > constants.LEADERBOARD_MAX_DISPLAY + 1) {
-                        // Other leaderboard entries before this one
-                        appendedLeaderboardMessage += constants.LEADERBOARD_SEPARATOR + "\n";
+                    // If showing user who ran this command, make them bold.
+                    if (ranCommand) {
+                        message = bold(message);
+
+                        // Add separator if there are other hidden entries between the last top spot and this one.
+                        if (cycle > constants.LEADERBOARD_MAX_DISPLAY + 1) {
+                            appendedLeaderboardMessage += constants.LEADERBOARD_SEPARATOR + "\n";
+                        }
                     }
+
+                    // Append entry for this user.
                     appendedLeaderboardMessage += message;
-                    if (cycle < leaderboardStats.length) {
-                        // Other leaderboard entries after this one
+
+                    // Add separator if there are other hidden entries after this one.
+                    if (ranCommand && cycle < leaderboardStats.length) {
                         appendedLeaderboardMessage += constants.LEADERBOARD_SEPARATOR;
+                        break;
                     }
                 }
             }
