@@ -13,6 +13,9 @@ const UPDATE_ALL_ROLES_ERROR = "Failed to update roles of users due to an error.
 const UPDATE_ALL_ROLES_SUCCESS = "Successfully updated the roles of all users.";
 const OPTION_NULL_NO_FORMAT = "N/A";
 const OPTION_NULL = inlineCode(OPTION_NULL_NO_FORMAT);
+const LEADERBOARD_EMPTY_MESSAGE = "Nobody has any points yet...";
+const LEADERBOARD_SEPARATOR = "‧‧‧";
+const LEADERBOARD_MAX_DISPLAY = 10;
 const MISSING_ACCESS_CODE = 50001;          // For roles
 const MISSING_PERMISSIONS_CODE = 50013;     // For messages
 const FEEDBACK_AGREEMENT_TITLE = "Feedback Agreement"
@@ -90,6 +93,9 @@ module.exports = {
     UPDATE_ALL_ROLES_SUCCESS,
     OPTION_NULL_NO_FORMAT,
     OPTION_NULL,
+    LEADERBOARD_EMPTY_MESSAGE,
+    LEADERBOARD_SEPARATOR,
+    LEADERBOARD_MAX_DISPLAY,
     MISSING_ACCESS_CODE,
     MISSING_PERMISSIONS_CODE,
     FEEDBACK_AGREEMENT_TITLE,
