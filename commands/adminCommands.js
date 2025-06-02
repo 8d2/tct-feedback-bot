@@ -267,7 +267,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("admin")
         .setDescription("administrator commands")
-        // .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(ADD_CHANNEL_COMMAND_NAME)
