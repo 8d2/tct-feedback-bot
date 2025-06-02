@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
             // The forum tag that enables feedback contracts in the thread.
             type: DataTypes.STRING(31)
         },
+        contract_cooldown: {
+            // The minimum cooldown seconds between posting a contract in the same thread
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+        },
         staff_is_protected: {
             // Whether staff are protected from data modifying commands, 1 = yes, 0 = no
             type: DataTypes.BOOLEAN,

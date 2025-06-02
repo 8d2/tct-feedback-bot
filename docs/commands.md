@@ -45,5 +45,5 @@ If `updateallroles` is true, all members will have their roles updated based on 
   > **D.2.** As an *administrator*, I want to *assign a role to each point milestone* so that *the bot is able to assign these roles automatically*.
 - [x] `/admin setrole <roletype> <role>` - Sets the role to automatically assign when a user reaches the requirement of the role type.
 - [x] `/admin settings` - Shows all the current settings of the bot, including the set feedback forum channel, tag, and all role requirements.
-- [ ] `/admin setcontractcooldown <time>` - Sets how long a user must wait before posting another contract in the same feedback thread.
+- [x] `/admin setcontractcooldown <time>` - Sets how long a user must wait before posting another contract in the same feedback thread.
 - [x] `/admin setstaffprotection <level>` - Sets the protection level of mod commands ran on other moderators and admins.
