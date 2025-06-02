@@ -103,7 +103,15 @@ const COMMAND_FUNCTIONS = {
      */
     [ADD_FORUM_TAG_COMMAND_NAME]: async function handleSetForumTag(interaction, messageEmbed) {
         const forumTagId = interaction.options.getString(FORUM_TAG_OPTION_NAME);
+        
+        if (forumTagId.length > constants.ID_CHARACTER_LIMIT) {
+            messageEmbed.setDescription(constants.ID_CHARACTER_LIMIT_DESC);
+            messageEmbed.setColor(Colors.Yellow);
+            return false;
+        }
+        
         const added = await settingsMethods.addFeedbackForumTagId(forumTagId);
+        
         if (!added) {
             // Already in database
             messageEmbed.setDescription(`${forumTagId} is already a feedback forum tag.`);
@@ -209,7 +217,7 @@ const COMMAND_FUNCTIONS = {
             `\nFeedback Channels: ${concatList(channels)}\n` +
             `Feedback Tags: ${inlineCode(concatList(tagIds, constants.OPTION_NULL_NO_FORMAT))}\n` +
             `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}\n` +
-            `Staff Potected: ${bold(staffIsProtected)}`
+            `Staff Protected: ${bold(staffIsProtected)}`
         );
         messageEmbed.setColor(Colors.DarkPurple);
         return true;

@@ -5,16 +5,16 @@ module.exports = (sequelize, DataTypes) => {
 	return sequelize.define('settings', {
         identifier: {
             // Identifier for these settings.
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(31),
             primaryKey: true
         },
         feedback_channel_id: {
             // The forum channel where feedback contracts can be made.
-            type: DataTypes.STRING
+            type: DataTypes.STRING(31)
         },
         feedback_tag_id: {
             // The forum tag that enables feedback contracts in the thread.
-            type: DataTypes.STRING
+            type: DataTypes.STRING(31)
         },
         staff_is_protected: {
             // Whether staff are protected from data modifying commands, 1 = yes, 0 = no

@@ -2,6 +2,8 @@
 const { bold, strikethrough, underline, subtext, inlineCode } = require("discord.js");
 
 const COMMAND_NOT_IMPLEMENTED_DESC = "This command has not been fully implemented."
+const ID_CHARACTER_LIMIT = 30; // discord IDs are unsigned 8 byte ints, the maximum length for an ID string is 19 chars.
+const ID_CHARACTER_LIMIT_DESC = `The maximum length for this value is ${ID_CHARACTER_LIMIT} characters.`;
 const MESSAGE_SENT_CONFIRM_MESSAGE = "The message has been sent."
 const MESSAGE_SENT_FAILED_MESSAGE = "The message failed to send."
 const MESSAGE_SENT_PERMISSION_FAILED_MESSAGE = "The message failed to send due to lack of permissions."
@@ -11,6 +13,9 @@ const UPDATE_ALL_ROLES_ERROR = "Failed to update roles of users due to an error.
 const UPDATE_ALL_ROLES_SUCCESS = "Successfully updated the roles of all users.";
 const OPTION_NULL_NO_FORMAT = "N/A";
 const OPTION_NULL = inlineCode(OPTION_NULL_NO_FORMAT);
+const LEADERBOARD_EMPTY_MESSAGE = "Nobody has any points yet...";
+const LEADERBOARD_SEPARATOR = "‧‧‧";
+const LEADERBOARD_MAX_DISPLAY = 10;
 const MISSING_ACCESS_CODE = 50001;          // For roles
 const MISSING_PERMISSIONS_CODE = 50013;     // For messages
 const FEEDBACK_AGREEMENT_TITLE = "Feedback Agreement"
@@ -72,10 +77,10 @@ const STAR_RATING_INFO = {
         point_value: 3,
     },
 };
-const INTERACTION_NOT_BUILDER_ERROR = "You cannot interact with feedback contracts since you are not a builder in this thread."
-const CONTRACT_STAR_SELECT_CUSTOM_ID = "feedback-contract-star-select"
-const CONTRACT_CONFIRM_CUSTOM_ID = "feedback-contract-confirm"
-const CONTRACT_RULES_ACCEPT_ID = "feedback-contract-rules-accept"
+const INTERACTION_NOT_BUILDER_ERROR = "You cannot interact with feedback contracts since you are not a builder in this thread.";
+const CONTRACT_STAR_SELECT_CUSTOM_ID = "feedback-contract-star-select";
+const CONTRACT_CONFIRM_CUSTOM_ID = "feedback-contract-confirm";
+const CONTRACT_RULES_ACCEPT_ID = "feedback-contract-rules-accept";
 
 module.exports = {
     COMMAND_NOT_IMPLEMENTED_DESC,
@@ -88,6 +93,9 @@ module.exports = {
     UPDATE_ALL_ROLES_SUCCESS,
     OPTION_NULL_NO_FORMAT,
     OPTION_NULL,
+    LEADERBOARD_EMPTY_MESSAGE,
+    LEADERBOARD_SEPARATOR,
+    LEADERBOARD_MAX_DISPLAY,
     MISSING_ACCESS_CODE,
     MISSING_PERMISSIONS_CODE,
     FEEDBACK_AGREEMENT_TITLE,
@@ -96,5 +104,7 @@ module.exports = {
     INTERACTION_NOT_BUILDER_ERROR,
     CONTRACT_STAR_SELECT_CUSTOM_ID,
     CONTRACT_CONFIRM_CUSTOM_ID,
-    CONTRACT_RULES_ACCEPT_ID
+    CONTRACT_RULES_ACCEPT_ID,
+    ID_CHARACTER_LIMIT,
+    ID_CHARACTER_LIMIT_DESC
 }

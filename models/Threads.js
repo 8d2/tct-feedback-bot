@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
 	return sequelize.define('threads', {
 		thread_id: {
             // Thread ID
-			type: DataTypes.STRING,
+			type: DataTypes.STRING(31),
 			primaryKey: true
 		},
         collaborator_count: {
