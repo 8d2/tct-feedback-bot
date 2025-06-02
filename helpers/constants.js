@@ -81,6 +81,13 @@ const INTERACTION_NOT_BUILDER_ERROR = "You cannot interact with feedback contrac
 const CONTRACT_STAR_SELECT_CUSTOM_ID = "feedback-contract-star-select";
 const CONTRACT_CONFIRM_CUSTOM_ID = "feedback-contract-confirm";
 const CONTRACT_RULES_ACCEPT_ID = "feedback-contract-rules-accept";
+const TIME_CONVERSIONS = [
+    { name: "week", conversion: 604800 },
+    { name: "day", conversion: 86400 },
+    { name: "hour", conversion: 3600 },
+    { name: "minute", conversion: 60 },
+    { name: "second" }
+];
 
 module.exports = {
     COMMAND_NOT_IMPLEMENTED_DESC,
@@ -106,5 +113,6 @@ module.exports = {
     CONTRACT_CONFIRM_CUSTOM_ID,
     CONTRACT_RULES_ACCEPT_ID,
     ID_CHARACTER_LIMIT,
-    ID_CHARACTER_LIMIT_DESC
+    ID_CHARACTER_LIMIT_DESC,
+    TIME_CONVERSIONS
 }

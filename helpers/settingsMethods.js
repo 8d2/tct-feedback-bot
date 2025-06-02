@@ -230,6 +230,25 @@ async function setRoleRequirement(roleType, roleRequirement) {
 }
 
 /**
+ * Returns the cooldown for posting contracts in the same thread.
+ * @returns {int} The current cooldown in seconds. If 0, there is no cooldown.
+ */
+async function getContractCooldown() {
+    return settings ? settings.contract_cooldown : 0;
+}
+
+/**
+ * Sets the cooldown for posting contracts in the same thread.
+ * @param {boolean} cooldown The cooldown in seconds to set.
+ */
+async function setContractCooldown(cooldown) {
+    if (settings) {
+        settings.contract_cooldown = cooldown;
+        settings.save();
+    }
+}
+
+/**
  * Returns whether staff members are protected from data modifying commands.
  * This includes /mod setpoints, /mod block.
  * @returns {boolean} whether staff is protected from data modifying commands.
@@ -270,6 +289,8 @@ module.exports = {
     getRoleRequirement,
     setRoleRequirementFromRole,
     setRoleRequirement,
+    getContractCooldown,
+    setContractCooldown,
     getStaffIsProtected,
     setStaffIsProtected,
 
