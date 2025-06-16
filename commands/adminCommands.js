@@ -219,6 +219,7 @@ const COMMAND_FUNCTIONS = {
             `\nFeedback Channels: ${concatList(channels)}\n` +
             `Feedback Tags: ${inlineCode(concatList(tagIds, constants.OPTION_NULL_NO_FORMAT))}\n` +
             `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}\n` +
+            `Feedback Contract Cooldown: ${inlineCode(getTimeDisplay(await settingsMethods.getContractCooldown()))}\n` +
             `Staff Protected: ${bold(staffIsProtected)}`
         );
         messageEmbed.setColor(Colors.DarkPurple);
@@ -235,7 +236,11 @@ const COMMAND_FUNCTIONS = {
         const cooldown = interaction.options.getInteger(COOLDOWN_OPTION_NAME);
         await settingsMethods.setContractCooldown(cooldown);
         messageEmbed.setColor(Colors.Green);
-        messageEmbed.setDescription(`The cooldown for posting contracts in the same thread is now ${inlineCode(getTimeDisplay(cooldown))}.`)
+        messageEmbed.setDescription(
+            `The contract cooldown has been updated. Users may now post contracts once per ${
+                inlineCode(getTimeDisplay(cooldown))
+            } per thread.`
+        )
         return true;
     },
     
