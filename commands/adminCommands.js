@@ -7,7 +7,7 @@ const constants = require("../helpers/constants.js");
 const messageMethods = require("../helpers/messageMethods.js");
 const settingsMethods = require("../helpers/settingsMethods.js");
 const userMethods = require("../helpers/userMethods.js");
-const { pluralize, concatList } = require('../helpers/util.js');
+const { pluralize, concatList, getTimeDisplay } = require('../helpers/util.js');
 
 // Constants
 const CHANNEL_OPTION_NAME = "feedbackchannel";
@@ -17,6 +17,7 @@ const ROLE_OPTION_NAME = "role";
 const ROLE_TYPE_OPTION_NAME = "roletype";
 const UPDATE_ALL_OPTION_NAME = "updateallroles";
 const PROTECTED_OPTION_NAME = "protected";
+const COOLDOWN_OPTION_NAME = "cooldown";
 
 const ROLE_TYPES = [
     {name: "regular", value: "regular"},
@@ -33,6 +34,7 @@ const SET_REQUIREMENT_COMMAND_NAME = "setrequirement";
 const SET_ROLE_COMMAND_NAME = "setrole";
 const GET_SETTINGS_COMMAND_NAME = "settings";
 const SET_STAFF_PROTECTED_COMMAND_NAME = "setstaffprotection";
+const SET_CONTRACT_COOLDOWN_COMMAND_NAME = "setcontractcooldown";
 
 const COMMAND_FUNCTIONS = {
     
@@ -217,9 +219,28 @@ const COMMAND_FUNCTIONS = {
             `\nFeedback Channels: ${concatList(channels)}\n` +
             `Feedback Tags: ${inlineCode(concatList(tagIds, constants.OPTION_NULL_NO_FORMAT))}\n` +
             `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}\n` +
+            `Feedback Contract Cooldown: ${inlineCode(getTimeDisplay(await settingsMethods.getContractCooldown()))}\n` +
             `Staff Protected: ${bold(staffIsProtected)}`
         );
         messageEmbed.setColor(Colors.DarkPurple);
+        return true;
+    },
+    
+    /**
+     * Handles the '/admin setcontractcooldown' command.
+     * @param {CommandInteraction} the interaction that used this command
+     * @param {EmbedBuilder} the embed to modify and reply with
+     * @return {boolean} true if the command succeeded, false if it failed.
+     */
+    [SET_CONTRACT_COOLDOWN_COMMAND_NAME]: async function handleSetContractCooldown(interaction, messageEmbed) {
+        const cooldown = interaction.options.getInteger(COOLDOWN_OPTION_NAME);
+        await settingsMethods.setContractCooldown(cooldown);
+        messageEmbed.setColor(Colors.Green);
+        messageEmbed.setDescription(
+            `The contract cooldown has been updated. Users may now post contracts once per ${
+                inlineCode(getTimeDisplay(cooldown))
+            } per thread.`
+        )
         return true;
     },
     
@@ -345,6 +366,17 @@ module.exports = {
         .addSubcommand(new SlashCommandSubcommandBuilder()
             .setName(GET_SETTINGS_COMMAND_NAME)
             .setDescription("Show the current feedback bot admin settings.")
+        )
+        
+        .addSubcommand(new SlashCommandSubcommandBuilder()
+            .setName(SET_CONTRACT_COOLDOWN_COMMAND_NAME)
+            .setDescription("Sets the cooldown for users to post a contract in the same thread.")
+            .addIntegerOption(new SlashCommandIntegerOption()
+                .setName(COOLDOWN_OPTION_NAME)
+                .setDescription("Cooldown for posting a contract in seconds")
+                .setMinValue(0)
+                .setRequired(true)
+            )
         )
         
         .addSubcommand(new SlashCommandSubcommandBuilder()
