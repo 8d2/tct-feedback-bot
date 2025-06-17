@@ -8,7 +8,7 @@ const { getDatabaseRoles } = require('./settingsMethods.js');
 const { handleAddRole, handleRemoveRole } = require('../handlers/unsafe.js');
 const { Collection, PermissionsBitField } = require('discord.js');
 const { Users } = require('../dbObjects.js');
-const constants = require("../helpers/constants.js")
+const constants = require("../helpers/constants.js");
 
 const users = new Collection();
 
