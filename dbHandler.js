@@ -15,6 +15,7 @@ const Roles = require('./models/Roles.js')(sequelize, dataTypes);
 const Settings = require('./models/Settings.js')(sequelize, dataTypes);
 const Tags = require('./models/Tags.js')(sequelize, dataTypes);
 const Threads = require('./models/Threads.js')(sequelize, dataTypes);
+const ThreadUsers = require('./models/ThreadUsers.js')(sequelize, dataTypes);
 const Users = require('./models/Users.js')(sequelize, dataTypes);
 
 // Command arguments
@@ -48,6 +49,7 @@ module.exports = {
 	Settings,
 	Tags,
 	Threads,
+	ThreadUsers,
 	Users,
     Collaborators
 }
