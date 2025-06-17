@@ -19,10 +19,10 @@ const ThreadUsers = require('./models/ThreadUsers.js')(sequelize, dataTypes);
 const Users = require('./models/Users.js')(sequelize, dataTypes);
 
 // Relationships
-Threads.hasMany(ThreadUsers);
+Threads.hasMany(ThreadUsers, {foreignKey: 'thread_id'});
 ThreadUsers.belongsTo(Threads, {foreignKey: 'thread_id'});
 ThreadUsers.belongsTo(Users, {foreignKey: 'user_id'});
-Users.hasMany(ThreadUsers);
+Users.hasMany(ThreadUsers, {foreignKey: 'user_id'});
 
 // Command arguments
 const force = process.argv.includes('--force') || process.argv.includes('-f');
