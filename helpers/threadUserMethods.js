@@ -7,7 +7,7 @@ const threadUsers = new Collection();
 
 function hashThreadUser(threadId, userId) {
     const hash = crypto
-        .createHash('shake256', { outputLength: constants.THREADUSER_ENCODING_BYTES, encoding: 'hex' })
+        .createHash(constants.THREADUSER_HASHING_ALGORITHM, { outputLength: constants.THREADUSER_ENCODING_BYTES, encoding: 'hex' })
         .update(threadId + 'a' + userId)
         .digest('base64');
     return hash;
@@ -20,7 +20,7 @@ async function getOrCreateThreadUserInfo(threadId, userId) {
         return threadUser;
     }
     const newThreadUser = await ThreadUsers.create();
-    threadUsers.set(id, newUser);
+    threadUsers.set(hash, newThreadUser);
     return newUser;
 }
 
