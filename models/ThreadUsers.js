@@ -4,14 +4,20 @@
 module.exports = (sequelize, DataTypes) => {
 	const ThreadUser = sequelize.define('thread_users', {
         thread_id: {
-            // Thread id.
-			type: DataTypes.BIGINT.UNSIGNED,
-            allowNull: false
+            // Thread id (from Threads model).
+			type: DataTypes.STRING(31),
+            references: {
+                model: 'threads',
+                key: 'thread_id',
+            }
 		},
 		user_id: {
-            // User id.
-			type: DataTypes.BIGINT.UNSIGNED,
-            allowNull: false
+            // User id (from Users model).
+			type: DataTypes.STRING(31),
+            references: {
+                model: 'users',
+                key: 'user_id',
+            }
 		},
         is_blocked: {
             // Whether the user (corresponding to user_id) is blocked from 

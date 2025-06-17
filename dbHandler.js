@@ -18,6 +18,12 @@ const Threads = require('./models/Threads.js')(sequelize, dataTypes);
 const ThreadUsers = require('./models/ThreadUsers.js')(sequelize, dataTypes);
 const Users = require('./models/Users.js')(sequelize, dataTypes);
 
+// Relationships
+Threads.hasMany(ThreadUsers);
+ThreadUsers.belongsTo(Threads, {foreignKey: 'thread_id'});
+ThreadUsers.belongsTo(Users, {foreignKey: 'user_id'});
+Users.hasMany(ThreadUsers);
+
 // Command arguments
 const force = process.argv.includes('--force') || process.argv.includes('-f');
 const sync = process.argv.includes('--sync') || process.argv.includes('-s');
