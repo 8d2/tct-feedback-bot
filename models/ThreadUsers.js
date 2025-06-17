@@ -41,8 +41,7 @@ module.exports = (sequelize, DataTypes) => {
             // A date representing when the user last posted a contract
             // in this thread.
             type: DataTypes.DATE,
-            defaultValue: new Date(2000),
-            allowNull: false
+            allowNull: true
         },
 	}, 
     {
