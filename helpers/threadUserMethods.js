@@ -7,7 +7,7 @@ const threadUsers = new Collection();
 
 function hashThreadUser(threadId, userId) {
     const hash = crypto
-        .createHash('shake256', { outputLength: 148, encoding: 'hex' })
+        .createHash('shake256', { outputLength: constants.THREADUSER_ENCODING_BYTES, encoding: 'hex' })
         .update(threadId + 'a' + userId)
         .digest('base64');
     return hash;
