@@ -1,13 +1,21 @@
 const { Collection } = require("discord.js");
 const { ThreadUsers } = require("../dbHandler");
 const constants = require("../helpers/constants.js");
+const crypto = require("node:crypto");
 
 const threadUsers = new Collection();
 
+function hashThreadUser(threadId, userId) {
+    const hash = crypto
+        .createHash('shake256', { outputLength: 148, encoding: 'hex' })
+        .update(threadId + 'a' + userId)
+        .digest('base64');
+    return hash;
+}
+
 async function getOrCreateThreadUserInfo(threadId, userId) {
-    const threadUser = await ThreadUsers.findOne({
-        where: { thread_id: threadId, user_id: userId }
-    });
+    const hash = hashThreadUser(threadId, userId);
+    const threadUser = threadUsers.get(hash);
     if (threadUser) {
         return threadUser;
     }
@@ -24,6 +32,12 @@ module.exports = {
      */
     async init() {
         const storedThreadUsers = await ThreadUsers.findAll()
-        storedThreadUsers.forEach(threadUser => threadUsers.set(threadUser.id, threadUser));
+        storedThreadUsers.forEach(
+            threadUser => threadUsers.set(
+                // ThreadUser IDs are constructed by combining thread_id and user_id
+                hashThreadUser(threadUser.thread_id, threadUser.user_id), 
+                threadUser
+            )
+        );
     },
 }
