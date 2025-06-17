@@ -15,8 +15,8 @@ function hashThreadUser(threadId, userId) {
 
 /**
  * Get a ThreadUser from thread id and user id.
- * @param {string} threadId 
- * @param {string} userId 
+ * @param {string} threadId Thread ID of the corresponding ThreadUser.
+ * @param {string} userId User ID of the corresponding ThreadUser.
  * @returns {ThreadUsers?} ThreadUser. Null if doesn't exist.
  */
 function getThreadUserInfo(threadId, userId) {
@@ -27,8 +27,8 @@ function getThreadUserInfo(threadId, userId) {
 
 /**
  * Get a ThreadUser from thread id and user id, and if not found, create a new threaduser to store.
- * @param {string} threadId 
- * @param {string} userId 
+ * @param {string} threadId Thread ID of the corresponding ThreadUser.
+ * @param {string} userId User ID of the corresponding ThreadUser.
  * @returns {ThreadUsers?} ThreadUser. Null if doesn't exist.
  */
 async function getOrCreateThreadUserInfo(threadId, userId) {
@@ -42,9 +42,46 @@ async function getOrCreateThreadUserInfo(threadId, userId) {
     return newUser;
 }
 
+/**
+ * Gets when a ThreadUser last posted a contract.
+ * @param {string} threadId Thread ID of the corresponding ThreadUser.
+ * @param {string} userId User ID of the corresponding ThreadUser.
+ * @returns {Date?} The date when the user last posted a contract in the thread.
+ */
+async function getLastContractPosted(threadId, userId) {
+    const threadUser = getOrCreateThreadUserInfo(threadId, userId);
+    return threadUser ? threadUser.last_contract_posted : null;
+}
+
+/**
+ * Sets the date when a ThreadUser last posted a contract.
+ * @param {ThreadUsers} threadUser ThreadUser to set last contract posted date.
+ * @param {Date} date When the ThreadUser last posted a contract.
+ * @returns {ThreadUsers} ThreadUser.
+ */
+async function setLastContractPostedFromThreadUser(threadUser, date = new Date()) {
+    threadUser.last_contract_posted = date;
+    return threadUser.save();
+}
+
+/**
+ * Sets the date when a user (`userId`) last posted a contract in the thread (`threadId`).
+ * @param {string} threadId Thread ID of the corresponding ThreadUser.
+ * @param {string} userId User ID of the corresponding ThreadUser.
+ * @param {Date} date When the ThreadUser last posted a contract.
+ * @returns {ThreadUsers} ThreadUser.
+ */
+async function setLastContractPosted(threadId, userId, date = new Date()) {
+    const threadUser = getOrCreateThreadUserInfo(threadId, userId);
+    return setLastContractPostedFromThreadUser(threadUser, date);
+}
+
 module.exports = {
     getThreadUserInfo,
     getOrCreateThreadUserInfo,
+    getLastContractPosted,
+    setLastContractPostedFromThreadUser,
+    setLastContractPosted,
 
     /**
      * Initialize thread_users collection from database.
