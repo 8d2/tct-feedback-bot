@@ -13,18 +13,37 @@ function hashThreadUser(threadId, userId) {
     return hash;
 }
 
+/**
+ * Get a ThreadUser from thread id and user id.
+ * @param {string} threadId 
+ * @param {string} userId 
+ * @returns {ThreadUsers?} ThreadUser. Null if doesn't exist.
+ */
+function getThreadUserInfo(threadId, userId) {
+    const hash = hashThreadUser(threadId, userId);
+    const threadUser = threadUsers.get(hash);
+    return threadUser;
+}
+
+/**
+ * Get a ThreadUser from thread id and user id, and if not found, create a new threaduser to store.
+ * @param {string} threadId 
+ * @param {string} userId 
+ * @returns {ThreadUsers?} ThreadUser. Null if doesn't exist.
+ */
 async function getOrCreateThreadUserInfo(threadId, userId) {
     const hash = hashThreadUser(threadId, userId);
     const threadUser = threadUsers.get(hash);
     if (threadUser) {
         return threadUser;
     }
-    const newThreadUser = await ThreadUsers.create();
+    const newThreadUser = await ThreadUsers.create({thread_id: threadId, user_id: userId});
     threadUsers.set(hash, newThreadUser);
     return newUser;
 }
 
 module.exports = {
+    getThreadUserInfo,
     getOrCreateThreadUserInfo,
 
     /**
