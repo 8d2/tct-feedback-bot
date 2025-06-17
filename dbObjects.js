@@ -1,7 +1,7 @@
 // Defines helper methods within database models.
 // For example, getting a user could call some method user.foo() if defined here.
 
-const { SETTINGS_MAIN_IDENTIFIER, Channels, Collaborators, Roles, Settings, Tags, Threads, Users } = require('./dbHandler.js');
+const { SETTINGS_MAIN_IDENTIFIER, Channels, Collaborators, Roles, Settings, Tags, Threads, ThreadUsers, Users } = require('./dbHandler.js');
 
 /**
  * Allows for `Settings.getRoles()` to retrieve all from Roles database.
@@ -148,5 +148,6 @@ module.exports = {
 	Settings,
 	Users,
     Threads,
+	ThreadUsers,
     Collaborators
 }

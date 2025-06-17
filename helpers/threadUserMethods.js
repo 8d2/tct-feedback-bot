@@ -1,5 +1,5 @@
 const { Collection } = require("discord.js");
-const { ThreadUsers } = require("../dbHandler");
+const { ThreadUsers } = require("../dbObjects.js");
 const constants = require("../helpers/constants.js");
 const crypto = require("node:crypto");
 
@@ -8,8 +8,10 @@ const threadUsers = new Collection();
 function hashThreadUser(threadId, userId) {
     const hash = crypto
         .createHash(constants.THREADUSER_HASHING_ALGORITHM, { outputLength: constants.THREADUSER_ENCODING_BYTES, encoding: 'hex' })
-        .update(threadId + 'a' + userId)
+        .update(threadId + 'a' + userId) // create a unique hexadecimal string by "concatenating" threadId and userId, separated by 'a'
         .digest('base64');
+    
+    console.log(`THREAD: ${threadId}\nUSER: ${userId}\nHASH: ${hash}`);
     return hash;
 }
 
@@ -39,7 +41,7 @@ async function getOrCreateThreadUserInfo(threadId, userId) {
     }
     const newThreadUser = await ThreadUsers.create({thread_id: threadId, user_id: userId});
     threadUsers.set(hash, newThreadUser);
-    return newUser;
+    return newThreadUser;
 }
 
 /**
@@ -49,14 +51,14 @@ async function getOrCreateThreadUserInfo(threadId, userId) {
  * @returns {Date?} The date when the user last posted a contract in the thread.
  */
 async function getLastContractPosted(threadId, userId) {
-    const threadUser = getOrCreateThreadUserInfo(threadId, userId);
+    const threadUser = await getOrCreateThreadUserInfo(threadId, userId);
     return threadUser ? threadUser.last_contract_posted : null;
 }
 
 /**
  * Sets the date when a ThreadUser last posted a contract.
  * @param {ThreadUsers} threadUser ThreadUser to set last contract posted date.
- * @param {Date} date When the ThreadUser last posted a contract.
+ * @param {Date} date When the ThreadUser last posted a contract. Defaults to now.
  * @returns {ThreadUsers} ThreadUser.
  */
 async function setLastContractPostedFromThreadUser(threadUser, date = new Date()) {
@@ -68,11 +70,11 @@ async function setLastContractPostedFromThreadUser(threadUser, date = new Date()
  * Sets the date when a user (`userId`) last posted a contract in the thread (`threadId`).
  * @param {string} threadId Thread ID of the corresponding ThreadUser.
  * @param {string} userId User ID of the corresponding ThreadUser.
- * @param {Date} date When the ThreadUser last posted a contract.
+ * @param {Date} date When the ThreadUser last posted a contract. Defaults to now.
  * @returns {ThreadUsers} ThreadUser.
  */
 async function setLastContractPosted(threadId, userId, date = new Date()) {
-    const threadUser = getOrCreateThreadUserInfo(threadId, userId);
+    const threadUser = await getOrCreateThreadUserInfo(threadId, userId);
     return setLastContractPostedFromThreadUser(threadUser, date);
 }
 

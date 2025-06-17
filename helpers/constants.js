@@ -19,7 +19,7 @@ const LEADERBOARD_MAX_DISPLAY = 10;
 const MISSING_ACCESS_CODE = 50001;          // For roles
 const MISSING_PERMISSIONS_CODE = 50013;     // For messages
 const THREADUSER_ENCODING_BYTES = 19;     // == log2(16^(18+1+18)) / 8, bits needed to safely encode `${thread_id}a${user_id}`
-const THREADUSER_HASHING_ALGORITHM = "blake2b-512";
+const THREADUSER_HASHING_ALGORITHM = "shake-256";
 const FEEDBACK_AGREEMENT_TITLE = "Feedback Agreement"
 const HORIZONTAL_RULE = `\n${subtext(strikethrough("-------------------------------"))}\n`;
 const STAR_RATING_INFO = {

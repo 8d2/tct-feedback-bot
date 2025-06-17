@@ -11,6 +11,7 @@ const { getPointsInfoDisplayMessages, showCommandError } = require("../helpers/m
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const constants = require("../helpers/constants.js");
 const { concatList } = require('../helpers/util.js');
+const threadUserMethods = require("../helpers/threadUserMethods.js");
 
 // Constants
 const CREATE_COMMAND_NAME = "create";
@@ -123,6 +124,10 @@ const COMMAND_FUNCTIONS = {
                 }
             }
 
+            // Resets the user's contract cooldown timer
+            await threadUserMethods.setLastContractPosted(feedbackThread.id, interaction.user.id);
+
+            // Finally, reply with the contract message
             await interaction.reply(createContractMessage(interaction, usersToPing));
             return true;
         }

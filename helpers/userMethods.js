@@ -327,7 +327,7 @@ module.exports = {
      * Initialize users collection from database.
      */
     async init() {
-        const storedUsers = await Users.findAll()
+        const storedUsers = await Users.findAll();
         storedUsers.forEach(user => users.set(user.user_id, user));
     },
 }
