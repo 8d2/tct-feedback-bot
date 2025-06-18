@@ -6,6 +6,12 @@ const settingsMethods = require("./settingsMethods.js");
 
 const threadUsers = new Collection();
 
+/**
+ * Returns a hash corresponding to a unique threadid-userid pair.
+ * @param {*} threadId 
+ * @param {*} userId 
+ * @returns A unique hash.
+ */
 function hashThreadUser(threadId, userId) {
     const hash = crypto
         .createHash(constants.THREADUSER_HASHING_ALGORITHM, { outputLength: constants.THREADUSER_ENCODING_BYTES, encoding: 'hex' })
