@@ -147,7 +147,7 @@ module.exports = {
 	Roles,
 	Settings,
 	Users,
-    Threads,
+	Threads,
 	ThreadUsers,
-    Collaborators
+	Collaborators
 }

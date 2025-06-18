@@ -2,23 +2,23 @@
 // Stores per-thread user data
 
 module.exports = (sequelize, DataTypes) => {
-	const ThreadUser = sequelize.define('thread_users', {
+    const ThreadUser = sequelize.define('thread_users', {
         thread_id: {
             // Thread id (from Threads model).
-			type: DataTypes.STRING(31),
+            type: DataTypes.STRING(31),
             references: {
                 model: 'threads',
                 key: 'thread_id',
             }
-		},
-		user_id: {
+        },
+        user_id: {
             // User id (from Users model).
-			type: DataTypes.STRING(31),
+            type: DataTypes.STRING(31),
             references: {
                 model: 'users',
                 key: 'user_id',
             }
-		},
+        },
         is_blocked: {
             // Whether the user (corresponding to user_id) is blocked from 
             // posting contracts in the thread (corresponding to thread_id).
@@ -43,10 +43,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATE,
             allowNull: true
         },
-	}, 
+    }, 
     {
-		timestamps: false,
-	});
+        timestamps: false,
+    });
 
     return ThreadUser;
 };
