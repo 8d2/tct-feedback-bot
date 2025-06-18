@@ -10,8 +10,6 @@ function hashThreadUser(threadId, userId) {
         .createHash(constants.THREADUSER_HASHING_ALGORITHM, { outputLength: constants.THREADUSER_ENCODING_BYTES, encoding: 'hex' })
         .update(threadId + 'a' + userId) // create a unique hexadecimal string by "concatenating" threadId and userId, separated by 'a'
         .digest('base64');
-    
-    console.log(`THREAD: ${threadId}\nUSER: ${userId}\nHASH: ${hash}`);
     return hash;
 }
 
