@@ -8,8 +8,8 @@ const threadUsers = new Collection();
 
 /**
  * Returns a hash corresponding to a unique threadid-userid pair.
- * @param {*} threadId 
- * @param {*} userId 
+ * @param {string} threadId 
+ * @param {string} userId 
  * @returns A unique hash.
  */
 function hashThreadUser(threadId, userId) {
