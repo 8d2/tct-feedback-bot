@@ -10,7 +10,7 @@ const userMethods = require("../helpers/userMethods.js");
 const { getPointsInfoDisplayMessages, showCommandError } = require("../helpers/messageMethods.js");
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const constants = require("../helpers/constants.js");
-const { concatList } = require('../helpers/util.js');
+const { concatList, getTimeDisplay } = require('../helpers/util.js');
 const threadUserMethods = require("../helpers/threadUserMethods.js");
 
 // Constants
@@ -63,6 +63,16 @@ const COMMAND_FUNCTIONS = {
             showCommandError(
                 interaction,
                 "You have been blocked from creating feedback contracts for spam or abuse."
+            );
+            return false;
+        }
+
+        // Check if the user still has an active contract cooldown in the thread
+        const cooldownRemainingSeconds = await threadUserMethods.getThreadUserCooldown(feedbackThread.id, interaction.user.id);
+        if (cooldownRemainingSeconds > 0) {
+            showCommandError(
+                interaction,
+                `You have an active contract cooldown in this thread. Please wait ${inlineCode(getTimeDisplay(cooldownRemainingSeconds))} before attempting to post another contract.`
             );
             return false;
         }

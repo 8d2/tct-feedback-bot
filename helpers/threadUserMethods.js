@@ -2,6 +2,7 @@ const { Collection } = require("discord.js");
 const { ThreadUsers } = require("../dbObjects.js");
 const constants = require("../helpers/constants.js");
 const crypto = require("node:crypto");
+const settingsMethods = require("./settingsMethods.js");
 
 const threadUsers = new Collection();
 
@@ -54,6 +55,25 @@ async function getLastContractPosted(threadId, userId) {
 }
 
 /**
+ * Gets the remaining **seconds** until the user (`userId`) can post another contract in the thread (`threadId`).
+ * @param {string} threadId Thread ID of the corresponding ThreadUser.
+ * @param {string} userId User ID of the corresponding ThreadUser.
+ * @returns {number} The time in **seconds** until the ThreadUser's cooldown wears off, or `0`
+ * if they have no active contract cooldown.
+ */
+async function getThreadUserCooldown(threadId, userId) {
+    const lastContractPostedDate = await getLastContractPosted(threadId, userId);
+    // If lastContractPostedDate is null, then the user has never posted a contract in the thread
+    // and thus has no active cooldown.
+    if (lastContractPostedDate == null) return 0;
+
+    const contractCooldownSeconds = await settingsMethods.getContractCooldown(); // measured in SECONDS
+    const timeSinceLastContract = Date.now() - lastContractPostedDate.getTime(); // measured in MILLISECONDS
+    const res = Math.max(0, contractCooldownSeconds - 0.001 * timeSinceLastContract);
+    return Math.ceil(res);
+}
+
+/**
  * Sets the date when a ThreadUser last posted a contract.
  * @param {ThreadUsers} threadUser ThreadUser to set last contract posted date.
  * @param {Date} date When the ThreadUser last posted a contract. Defaults to now.
@@ -80,6 +100,7 @@ module.exports = {
     getThreadUserInfo,
     getOrCreateThreadUserInfo,
     getLastContractPosted,
+    getThreadUserCooldown,
     setLastContractPostedFromThreadUser,
     setLastContractPosted,
 

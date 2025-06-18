@@ -1,6 +1,5 @@
 // Stores settings set by admin commands, including getter + setter methods.
 
-const { Collection } = require('discord.js');
 const { SETTINGS_MAIN_IDENTIFIER, Channels, Roles, Settings, Tags } = require('../dbObjects.js');
 
 let settings;
