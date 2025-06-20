@@ -135,17 +135,6 @@ async function detectContractInteractionAllowed(interaction) {
 }
 
 /**
- * Handles feedback contract star select interactions.
- * @param {import("discord.js").Interaction} interaction The interaction that used this string select menu.
- */
-async function handleContractStarSelectInteraction(interaction) {
-    // Updates the feedback contract message if interaction allowed
-    if (await detectContractInteractionAllowed(interaction)) {
-        await interaction.update(createContractMessage(interaction));
-    }
-}
-
-/**
  * Handles feedback contract confirm button interaction.
  * @param {import("discord.js").Interaction} interaction The interaction that used the confirm button.
  */
@@ -191,8 +180,28 @@ async function handleContractConfirmInteraction(interaction) {
     }
 }
 
+/**
+ * Handles feedback contract star select interactions.
+ * @param {import("discord.js").Interaction} interaction The interaction that used this string select menu.
+ */
+async function handleContractStarSelectInteraction(interaction) {
+    // Updates the feedback contract message if interaction allowed
+    if (await detectContractInteractionAllowed(interaction)) {
+        await interaction.update(createContractMessage(interaction));
+    }
+}
+
+/**
+ * Handles feedback contract rules accept button interaction.
+ * @param {import("discord.js").Interaction} interaction The interaction that used the accept button.
+ */
+async function handleContractRulesAcceptInteraction(interaction) {
+
+}
+
 module.exports = {
     createContractMessage,
+    handleContractConfirmInteraction,
+    handleContractRulesAcceptInteraction,
     handleContractStarSelectInteraction,
-    handleContractConfirmInteraction
 }
