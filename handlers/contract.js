@@ -1,5 +1,5 @@
 const { ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder,
-    StringSelectMenuOptionBuilder, EmbedBuilder, Colors, blockQuote } = require("discord.js");
+    StringSelectMenuOptionBuilder, EmbedBuilder, Colors, blockQuote, heading, HeadingLevel, MessageFlags, inlineCode } = require("discord.js");
 
 const constants = require("../helpers/constants.js");
 const { getOriginalUser, getAuthorOptions, getGainedRolesMessage } = require("../helpers/messageMethods.js");
@@ -196,7 +196,30 @@ async function handleContractStarSelectInteraction(interaction) {
  * @param {import("discord.js").Interaction} interaction The interaction that used the accept button.
  */
 async function handleContractRulesAcceptInteraction(interaction) {
+    try {
+        // Changes accepted_rules to true to stop this from triggering again
+        await userMethods.setRulesAccepted(interaction.user.id);
 
+        // Embed to use when under success
+        const updatedResponseEmbed = new EmbedBuilder()
+            .setTimestamp()
+            .setColor(Colors.Green)
+            .setDescription(
+                heading("Rules Accepted", HeadingLevel.Two) +
+                `\nRun the ${inlineCode("/contract create")} command again to get started!`)
+        await interaction.update({embeds: [updatedResponseEmbed], components: [], flags: MessageFlags.Ephemeral});
+    }
+    catch {
+        // Embed to use when the interaction failed for whatever reason
+        const failedResponseEmbed = new EmbedBuilder()
+            .setTimestamp()
+            .setColor(Colors.Red)
+            .setDescription(
+                heading("Cancelled", HeadingLevel.Two) +
+                `\nRules acknowledgement cancelled, you probably timed out or an unknown error occured. Run ${inlineCode("/contract create")} again.`
+            );
+        await interaction.editReply({embeds: [failedResponseEmbed], components: [], flags: MessageFlags.Ephemeral});
+    }
 }
 
 module.exports = {
