@@ -76,9 +76,9 @@ const COMMAND_FUNCTIONS = {
             const acceptButton = new ButtonBuilder()
                 .setCustomId(constants.CONTRACT_RULES_ACCEPT_ID)
                 .setLabel("Accept")
-                .setStyle(ButtonStyle.Success)
+                .setStyle(ButtonStyle.Success);
             const row = new ActionRowBuilder()
-                .addComponents(acceptButton)
+                .addComponents(acceptButton);
             
             await interaction.reply({embeds: [rulesEmbed], components: [row], flags: MessageFlags.Ephemeral, withResponse: true});
             return false;

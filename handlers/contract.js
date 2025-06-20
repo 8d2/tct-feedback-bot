@@ -206,7 +206,7 @@ async function handleContractRulesAcceptInteraction(interaction) {
             .setColor(Colors.Green)
             .setDescription(
                 heading("Rules Accepted", HeadingLevel.Two) +
-                `\nRun the ${inlineCode("/contract create")} command again to get started!`)
+                `\nRun the ${inlineCode("/contract create")} command again to get started!`);
         await interaction.update({embeds: [updatedResponseEmbed], components: [], flags: MessageFlags.Ephemeral});
     }
     catch {
