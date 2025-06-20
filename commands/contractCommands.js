@@ -80,7 +80,7 @@ const COMMAND_FUNCTIONS = {
             const row = new ActionRowBuilder()
                 .addComponents(acceptButton)
             
-            const response = await interaction.reply({embeds: [rulesEmbed], components: [row], flags: MessageFlags.Ephemeral, withResponse: true});
+            await interaction.reply({embeds: [rulesEmbed], components: [row], flags: MessageFlags.Ephemeral, withResponse: true});
             return false;
         }
 
