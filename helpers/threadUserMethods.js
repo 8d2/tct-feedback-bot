@@ -91,6 +91,31 @@ async function getThreadUserCooldown(threadId, userId) {
 }
 
 /**
+ * Sets a ThreadUser's active contract message ID.
+ * @param {ThreadUsers} threadUser ThreadUser to set active contract message ID.
+ * @param {string?} messageId The message ID of the ThreadUser's active contract.
+ * Can be null.
+ */
+async function setActiveContractMessageIdFromThreadUser(threadUser, messageId) {
+    threadUser.active_contract_message_id = messageId;
+    return threadUser.save();
+}
+
+/**
+ * Sets the message ID of a user's (`userId`) active contract message
+ * within the thread (`threadId`).
+ * @param {string} threadId Thread ID of the corresponding ThreadUser.
+ * @param {string} userId User ID of the corresponding ThreadUser.
+ * @param {string?} messageId The message ID of the ThreadUser's active contract.
+ * Can be null.
+ * @returns {ThreadUsers} ThreadUser.
+ */
+async function setActiveContractMessageId(threadId, userId, messageId) {
+    const threadUser = await getOrCreateThreadUserInfo(threadId, userId);
+    return threadUser ? threadUser.active_contract_message_id : null;
+}
+
+/**
  * Sets the date when a ThreadUser last posted a contract.
  * @param {ThreadUsers} threadUser ThreadUser to set last contract posted date.
  * @param {Date} date When the ThreadUser last posted a contract. Defaults to now.
@@ -116,8 +141,11 @@ async function setLastContractPosted(threadId, userId, date = new Date()) {
 module.exports = {
     getThreadUserInfo,
     getOrCreateThreadUserInfo,
+    getActiveContractMessageId,
     getLastContractPosted,
     getThreadUserCooldown,
+    setActiveContractMessageIdFromThreadUser,
+    setActiveContractMessageId,
     setLastContractPostedFromThreadUser,
     setLastContractPosted,
 
