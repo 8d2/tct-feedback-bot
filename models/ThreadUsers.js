@@ -3,6 +3,7 @@
 
 module.exports = (sequelize, DataTypes) => {
     const ThreadUser = sequelize.define('thread_users', {
+        // FOREIGN KEYS
         thread_id: {
             // Thread id (from Threads model).
             type: DataTypes.STRING(31),
@@ -18,6 +19,15 @@ module.exports = (sequelize, DataTypes) => {
                 model: 'users',
                 key: 'user_id',
             }
+        },
+        // UHHH OTHER PROPERTIES
+        active_contract_message_id: {
+            // The message id of the user's active contract. `null` if the
+            // user has no active contract, either because the user has
+            // never posted a contract in the thread, or because their
+            // last contract has already been accepted.
+            type: DataTypes.STRING(31),
+            allowNull: true
         },
         is_blocked: {
             // Whether the user (corresponding to user_id) is blocked from 
