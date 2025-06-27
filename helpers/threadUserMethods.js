@@ -50,6 +50,17 @@ async function getOrCreateThreadUserInfo(threadId, userId) {
 }
 
 /**
+ * Gets the message ID of the ThreadUser's active contract, if it exists.
+ * @param {string} threadId Thread ID of the corresponding ThreadUser.
+ * @param {string} userId User ID of the corresponding ThreadUser.
+ * @returns {string?} The message ID of the active contract, if it exists.
+ */
+async function getActiveContractMessageId(threadId, userId) {
+    const threadUser = await getOrCreateThreadUserInfo(threadId, userId);
+    return threadUser ? threadUser.active_contract_message_id : null;
+}
+
+/**
  * Gets when a ThreadUser last posted a contract.
  * @param {string} threadId Thread ID of the corresponding ThreadUser.
  * @param {string} userId User ID of the corresponding ThreadUser.
