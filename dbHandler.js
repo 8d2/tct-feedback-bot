@@ -57,5 +57,5 @@ module.exports = {
 	Threads,
 	ThreadUsers,
 	Users,
-    Collaborators
+	Collaborators
 }
