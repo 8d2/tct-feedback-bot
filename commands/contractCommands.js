@@ -1,7 +1,7 @@
-const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags,
-        CommandInteractionOptionResolver, SlashCommandBooleanOption, SlashCommandUserOption,
-        bold, ButtonBuilder, ButtonStyle, ActionRowBuilder, HeadingLevel, inlineCode, heading }
-        = require("discord.js");
+const { ActionRowBuilder, bold, ButtonBuilder, ButtonStyle, Colors, CommandInteraction,
+    EmbedBuilder, heading, HeadingLevel, inlineCode, MessageFlags, SlashCommandBooleanOption,
+    SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOption }
+    = require("discord.js");
 
 const { createContractMessage } = require("../handlers/contract");
 const { handleSubcommandExecute } = require("../handlers/commands.js")
@@ -28,7 +28,7 @@ const COLLABORATOR_LIMIT = 20;
 const COMMAND_FUNCTIONS = {
     /**
      * Handles the `/contract create` subcommand.
-     * @param {CommandInteractionOptionResolver} interaction The interaction that used this command.
+     * @param {CommandInteraction} interaction The interaction that used this command.
      * @return {boolean} true if the command succeeded, false if it failed.
      */
     [CREATE_COMMAND_NAME]: async function handleContractCreate(interaction) {
@@ -124,6 +124,7 @@ const COMMAND_FUNCTIONS = {
         }
         else {
             // Passed all checks, make a contract!
+
             // Pings the thread collaborators if they have allow pings on.
             const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, false);
             const usersToPing = []
@@ -139,6 +140,11 @@ const COMMAND_FUNCTIONS = {
 
             // Finally, reply with the contract message
             await interaction.reply(createContractMessage(interaction, usersToPing));
+
+            // Cache the contract message ID
+            const contractMessage = await interaction.fetchReply();
+            const messageId = contractMessage.id;
+            await threadUserMethods.setActiveContractMessageId(feedbackThread.id, interaction.user.id, messageId);
             return true;
         }
     },
