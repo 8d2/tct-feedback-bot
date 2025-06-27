@@ -6,6 +6,7 @@ const { getOriginalUser, getAuthorOptions, getGainedRolesMessage } = require("..
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const { showCommandError } = require("../helpers/messageMethods.js");
 const contractMethods = require("../helpers/contractMethods.js");
+const threadUserMethods = require("../helpers/threadUserMethods.js");
 const userMethods = require("../helpers/userMethods.js");
 const { concat, pluralize } = require('../helpers/util.js');
 
@@ -166,6 +167,11 @@ async function handleContractConfirmInteraction(interaction) {
             userMethods.setPoints(originalUser.id, newPoints);
             userMethods.updateRoles(interaction, originalUser.id);
         }
+
+        // Reset the thread user's active contract ID so they can
+        // post contracts again
+        const threadId = interaction.channelId;
+        await threadUserMethods.resetActiveContractMessageId(threadId, originalUser.id);
 
         // Edit original contract message
         const lockedResponseEmbed = new EmbedBuilder()
