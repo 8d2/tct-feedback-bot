@@ -12,6 +12,7 @@ const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const constants = require("../helpers/constants.js");
 const { concatList, getTimeDisplay } = require('../helpers/util.js');
 const threadUserMethods = require("../helpers/threadUserMethods.js");
+const util = require("../helpers/util.js");
 
 // Constants
 const CREATE_COMMAND_NAME = "create";
@@ -73,6 +74,19 @@ const COMMAND_FUNCTIONS = {
             showCommandError(
                 interaction,
                 `You have an active contract cooldown in this thread. Please wait ${inlineCode(getTimeDisplay(cooldownRemainingSeconds))} before attempting to post another contract.`
+            );
+            return false;
+        }
+
+        // Check if the user still has an active/unfulfilled contract in the thread
+        const activeContractMessageId = await threadUserMethods.getActiveContractMessageId(feedbackThread.id, interaction.user.id);
+        if (activeContractMessageId) {
+            const contractLink = util.formatMessageLink(interaction.guildId, feedbackThread.id, activeContractMessageId);
+            showCommandError(
+                interaction,
+                `You have an active contract in this thread: 
+                ${contractLink}
+                It must be fulfilled before you can create a new contract.`
             );
             return false;
         }
