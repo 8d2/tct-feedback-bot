@@ -1,8 +1,10 @@
-const { Collection } = require("discord.js");
-const { ThreadUsers } = require("../dbObjects.js");
+const { Collection, ThreadChannel } = require("discord.js");
+const { ThreadUsers, Users } = require("../dbObjects.js");
 const constants = require("../helpers/constants.js");
+const contractMethods = require("../helpers/contractMethods.js");
 const crypto = require("node:crypto");
 const settingsMethods = require("./settingsMethods.js");
+const userMethods = require("./userMethods.js");
 
 const threadUsers = new Collection();
 
@@ -65,6 +67,26 @@ async function addCollaborator(threadId, userId) {
 }
 
 /**
+ * Fetches all collaborators in a thread.
+ * @param {ThreadChannel} threadId The thread to fetch all collaborators from
+ * @param {boolean} [discardOwner=false] Whether to exclude the feedback thread
+ * owner from the returned Collection
+ * @returns {Collection<Users>} A Collection containing the fetched collaborators.
+ */
+async function getAllCollaboratorIdsFromThread(thread, discardOwner = false) {
+    // Get all collaborators in thread
+    const collaborators = getAllThreadUsersFromThread(thread.id)
+        .filter(threadUser => threadUser.is_collaborator == true)
+        .map(threadUser => userMethods.getUserInfo(threadUser.user_id));
+    
+    // Discard thread owner from results if discardOwner == true
+    if (discardOwner) {
+        const threadOwnerId = await contractMethods.getFeedbackThreadOwnerId(thread);
+        return collaborators.filter(user => user.user_id == threadOwnerId)
+    }
+}
+
+/**
  * Fetches all ThreadUsers that match a thread ID.
  * @param {string} threadId The ID of the thread to fetch all ThreadUsers from
  * @returns {Collection<ThreadUsers>}
@@ -91,7 +113,7 @@ async function getAllThreadUsersFromUser(userId) {
  */
 async function getIsCollaborator(threadId, userId) {
     const threadUser = await getOrCreateThreadUserInfo(threadId, userId);
-    return threadUser ? threadUser.last_contract_posted : false;
+    return threadUser ? threadUser.is_collaborator : false;
 }
 
 /**
@@ -163,6 +185,7 @@ module.exports = {
     getOrCreateThreadUserInfo,
 
     addCollaborator,
+    getAllCollaboratorIdsFromThread,
     getAllThreadUsersFromThread,
     getAllThreadUsersFromUser,
     getIsCollaborator,
