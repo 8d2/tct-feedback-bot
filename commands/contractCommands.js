@@ -41,7 +41,7 @@ const COMMAND_FUNCTIONS = {
         }
 
         // Check if the user is a thread builder 
-        if (await collaboratorMethods.getUserIsCollaborator(interaction.user, feedbackThread) == true) {
+        if (await threadUserMethods.getIsCollaborator(interaction.user.id, feedbackThread.id) == true) {
             showCommandError(
                 interaction,
                 "You cannot create feedback contracts since you are a builder in this thread."

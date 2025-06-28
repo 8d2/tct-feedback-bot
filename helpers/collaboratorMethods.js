@@ -60,21 +60,6 @@ async function getThreadCollaboratorUsers(thread, discardOwner) {
 }
 
 /**
- * Checks whether a user is a collaborator in a thread. Also returns true
- * if the user owns the thread.
- * @param {User} user The user to check
- * @param {ThreadChannel} thread The thread to check in
- * @return {boolean} Whether the user is a collaborator in the thread
- */
-async function getUserIsCollaborator(user, thread) {
-    await threadMethods.getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
-    const collabKey = getCollaboratorKey(user.id, thread.id);
-    const collabInstance = collaborators.get(collabKey);
-    
-    return collabInstance ? true : false
-}
-
-/**
  * Attempts to add a user as a collaborator to a thread.
  * @param {User} user The user to add
  * @param {ThreadChannel} thread The thread to add as collaborator to
@@ -121,7 +106,6 @@ async function removeCollaboratorFromThread(user, thread) {
 }
 
 module.exports = {
-    getUserIsCollaborator,
     getThreadCollaboratorUsers,
     addCollaboratorToThread,
     removeCollaboratorFromThread,

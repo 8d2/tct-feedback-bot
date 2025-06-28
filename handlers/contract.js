@@ -8,6 +8,7 @@ const { showCommandError } = require("../helpers/messageMethods.js");
 const contractMethods = require("../helpers/contractMethods.js");
 const userMethods = require("../helpers/userMethods.js");
 const { concat, pluralize } = require('../helpers/util.js');
+const threadUserMethods = require("../helpers/threadUserMethods.js");
 
 /**
  * Creates a new embed corresponding to the selected star rating.
@@ -125,7 +126,7 @@ async function detectContractInteractionAllowed(interaction) {
     // If the user is not a collaborator, display an error message.
     const user = interaction.user;
     const thread = interaction.channel;
-    if (!(await collaboratorMethods.getUserIsCollaborator(user, thread))) {
+    if (!(await threadUserMethods.getIsCollaborator(user.id, thread.id))) {
         await showCommandError(interaction, constants.INTERACTION_NOT_BUILDER_ERROR);
         return false;
     }
