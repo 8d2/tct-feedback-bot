@@ -6,6 +6,8 @@ const settingsMethods = require("./settingsMethods.js");
 
 const threadUsers = new Collection();
 
+// REALLY REALLY IMPORTANT METHODS
+
 /**
  * Returns a hash corresponding to a unique threadid-userid pair.
  * @param {string} threadId 
@@ -49,6 +51,31 @@ async function getOrCreateThreadUserInfo(threadId, userId) {
     return newThreadUser;
 }
 
+// ALSO IMPORTANT METHODS THAT RELY ON THE ABOVE
+
+/**
+ * Adds a user (`userId`) as a collaborator to the thread (`threadId`).
+ * @param {string} threadId Thread ID of the corresponding ThreadUser.
+ * @param {string} userId User ID of the corresponding ThreadUser.
+ */
+async function addCollaborator(threadId, userId) {
+    const threadUser = await getOrCreateThreadUserInfo(threadId, userId);
+    threadUser.is_collaborator = true;
+    return threadUser.save();
+}
+
+/**
+ * Gets whether a user (`userId`) is a collaborator in the thread (`threadId`).
+ * @param {string} threadId Thread ID of the corresponding ThreadUser.
+ * @param {string} userId User ID of the corresponding ThreadUser.
+ * @returns {boolean} `true` if the user is a collaborator or thread owner,
+ * `false` otherwise.
+ */
+async function getIsCollaborator(threadId, userId) {
+    const threadUser = await getOrCreateThreadUserInfo(threadId, userId);
+    return threadUser ? threadUser.last_contract_posted : false;
+}
+
 /**
  * Gets when a ThreadUser last posted a contract.
  * @param {string} threadId Thread ID of the corresponding ThreadUser.
@@ -80,6 +107,17 @@ async function getThreadUserCooldown(threadId, userId) {
 }
 
 /**
+ * Removes a user (`userId`) as a collaborator to the thread (`threadId`).
+ * @param {string} threadId Thread ID of the corresponding ThreadUser.
+ * @param {string} userId User ID of the corresponding ThreadUser.
+ */
+async function removeCollaborator(threadId, userId) {
+    const threadUser = await getOrCreateThreadUserInfo(threadId, userId);
+    threadUser.is_collaborator = false;
+    return threadUser.save();
+}
+
+/**
  * Sets the date when a ThreadUser last posted a contract.
  * @param {ThreadUsers} threadUser ThreadUser to set last contract posted date.
  * @param {Date} date When the ThreadUser last posted a contract. Defaults to now.
@@ -105,8 +143,12 @@ async function setLastContractPosted(threadId, userId, date = new Date()) {
 module.exports = {
     getThreadUserInfo,
     getOrCreateThreadUserInfo,
+
+    addCollaborator,
+    getIsCollaborator,
     getLastContractPosted,
     getThreadUserCooldown,
+    removeCollaborator,
     setLastContractPostedFromThreadUser,
     setLastContractPosted,
 
