@@ -65,6 +65,24 @@ async function addCollaborator(threadId, userId) {
 }
 
 /**
+ * Fetches all ThreadUsers that match a thread ID.
+ * @param {string} threadId The ID of the thread to fetch all ThreadUsers from
+ * @returns {Collection<ThreadUsers>}
+ */
+async function getAllThreadUsersFromThread(threadId) {
+    return threadUsers.filter(threadUser => threadUser.thread_id == threadId);
+}
+
+/**
+ * Fetches all ThreadUsers that match a user ID.
+ * @param {string} userId The ID of the thread to fetch all ThreadUsers from
+ * @returns {Collection<ThreadUsers>}
+ */
+async function getAllThreadUsersFromUser(userId) {
+    return threadUsers.filter(threadUser => threadUser.user_id == userId);
+}
+
+/**
  * Gets whether a user (`userId`) is a collaborator in the thread (`threadId`).
  * @param {string} threadId Thread ID of the corresponding ThreadUser.
  * @param {string} userId User ID of the corresponding ThreadUser.
@@ -145,6 +163,8 @@ module.exports = {
     getOrCreateThreadUserInfo,
 
     addCollaborator,
+    getAllThreadUsersFromThread,
+    getAllThreadUsersFromUser,
     getIsCollaborator,
     getLastContractPosted,
     getThreadUserCooldown,
