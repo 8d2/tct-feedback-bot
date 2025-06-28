@@ -4,9 +4,8 @@ const { Collection } = require("discord.js");
 const { Threads, Collaborators } = require('../dbObjects.js');
 const { getFeedbackThreadOwner } = require("./contractMethods.js");
 
-const userMethods = require("./userMethods.js");
+const threadMethods = require("./threadMethods.js");
 
-const threads = new Collection();
 const collaborators = new Collection();
 
 /**
@@ -34,39 +33,6 @@ function getUserIdAndThreadIdFromKey(collaboratorKey) {
 }
 
 /**
- * Returns a thread info for a given thread.
- * If there isn't one in the database, it is created along with a collaboration instance for the thread owner.
- * @param {ThreadChannel} thread the thread to get the thread info of
- * @return {Threads} the thread
- */
-async function getOrCreateThreadInfo(thread) {
-    // create thread info
-    const existingThread = threads.get(thread.id);
-    if (existingThread) {
-        return existingThread;
-    }
-    const newThread = await Threads.create({thread_id: thread.id});
-    threads.set(thread.id, newThread);
-    
-    // create collaboration instance for the thread owner
-    const collabKey = getCollaboratorKey(thread.ownerId, thread.id);
-    const ownerCollab = await Collaborators.create({collaboration_id: collabKey});
-    collaborators.set(collabKey, ownerCollab);
-    
-    return newThread;
-}
-
-/**
- * Gets the number of collaborators participating in a specific thread.
- * @param {ThreadChannel} thread The thread
- * @return {int} The number of collaborators
- */
-async function getThreadCollaboratorCount(thread) {
-    const threadInfo = await getOrCreateThreadInfo(thread);
-    return threadInfo.collaborator_count;
-}
-
-/**
  * Returns users that have collaborator in a specific thread.
  * @param {ThreadChannel} thread The thread
  * @param {boolean} discardOwner If true, will remove the thread owner from the returned results
@@ -74,7 +40,7 @@ async function getThreadCollaboratorCount(thread) {
  */
 async function getThreadCollaboratorUsers(thread, discardOwner) {
     // Replaced to more reflect the original because `usersWithInfo` does not account for users without data in database
-    await getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
+    await threadMethods.getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
     const collabData = await Collaborators.findAll();
     const threadOwner = await getFeedbackThreadOwner(thread);
     let listOfUsers = [];
@@ -101,7 +67,7 @@ async function getThreadCollaboratorUsers(thread, discardOwner) {
  * @return {boolean} Whether the user is a collaborator in the thread
  */
 async function getUserIsCollaborator(user, thread) {
-    await getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
+    await threadMethods.getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
     const collabKey = getCollaboratorKey(user.id, thread.id);
     const collabInstance = collaborators.get(collabKey);
     
@@ -115,7 +81,7 @@ async function getUserIsCollaborator(user, thread) {
  * @return {boolean} `true` if this succeeded, `false` if the user is already a collaborator.
  */
 async function addCollaboratorToThread(user, thread) {
-    const threadInfo = await getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
+    const threadInfo = await threadMethods.getOrCreateThreadInfo(thread); // ensure the owner collab instance exists
     const collabKey = getCollaboratorKey(user.id, thread.id);
     const collabInstance = collaborators.get(collabKey);
     
@@ -138,7 +104,7 @@ async function addCollaboratorToThread(user, thread) {
  * @return {boolean} `true` if this succeeded, `false` if the user cannot be removed.
  */
 async function removeCollaboratorFromThread(user, thread) {
-    const threadInfo = await getOrCreateThreadInfo(thread);
+    const threadInfo = await threadMethods.getOrCreateThreadInfo(thread);
     const collabKey = getCollaboratorKey(user.id, thread.id);
     const collabInstance = collaborators.get(collabKey);
     
@@ -156,7 +122,6 @@ async function removeCollaboratorFromThread(user, thread) {
 
 module.exports = {
     getUserIsCollaborator,
-    getThreadCollaboratorCount,
     getThreadCollaboratorUsers,
     addCollaboratorToThread,
     removeCollaboratorFromThread,
