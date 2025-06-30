@@ -84,10 +84,10 @@ function getUnitAmounts(amount, units) {
 }
 
 /**
- * Gets a channel by ID. (An actual Discord channel object,
- * not a channel from the bot's database.)
- * @param {string} channelId The channel ID.
- * @returns {User?} A Discord channel corresponding to the ID.
+ * Gets a user by ID. (An actual Discord user object,
+ * not a user from the bot's database.)
+ * @param {string} userId The user ID.
+ * @returns {User?} A Discord user corresponding to the ID.
  */
 async function getUserById(userId) {
     if (!storedClient) {
