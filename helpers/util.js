@@ -1,22 +1,9 @@
 // Utility methods
 
+const { Channel, Client, User } = require("discord.js");
 const constants = require("./constants.js");
 
-/**
- * Returns a suffix to use for the amount to concat and pluralizea word or not.
- * @return {string} Pluralizing or not suffix.
- */
-function getPluralSuffix(amount) {
-    return amount == 1 ? "" : "s";
-}
-
-/**
- * Pluralizes a string in the format "n <str>" depending on what number n is.
- * @return {string} Pluralized string.
- */
-function pluralize(amount, str) {
-    return amount + " " + str + getPluralSuffix(amount);
-}
+let storedClient = null;
 
 /**
  * Concats every item of the array together using a separator.
@@ -56,6 +43,28 @@ function concatList(array, empty = constants.OPTION_NULL, separator = ", ", and 
 }
 
 /**
+ * Gets a channel by ID. (An actual Discord channel object,
+ * not a channel from the bot's database.)
+ * @param {string} channelId The channel ID.
+ * @returns {Channel?} A Discord channel corresponding to the ID.
+ */
+async function getChannelById(channelId) {
+    if (!storedClient) {
+        console.warn(`${getChannelById.name} failed; client has not been loaded yet`);
+        return;
+    }
+    return await storedClient.channels.fetch(channelId);
+}
+
+/**
+ * Returns a suffix to use for the amount to concat and pluralize a word or not.
+ * @return {string} Pluralizing or not suffix.
+ */
+function getPluralSuffix(amount) {
+    return amount == 1 ? "" : "s";
+}
+
+/**
  * From the amount and provided units, returns how much of each unit the amount takes up.
  * @param {int} amount The amount to get units of.
  * @param {Array.<{name: string, conversion: int?}} units List of units to convert amount from.
@@ -75,6 +84,20 @@ function getUnitAmounts(amount, units) {
 }
 
 /**
+ * Gets a user by ID. (An actual Discord user object,
+ * not a user from the bot's database.)
+ * @param {string} userId The user ID.
+ * @returns {User?} A Discord user corresponding to the ID.
+ */
+async function getUserById(userId) {
+    if (!storedClient) {
+        console.warn(`${getUserById.name} failed; client has not been loaded yet`);
+        return;
+    }
+    return await storedClient.users.fetch(userId);
+}
+
+/**
  * Returns a string describing time units encapsulated by the provided amount of seconds. Goes up to weeks.
  * Ex: getTimeDisplay(3600) = "1 hour", getTimeDisplay(86400) = "1 day", getTimeDisplay(7261) = "2 hours, 1 minute, 1 second"
  * @param {int} seconds Seconds to parse.
@@ -87,10 +110,28 @@ function getTimeDisplay(seconds) {
     );
 }
 
+/**
+ * Pluralizes a string in the format "n <str>" depending on what number n is.
+ * @return {string} Pluralized string.
+ */
+function pluralize(amount, str) {
+    return amount + " " + str + getPluralSuffix(amount);
+}
+
 module.exports = {
-    getPluralSuffix,
-    pluralize,
     concat,
     concatList,
-    getTimeDisplay
+    getChannelById,
+    getPluralSuffix,
+    getTimeDisplay,
+    getUserById,
+    pluralize,
+
+    /**
+     * Store the client for usage in helper functions.
+     * @param {Client} client The bot's client.
+     */
+    async init(client) {
+        storedClient = client;
+    },
 }
