@@ -5,9 +5,10 @@ const { Client } = require("discord.js");
 let storedClient = null;
 
 /**
- * Gets a channel by ID.
- * @param {string} channelId 
- * @returns {import("discord.js").Channel?}
+ * Gets a channel by ID. (An actual Discord channel object,
+ * not a channel from the bot's database.)
+ * @param {string} channelId The channel ID.
+ * @returns {import("discord.js").Channel?} A Discord channel corresponding to the ID.
  */
 async function getChannelById(channelId) {
     if (!storedClient) {
@@ -22,7 +23,7 @@ module.exports = {
 
     /**
      * Initialize channel helper functions.
-     * @param {Client} client 
+     * @param {Client} client The bot's client.
      */
     async init(client) {
         storedClient = client;
