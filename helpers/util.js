@@ -128,7 +128,7 @@ module.exports = {
     pluralize,
 
     /**
-     * Store the client.
+     * Store the client for usage in helper functions.
      * @param {Client} client The bot's client.
      */
     async init(client) {
