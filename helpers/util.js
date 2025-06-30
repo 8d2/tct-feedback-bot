@@ -128,7 +128,7 @@ module.exports = {
     pluralize,
 
     /**
-     * Initialize channel helper functions.
+     * Store the client.
      * @param {Client} client The bot's client.
      */
     async init(client) {
