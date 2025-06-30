@@ -4,6 +4,7 @@
 const { Events } = require('discord.js');
 
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
+const channelMethods = require("../helpers/channelMethods.js");
 const settingsMethods = require("../helpers/settingsMethods.js");
 const threadUserMethods = require("../helpers/threadUserMethods.js");
 const userMethods = require("../helpers/userMethods.js");
@@ -16,6 +17,7 @@ module.exports = {
         userMethods.init();
         settingsMethods.init();
         threadUserMethods.init();
+        channelMethods.init(client);
         collaboratorMethods.init();
         console.log(`${client.user.tag} ready.`);
         console.log(client.application.id);
