@@ -71,22 +71,24 @@ async function addCollaborator(threadId, userId) {
  * @param {ThreadChannel} threadId The thread to fetch all collaborators from
  * @param {boolean} [discardOwner=false] Whether to exclude the feedback thread
  * owner from the returned Collection
- * @returns {Collection<Users>} A Collection containing the fetched collaborators.
+ * @returns {[Users]} An array containing the fetched collaborators as `Users`.
  */
 async function getAllCollaboratorsFromThread(thread, discardOwner = false) {
 
     // Get all collaborators in thread
-    const collaborators = getAllThreadUsersFromThread(thread.id)
+    const collaboratorArray = [];
+    getAllThreadUsersFromThread(thread.id)
         .filter(threadUser => threadUser.is_collaborator == true)
-        .map(threadUser => getUserFromThreadUser(threadUser));
+        .map(threadUser => getUserFromThreadUser(threadUser))
+        .map(user => collaboratorArray.push(user));
     
     // Discard thread owner from results if discardOwner == true
     if (discardOwner) {
         const threadOwnerId = await contractMethods.getFeedbackThreadOwnerId(thread);
-        return collaborators.filter(user => user.user_id == threadOwnerId);
+        return collaboratorArray.filter(user => user.user_id == threadOwnerId);
     }
 
-    return collaborators;
+    return collaboratorArray;
 }
 
 /**

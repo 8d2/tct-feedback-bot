@@ -125,12 +125,13 @@ const COMMAND_FUNCTIONS = {
         else {
             // Passed all checks, make a contract!
             // Pings the thread collaborators if they have allow pings on.
-            const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, false);
+            //const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, false);
+            const collaborators = threadUserMethods.getAllCollaboratorsFromThread(feedbackThread, false).values();
             const userIdsToPing = [];
             for (let user of collaborators) {
-                const userAllowsPings = await userMethods.getAllowPings(user.id);
+                const userAllowsPings = await userMethods.getAllowPings(user.user_id);
                 if (userAllowsPings) {
-                    userIdsToPing.push(user.id);
+                    userIdsToPing.push(user.user_id);
                 }
             }
 
@@ -158,10 +159,12 @@ const COMMAND_FUNCTIONS = {
         else {
             const feedbackThreadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
             const feedbackEnabled = await contractMethods.isFeedbackEnabled(feedbackThread);
-            const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, true);
+            //const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, true);
+            const collaboratorPings = await threadUserMethods.getAllCollaboratorsFromThread(feedbackThread, true)
+                .map(user => `<@${user.user_id}>`);
 
             // Format list of collaborators message + respond
-            const collaboratorsMessage = concatList(collaborators, "No other users added!");
+            const collaboratorsMessage = concatList(collaboratorPings, empty="No other users added!");
             const responseEmbed = new EmbedBuilder()
                 .setTimestamp()
                 .setColor(Colors.Blue)
