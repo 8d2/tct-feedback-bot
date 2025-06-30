@@ -27,4 +27,4 @@ module.exports = {
     async init(client) {
         storedClient = client;
     },
-}
+};
