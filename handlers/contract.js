@@ -48,10 +48,10 @@ function createContractEmbed(interaction, starRating) {
 /**
  * Constructs a complete contract message, including an embed, rating select, and confirm button.
  * @param {import("discord.js").Interaction} interaction The interaction that created/used the contract.
- * @param {[User]?} pingUsers Users to ping within the contract message.
+ * @param {[string]?} pingUserIds User IDs to ping within the contract message.
  * @returns {import("discord.js").InteractionReplyOptions} The created contract message.
  */
-function createContractMessage(interaction, pingUsers) {
+function createContractMessage(interaction, pingUserIds) {
 
     // If no star rating is selected, this is just null
     const selectedStarRating = interaction.values ? interaction.values[0] : null;
@@ -69,8 +69,8 @@ function createContractMessage(interaction, pingUsers) {
     const row2 = new ActionRowBuilder()
         .addComponents(newConfirmButton);
     
-    // Adds a thread owner ping to the message
-    const threadOwnerPing = pingUsers ? concat(pingUsers, " ") : null;
+    // Adds builder pings to the message
+    const threadOwnerPing = pingUsers ? concat(pingUserIds.map(uid => `<@${uid}>`), " ") : null;
 
     // Preserves the thread owner ping between message updates
     const previousContent = interaction.message ? interaction.message.content : null;

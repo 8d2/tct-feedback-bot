@@ -73,17 +73,20 @@ async function addCollaborator(threadId, userId) {
  * owner from the returned Collection
  * @returns {Collection<Users>} A Collection containing the fetched collaborators.
  */
-async function getAllCollaboratorIdsFromThread(thread, discardOwner = false) {
+async function getAllCollaboratorsFromThread(thread, discardOwner = false) {
+
     // Get all collaborators in thread
     const collaborators = getAllThreadUsersFromThread(thread.id)
         .filter(threadUser => threadUser.is_collaborator == true)
-        .map(threadUser => userMethods.getUserInfo(threadUser.user_id));
+        .map(threadUser => getUserFromThreadUser(threadUser));
     
     // Discard thread owner from results if discardOwner == true
     if (discardOwner) {
         const threadOwnerId = await contractMethods.getFeedbackThreadOwnerId(thread);
-        return collaborators.filter(user => user.user_id == threadOwnerId)
+        return collaborators.filter(user => user.user_id == threadOwnerId);
     }
+
+    return collaborators;
 }
 
 /**
@@ -91,7 +94,7 @@ async function getAllCollaboratorIdsFromThread(thread, discardOwner = false) {
  * @param {string} threadId The ID of the thread to fetch all ThreadUsers from
  * @returns {Collection<ThreadUsers>}
  */
-async function getAllThreadUsersFromThread(threadId) {
+function getAllThreadUsersFromThread(threadId) {
     return threadUsers.filter(threadUser => threadUser.thread_id == threadId);
 }
 
@@ -100,7 +103,7 @@ async function getAllThreadUsersFromThread(threadId) {
  * @param {string} userId The ID of the thread to fetch all ThreadUsers from
  * @returns {Collection<ThreadUsers>}
  */
-async function getAllThreadUsersFromUser(userId) {
+function getAllThreadUsersFromUser(userId) {
     return threadUsers.filter(threadUser => threadUser.user_id == userId);
 }
 
@@ -147,6 +150,15 @@ async function getThreadUserCooldown(threadId, userId) {
 }
 
 /**
+ * Gets the unique `Users` object belonging to a ThreadUser.
+ * @param {ThreadUsers} threadUser The ThreadUser.
+ * @returns {Users} The User belonging to the ThreadUser object.
+ */
+function getUserFromThreadUser(threadUser) {
+    return userMethods.getUserInfo(threadUser.user_id);
+}
+
+/**
  * Removes a user (`userId`) as a collaborator to the thread (`threadId`).
  * @param {string} threadId Thread ID of the corresponding ThreadUser.
  * @param {string} userId User ID of the corresponding ThreadUser.
@@ -185,12 +197,13 @@ module.exports = {
     getOrCreateThreadUserInfo,
 
     addCollaborator,
-    getAllCollaboratorIdsFromThread,
+    getAllCollaboratorsFromThread,
     getAllThreadUsersFromThread,
     getAllThreadUsersFromUser,
     getIsCollaborator,
     getLastContractPosted,
     getThreadUserCooldown,
+    getUserFromThreadUser,
     removeCollaborator,
     setLastContractPostedFromThreadUser,
     setLastContractPosted,

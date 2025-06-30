@@ -126,11 +126,11 @@ const COMMAND_FUNCTIONS = {
             // Passed all checks, make a contract!
             // Pings the thread collaborators if they have allow pings on.
             const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, false);
-            const usersToPing = []
+            const userIdsToPing = [];
             for (let user of collaborators) {
                 const userAllowsPings = await userMethods.getAllowPings(user.id);
                 if (userAllowsPings) {
-                    usersToPing.push(user)
+                    userIdsToPing.push(user.id);
                 }
             }
 
@@ -138,7 +138,7 @@ const COMMAND_FUNCTIONS = {
             await threadUserMethods.setLastContractPosted(feedbackThread.id, interaction.user.id);
 
             // Finally, reply with the contract message
-            await interaction.reply(createContractMessage(interaction, usersToPing));
+            await interaction.reply(createContractMessage(interaction, userIdsToPing));
             return true;
         }
     },
