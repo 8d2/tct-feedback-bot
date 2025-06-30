@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags,
         CommandInteractionOptionResolver, SlashCommandBooleanOption, SlashCommandUserOption,
-        bold, ButtonBuilder, ButtonStyle, ActionRowBuilder, HeadingLevel, inlineCode, heading }
+        bold, ButtonBuilder, ButtonStyle, ActionRowBuilder}
         = require("discord.js");
 
 const { createContractMessage } = require("../handlers/contract");
@@ -87,43 +87,16 @@ const COMMAND_FUNCTIONS = {
             const acceptButton = new ButtonBuilder()
                 .setCustomId(constants.CONTRACT_RULES_ACCEPT_ID)
                 .setLabel("Accept")
-                .setStyle(ButtonStyle.Success)
+                .setStyle(ButtonStyle.Success);
             const row = new ActionRowBuilder()
-                .addComponents(acceptButton)
+                .addComponents(acceptButton);
             
-            const response = await interaction.reply({embeds: [rulesEmbed], components: [row], flags: MessageFlags.Ephemeral, withResponse: true});
-            try {
-                // Await for the response with a time limit
-                const confirmation = await response.resource.message.awaitMessageComponent({ time: 600_000 });
-                if (confirmation.customId === constants.CONTRACT_RULES_ACCEPT_ID) {
-                    // Changes accepted_rules to true to stop this from triggering again
-                    await userMethods.setRulesAccepted(interaction.user.id);
-
-                    // Embed to use when under success
-                    const updatedResponseEmbed = new EmbedBuilder()
-                        .setTimestamp()
-                        .setColor(Colors.Green)
-                        .setDescription(
-                            heading("Rules Accepted", HeadingLevel.Two) +
-                            `\nRun the ${inlineCode("/contract create")} command again to get started!`)
-                    await confirmation.update({embeds: [updatedResponseEmbed], components: [], flags: MessageFlags.Ephemeral});
-                }
-            }
-            catch {
-                // Embed to use when the interaction failed for whatever reason
-                const failedResponseEmbed = new EmbedBuilder()
-                    .setTimestamp()
-                    .setColor(Colors.Red)
-                    .setDescription(
-                        heading("Cancelled", HeadingLevel.Two) +
-                        `\nRules acknowledgement cancelled, you probably timed out or an unknown error occured. Run ${inlineCode("/contract create")} again.`
-                    );
-                await interaction.editReply({embeds: [failedResponseEmbed], components: [], flags: MessageFlags.Ephemeral});
-            }
+            await interaction.reply({embeds: [rulesEmbed], components: [row], flags: MessageFlags.Ephemeral, withResponse: true});
             return false;
         }
+
+        // Passed all checks, make a contract!
         else {
-            // Passed all checks, make a contract!
             // Pings the thread collaborators if they have allow pings on.
             const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, false);
             const usersToPing = []
