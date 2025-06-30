@@ -53,7 +53,7 @@ async function getChannelById(channelId) {
         console.warn(`${getChannelById.name} failed; client has not been loaded yet`);
         return;
     }
-    return await client.channels.fetch(channelId);
+    return await storedClient.channels.fetch(channelId);
 }
 
 /**
@@ -94,7 +94,7 @@ async function getUserById(userId) {
         console.warn(`${getUserById.name} failed; client has not been loaded yet`);
         return;
     }
-    return await client.users.fetch(userId);
+    return await storedClient.users.fetch(userId);
 }
 
 /**
