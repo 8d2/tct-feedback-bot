@@ -160,8 +160,12 @@ const COMMAND_FUNCTIONS = {
             const feedbackThreadOwner = await contractMethods.getFeedbackThreadOwner(feedbackThread);
             const feedbackEnabled = await contractMethods.isFeedbackEnabled(feedbackThread);
             //const collaborators = await collaboratorMethods.getThreadCollaboratorUsers(feedbackThread, true);
-            const collaboratorPings = await threadUserMethods.getAllCollaboratorsFromThread(feedbackThread, true)
-                .map(user => `<@${user.user_id}>`);
+            const collaboratorPings = threadUserMethods.getAllCollaboratorsFromThread(feedbackThread, true)
+                .then
+                (
+                    onfulfilled = (res => res.map(user => `<@${user.user_id}>`)),
+                    onrejected = ["Failed to fetch collaborators."]
+                );
 
             // Format list of collaborators message + respond
             const collaboratorsMessage = concatList(collaboratorPings, empty="No other users added!");

@@ -20,7 +20,7 @@ function pluralize(amount, str) {
 
 /**
  * Concats every item of the array together using a separator.
- * @param {Array} array Array to concat.
+ * @param {[string]} array Array to concat.
  * @param {string} separator The separator to use between each item.
  * @param {int} trimEnd How much off the end of the array to exclude from the separator (1 = last item is not concatenated).
  * @return {string} The produced concatenated array.
