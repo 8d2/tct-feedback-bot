@@ -1,6 +1,6 @@
 // Utility methods
 
-const { Client } = require("discord.js");
+const { Channel, Client, User } = require("discord.js");
 const constants = require("./constants.js");
 
 let storedClient = null;
@@ -46,7 +46,7 @@ function concatList(array, empty = constants.OPTION_NULL, separator = ", ", and 
  * Gets a channel by ID. (An actual Discord channel object,
  * not a channel from the bot's database.)
  * @param {string} channelId The channel ID.
- * @returns {import("discord.js").Channel | null} A Discord channel corresponding to the ID.
+ * @returns {Channel?} A Discord channel corresponding to the ID.
  */
 async function getChannelById(channelId) {
     if (!storedClient) {
@@ -84,6 +84,20 @@ function getUnitAmounts(amount, units) {
 }
 
 /**
+ * Gets a channel by ID. (An actual Discord channel object,
+ * not a channel from the bot's database.)
+ * @param {string} channelId The channel ID.
+ * @returns {User?} A Discord channel corresponding to the ID.
+ */
+async function getUserById(userId) {
+    if (!storedClient) {
+        console.warn(`${getUserById.name} failed; client has not been loaded yet`);
+        return;
+    }
+    return await client.users.fetch(userId);
+}
+
+/**
  * Returns a string describing time units encapsulated by the provided amount of seconds. Goes up to weeks.
  * Ex: getTimeDisplay(3600) = "1 hour", getTimeDisplay(86400) = "1 day", getTimeDisplay(7261) = "2 hours, 1 minute, 1 second"
  * @param {int} seconds Seconds to parse.
@@ -110,6 +124,7 @@ module.exports = {
     getChannelById,
     getPluralSuffix,
     getTimeDisplay,
+    getUserById,
     pluralize,
 
     /**
