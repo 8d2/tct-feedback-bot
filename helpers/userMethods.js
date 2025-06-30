@@ -8,7 +8,7 @@ const { getDatabaseRoles } = require('./settingsMethods.js');
 const { handleAddRole, handleRemoveRole } = require('../handlers/unsafe.js');
 const { Collection, PermissionsBitField } = require('discord.js');
 const { Users } = require('../dbObjects.js');
-const constants = require("../helpers/constants.js")
+const constants = require("../helpers/constants.js");
 
 const users = new Collection();
 
@@ -86,7 +86,7 @@ async function getPoints(id) {
 
 /**
  * Get whether the user ID is blocked from creating contracts.
- * @param {string} the user id to get the block status of
+ * @param {string} id the user id to get the block status of
  * @return {boolean} whether the user is blocked
  */
 async function getIsBlocked(id) {
@@ -96,7 +96,7 @@ async function getIsBlocked(id) {
 
 /**
  * Get whether the user ID will receive pings on creation of a contract in their thread.
- * @param {string} the user id to get the allowping status of
+ * @param {string} id the user id to get the allowping status of
  * @return {boolean} whether the user allows pings
  */
 async function getAllowPings(id) {
@@ -327,7 +327,7 @@ module.exports = {
      * Initialize users collection from database.
      */
     async init() {
-        const storedUsers = await Users.findAll()
+        const storedUsers = await Users.findAll();
         storedUsers.forEach(user => users.set(user.user_id, user));
     },
 }

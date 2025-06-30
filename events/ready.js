@@ -3,9 +3,10 @@
 
 const { Events } = require('discord.js');
 
-const userMethods = require("../helpers/userMethods.js")
-const settingsMethods = require("../helpers/settingsMethods.js")
-const collaboratorMethods = require("../helpers/collaboratorMethods.js")
+const collaboratorMethods = require("../helpers/collaboratorMethods.js");
+const settingsMethods = require("../helpers/settingsMethods.js");
+const threadUserMethods = require("../helpers/threadUserMethods.js");
+const userMethods = require("../helpers/userMethods.js");
 
 module.exports = {
     name: Events.ClientReady,
@@ -14,6 +15,7 @@ module.exports = {
         // Will run once when the client is loaded
         userMethods.init();
         settingsMethods.init();
+        threadUserMethods.init();
         collaboratorMethods.init();
         console.log(`${client.user.tag} ready.`);
         console.log(client.application.id);

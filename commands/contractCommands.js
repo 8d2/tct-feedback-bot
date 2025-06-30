@@ -10,7 +10,8 @@ const userMethods = require("../helpers/userMethods.js");
 const { getPointsInfoDisplayMessages, showCommandError } = require("../helpers/messageMethods.js");
 const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const constants = require("../helpers/constants.js");
-const { concatList } = require('../helpers/util.js');
+const { concatList, getTimeDisplay } = require('../helpers/util.js');
+const threadUserMethods = require("../helpers/threadUserMethods.js");
 
 // Constants
 const CREATE_COMMAND_NAME = "create";
@@ -66,6 +67,16 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
 
+        // Check if the user still has an active contract cooldown in the thread
+        const cooldownRemainingSeconds = await threadUserMethods.getThreadUserCooldown(feedbackThread.id, interaction.user.id);
+        if (cooldownRemainingSeconds > 0) {
+            showCommandError(
+                interaction,
+                `You have an active contract cooldown in this thread. Please wait ${inlineCode(getTimeDisplay(cooldownRemainingSeconds))} before attempting to post another contract.`
+            );
+            return false;
+        }
+
         // Check if user has read and accepted the rules
         const acceptedRules = await userMethods.getRulesAccepted(interaction.user.id)
         if (!acceptedRules) {
@@ -96,6 +107,10 @@ const COMMAND_FUNCTIONS = {
                 }
             }
 
+            // Resets the user's contract cooldown timer
+            await threadUserMethods.setLastContractPosted(feedbackThread.id, interaction.user.id);
+
+            // Finally, reply with the contract message
             await interaction.reply(createContractMessage(interaction, usersToPing));
             return true;
         }

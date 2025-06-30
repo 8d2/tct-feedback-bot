@@ -15,7 +15,14 @@ const Roles = require('./models/Roles.js')(sequelize, dataTypes);
 const Settings = require('./models/Settings.js')(sequelize, dataTypes);
 const Tags = require('./models/Tags.js')(sequelize, dataTypes);
 const Threads = require('./models/Threads.js')(sequelize, dataTypes);
+const ThreadUsers = require('./models/ThreadUsers.js')(sequelize, dataTypes);
 const Users = require('./models/Users.js')(sequelize, dataTypes);
+
+// Relationships
+Threads.hasMany(ThreadUsers, {foreignKey: 'thread_id'});
+ThreadUsers.belongsTo(Threads, {foreignKey: 'thread_id'});
+ThreadUsers.belongsTo(Users, {foreignKey: 'user_id'});
+Users.hasMany(ThreadUsers, {foreignKey: 'user_id'});
 
 // Command arguments
 const force = process.argv.includes('--force') || process.argv.includes('-f');
@@ -48,6 +55,7 @@ module.exports = {
 	Settings,
 	Tags,
 	Threads,
+	ThreadUsers,
 	Users,
-    Collaborators
+	Collaborators
 }
