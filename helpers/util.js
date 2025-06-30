@@ -6,22 +6,6 @@ const constants = require("./constants.js");
 let storedClient = null;
 
 /**
- * Returns a suffix to use for the amount to concat and pluralizea word or not.
- * @return {string} Pluralizing or not suffix.
- */
-function getPluralSuffix(amount) {
-    return amount == 1 ? "" : "s";
-}
-
-/**
- * Pluralizes a string in the format "n <str>" depending on what number n is.
- * @return {string} Pluralized string.
- */
-function pluralize(amount, str) {
-    return amount + " " + str + getPluralSuffix(amount);
-}
-
-/**
  * Concats every item of the array together using a separator.
  * @param {Array} array Array to concat.
  * @param {string} separator The separator to use between each item.
@@ -73,6 +57,14 @@ async function getChannelById(channelId) {
 }
 
 /**
+ * Returns a suffix to use for the amount to concat and pluralizea word or not.
+ * @return {string} Pluralizing or not suffix.
+ */
+function getPluralSuffix(amount) {
+    return amount == 1 ? "" : "s";
+}
+
+/**
  * From the amount and provided units, returns how much of each unit the amount takes up.
  * @param {int} amount The amount to get units of.
  * @param {Array.<{name: string, conversion: int?}} units List of units to convert amount from.
@@ -104,13 +96,21 @@ function getTimeDisplay(seconds) {
     );
 }
 
+/**
+ * Pluralizes a string in the format "n <str>" depending on what number n is.
+ * @return {string} Pluralized string.
+ */
+function pluralize(amount, str) {
+    return amount + " " + str + getPluralSuffix(amount);
+}
+
 module.exports = {
-    getPluralSuffix,
-    pluralize,
     concat,
     concatList,
     getChannelById,
+    getPluralSuffix,
     getTimeDisplay,
+    pluralize,
 
     /**
      * Initialize channel helper functions.
