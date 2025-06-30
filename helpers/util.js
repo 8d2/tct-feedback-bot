@@ -57,7 +57,7 @@ async function getChannelById(channelId) {
 }
 
 /**
- * Returns a suffix to use for the amount to concat and pluralizea word or not.
+ * Returns a suffix to use for the amount to concat and pluralize a word or not.
  * @return {string} Pluralizing or not suffix.
  */
 function getPluralSuffix(amount) {
