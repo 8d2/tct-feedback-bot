@@ -2,6 +2,7 @@
 
 const { Collection } = require('discord.js');
 const { Threads, Collaborators } = require('../dbObjects.js');
+const threadUserMethods = require('./threadUserMethods.js');
 
 const threads = new Collection();
 
@@ -24,6 +25,9 @@ async function getOrCreateThreadInfo(thread) {
     const collabKey = getCollaboratorKey(thread.ownerId, thread.id);
     const ownerCollab = await Collaborators.create({collaboration_id: collabKey});
     collaborators.set(collabKey, ownerCollab);
+
+    // set thread owner as collaborator
+    threadUserMethods.addCollaborator(thread.id, thread.ownerId);
     
     return newThread;
 }
