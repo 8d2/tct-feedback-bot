@@ -1,6 +1,9 @@
 // Utility methods
 
+const { Client } = require("discord.js");
 const constants = require("./constants.js");
+
+let storedClient = null;
 
 /**
  * Returns a suffix to use for the amount to concat and pluralizea word or not.
@@ -56,6 +59,20 @@ function concatList(array, empty = constants.OPTION_NULL, separator = ", ", and 
 }
 
 /**
+ * Gets a channel by ID. (An actual Discord channel object,
+ * not a channel from the bot's database.)
+ * @param {string} channelId The channel ID.
+ * @returns {import("discord.js").Channel | null} A Discord channel corresponding to the ID.
+ */
+async function getChannelById(channelId) {
+    if (!storedClient) {
+        console.warn(`${getChannelById.name} failed; client has not been loaded yet`);
+        return;
+    }
+    return await client.channels.fetch(channelId);
+}
+
+/**
  * From the amount and provided units, returns how much of each unit the amount takes up.
  * @param {int} amount The amount to get units of.
  * @param {Array.<{name: string, conversion: int?}} units List of units to convert amount from.
@@ -92,5 +109,14 @@ module.exports = {
     pluralize,
     concat,
     concatList,
-    getTimeDisplay
+    getChannelById,
+    getTimeDisplay,
+
+    /**
+     * Initialize channel helper functions.
+     * @param {Client} client The bot's client.
+     */
+    async init(client) {
+        storedClient = client;
+    },
 }
