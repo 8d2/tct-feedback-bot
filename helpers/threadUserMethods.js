@@ -126,7 +126,7 @@ async function setActiveContractMessageIdFromThreadUser(threadUser, messageId) {
  */
 async function setActiveContractMessageId(threadId, userId, messageId) {
     const threadUser = await getOrCreateThreadUserInfo(threadId, userId);
-    return setActiveContractMessageIdFromThreadUser(threadUser, messageId);
+    return await setActiveContractMessageIdFromThreadUser(threadUser, messageId);
 }
 
 /**
