@@ -1,7 +1,7 @@
-const { SlashCommandBuilder, SlashCommandSubcommandBuilder, EmbedBuilder, Colors, MessageFlags,
-        CommandInteractionOptionResolver, SlashCommandBooleanOption, SlashCommandUserOption,
-        bold, ButtonBuilder, ButtonStyle, ActionRowBuilder}
-        = require("discord.js");
+const { ActionRowBuilder, bold, ButtonBuilder, ButtonStyle, Colors, CommandInteraction,
+    EmbedBuilder, inlineCode, MessageFlags, messageLink, SlashCommandBooleanOption, 
+    SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOption }
+    = require("discord.js");
 
 const { createContractMessage } = require("../handlers/contract");
 const { handleSubcommandExecute } = require("../handlers/commands.js")
@@ -28,7 +28,7 @@ const COLLABORATOR_LIMIT = 20;
 const COMMAND_FUNCTIONS = {
     /**
      * Handles the `/contract create` subcommand.
-     * @param {CommandInteractionOptionResolver} interaction The interaction that used this command.
+     * @param {CommandInteraction} interaction The interaction that used this command.
      * @return {boolean} true if the command succeeded, false if it failed.
      */
     [CREATE_COMMAND_NAME]: async function handleContractCreate(interaction) {
@@ -77,6 +77,19 @@ const COMMAND_FUNCTIONS = {
             return false;
         }
 
+        // Check if the user still has an active/unfulfilled contract in the thread
+        const activeContractMessageId = await threadUserMethods.getActiveContractMessageId(feedbackThread.id, interaction.user.id);
+        if (activeContractMessageId) {
+            const contractLink = messageLink(feedbackThread.id, activeContractMessageId, interaction.guildId);
+            showCommandError(
+                interaction,
+                `You have an active contract in this thread: 
+                ${contractLink}
+                It must be fulfilled before you can create a new contract.`
+            );
+            return false;
+        }
+
         // Check if user has read and accepted the rules
         const acceptedRules = await userMethods.getRulesAccepted(interaction.user.id)
         if (!acceptedRules) {
@@ -112,6 +125,11 @@ const COMMAND_FUNCTIONS = {
 
             // Finally, reply with the contract message
             await interaction.reply(createContractMessage(interaction, usersToPing));
+
+            // Cache the contract message ID
+            const contractMessage = await interaction.fetchReply();
+            const messageId = contractMessage.id;
+            await threadUserMethods.setActiveContractMessageId(feedbackThread.id, interaction.user.id, messageId);
             return true;
         }
     },
