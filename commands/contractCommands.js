@@ -1,7 +1,6 @@
 const { ActionRowBuilder, bold, ButtonBuilder, ButtonStyle, Colors, CommandInteraction,
-    EmbedBuilder, heading, HeadingLevel, inlineCode, MessageFlags, messageLink, 
-    SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandSubcommandBuilder, 
-    SlashCommandUserOption }
+    EmbedBuilder, inlineCode, MessageFlags, messageLink, SlashCommandBooleanOption, 
+    SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOption }
     = require("discord.js");
 
 const { createContractMessage } = require("../handlers/contract");
@@ -13,7 +12,6 @@ const collaboratorMethods = require("../helpers/collaboratorMethods.js");
 const constants = require("../helpers/constants.js");
 const { concatList, getTimeDisplay } = require('../helpers/util.js');
 const threadUserMethods = require("../helpers/threadUserMethods.js");
-const util = require("../helpers/util.js");
 
 // Constants
 const CREATE_COMMAND_NAME = "create";
