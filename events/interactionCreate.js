@@ -2,11 +2,12 @@
 // https://discordjs.guide/creating-your-bot/event-handling.html
 
 const { Events, MessageFlags } = require('discord.js');
-const { handleContractStarSelectInteraction, handleContractConfirmInteraction } = require('../handlers/contract');
+const { handleContractStarSelectInteraction, handleContractConfirmInteraction, handleContractRulesAcceptInteraction } = require('../handlers/contract');
 const constants = require("../helpers/constants.js");
 
 const BUTTON_HANDLERS = {
-    [constants.CONTRACT_CONFIRM_CUSTOM_ID]: handleContractConfirmInteraction
+    [constants.CONTRACT_CONFIRM_CUSTOM_ID]: handleContractConfirmInteraction,
+    [constants.CONTRACT_RULES_ACCEPT_ID]: handleContractRulesAcceptInteraction,
 };
 const STRING_SELECT_HANDLERS = {
     [constants.CONTRACT_STAR_SELECT_CUSTOM_ID]: handleContractStarSelectInteraction
