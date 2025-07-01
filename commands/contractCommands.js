@@ -1,6 +1,7 @@
 const { ActionRowBuilder, bold, ButtonBuilder, ButtonStyle, Colors, CommandInteraction,
-    EmbedBuilder, heading, HeadingLevel, inlineCode, MessageFlags, SlashCommandBooleanOption,
-    SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandUserOption }
+    EmbedBuilder, heading, HeadingLevel, inlineCode, MessageFlags, messageLink, 
+    SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandSubcommandBuilder, 
+    SlashCommandUserOption }
     = require("discord.js");
 
 const { createContractMessage } = require("../handlers/contract");
@@ -81,7 +82,7 @@ const COMMAND_FUNCTIONS = {
         // Check if the user still has an active/unfulfilled contract in the thread
         const activeContractMessageId = await threadUserMethods.getActiveContractMessageId(feedbackThread.id, interaction.user.id);
         if (activeContractMessageId) {
-            const contractLink = util.formatMessageLink(interaction.guildId, feedbackThread.id, activeContractMessageId);
+            const contractLink = messageLink(feedbackThread.id, activeContractMessageId, interaction.guildId);
             showCommandError(
                 interaction,
                 `You have an active contract in this thread: 

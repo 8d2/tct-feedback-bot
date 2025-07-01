@@ -56,17 +56,6 @@ function concatList(array, empty = constants.OPTION_NULL, separator = ", ", and 
 }
 
 /**
- * Formats a Discord message link from a guild ID, channel ID, and message ID.
- * @param {string} guildId The guild ID.
- * @param {string} channelId The channel ID.
- * @param {string} messageId The message ID.
- * @returns A formatted link: `https://discord.com/channels/{guildId}/{channelId}/{messageId}`
- */
-function formatMessageLink(guildId, channelId, messageId) {
-    return `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
-}
-
-/**
  * From the amount and provided units, returns how much of each unit the amount takes up.
  * @param {int} amount The amount to get units of.
  * @param {Array.<{name: string, conversion: int?}} units List of units to convert amount from.
