@@ -22,7 +22,7 @@ async function handleSendMessage(channel, replyOptions, responseEmbed) {
             // Missing Permissions
             error.code == constants.MISSING_PERMISSIONS_CODE ? constants.MESSAGE_SENT_PERMISSION_FAILED_MESSAGE :
             // Other error
-            constants.MESSAGE_SENT_FAILED_MESSAGE
+            constants.MESSAGE_SENT_FAILED_MESSAGE + ` Error code: ${error.code}`
         );
         responseEmbed.setColor(Colors.Red);
     };

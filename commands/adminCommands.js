@@ -7,7 +7,7 @@ const constants = require("../helpers/constants.js");
 const messageMethods = require("../helpers/messageMethods.js");
 const settingsMethods = require("../helpers/settingsMethods.js");
 const userMethods = require("../helpers/userMethods.js");
-const { pluralize, concatList, getTimeDisplay } = require('../helpers/util.js');
+const { pluralize, concatList } = require('../helpers/util.js');
 
 // Constants
 const CHANNEL_OPTION_NAME = "feedbackchannel";
@@ -219,7 +219,7 @@ const COMMAND_FUNCTIONS = {
             `\nFeedback Channels: ${concatList(channels)}\n` +
             `Feedback Tags: ${inlineCode(concatList(tagIds, constants.OPTION_NULL_NO_FORMAT))}\n` +
             `Feedbacker Roles: ${rolesMessage ? "\n" + rolesMessage : constants.OPTION_NULL}\n` +
-            `Feedback Contract Cooldown: ${inlineCode(getTimeDisplay(await settingsMethods.getContractCooldown()))}\n` +
+            `Feedback Contract Cooldown: ${await messageMethods.getContractCooldownMessage()}\n` +
             `Staff Protected: ${bold(staffIsProtected)}`
         );
         messageEmbed.setColor(Colors.DarkPurple);
@@ -238,7 +238,7 @@ const COMMAND_FUNCTIONS = {
         messageEmbed.setColor(Colors.Green);
         messageEmbed.setDescription(
             `The contract cooldown has been updated. Users may now post contracts once per ${
-                inlineCode(getTimeDisplay(cooldown))
+                await messageMethods.getContractCooldownMessage(cooldown)
             } per thread.`
         )
         return true;
