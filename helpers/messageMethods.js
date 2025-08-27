@@ -1,9 +1,19 @@
 // For bot related messages
 const { EmbedBuilder, Colors, MessageFlags, heading, bold, italic, inlineCode, HeadingLevel } = require("discord.js");
 
-const { getDatabaseRoles } = require('./settingsMethods.js');
+const { getContractCooldown, getDatabaseRoles } = require('./settingsMethods.js');
 const { getGainedRoles } = require('./userMethods.js');
-const { pluralize, concatList } = require('./util.js');
+const { pluralize, concatList, getTimeDisplay } = require('./util.js');
+
+/**
+ * Gets a message displaying how long the contract cooldown is.
+ * @param {boolean} cooldown If present, used as cooldown displayed. Otherwise, gets from settings.
+ * @returns {string} Message to display.
+ */
+async function getContractCooldownMessage(cooldown = null) {
+    const useCooldown = cooldown ?? await getContractCooldown();
+    return inlineCode(getTimeDisplay(useCooldown));
+}
 
 /**
  * Gets a message that displays what contract rating gives what points.
@@ -42,6 +52,7 @@ async function getRoleRequirementMessage(interaction, displayRoleType = false) {
  */
 async function getPointsInfoDisplayMessages(interaction) {
     // Array of strings for each embed
+    const contractMessage = await getContractCooldownMessage();
     return [
         heading("Feedback Guidelines:", HeadingLevel.One) +
         `\nWhen making a tower, one of the most important things is getting player feedback. Here's some steps on how to use our ${interaction.client.user} to streamline the process!`,
@@ -60,13 +71,16 @@ async function getPointsInfoDisplayMessages(interaction) {
         `\nAfter giving a tower feedback, run the ${inlineCode("/contract create")} command in the thread. The builder will then rate your feedback, which will give you ${italic("feedback points")}:\n` +
         `${getRatingPointsMessage()}\n\n` +
         bold("If you get enough feedback points, you can earn exclusive roles:") +
-        `\n${await getRoleRequirementMessage(interaction)}`,
+        `\n${await getRoleRequirementMessage(interaction)}\n\n` +
+        bold(`Note: Multiple contracts can be made in the same thread, but only after a cooldown of ${contractMessage}.`) +
+        `\n- Your active contract must be responded to before you can post another contract in the same thread\n` +
+        `- This limitation is per thread, meaning multiple contracts can still be active in ${italic("different")} threads within ${contractMessage}\n`,
 
         heading("Rules:", HeadingLevel.Two) +
         "\nThis bot is a powerful tool for giving and receiving feedback and as such, we have the power to punish those who misuse it. Along with common sense, here is a list of DONTS:\n" +
         "- DONT submit empty feedback\n" +
         "- DONT be unfair/biased when feedbacking\n" +
-        "- DONT offer bribes (robux, feedback, etc) in return for positive feedback\n" +
+        "- DONT offer bribes (robux, feedback, etc) in return for positive feedback\n\n" +
         bold("If you are found to be breaking these rules or abusing the bot in any other way, we will block you from using the bot, denying your ability to make feedback contracts and receive feedback points.") +
         "\n\n" +
         italic("Happy feedbacking!")
@@ -126,6 +140,7 @@ async function showCommandError(interaction, description) {
 }
 
 module.exports = {
+    getContractCooldownMessage,
     getRatingPointsMessage,
     getRoleRequirementMessage,
     getPointsInfoDisplayMessages,

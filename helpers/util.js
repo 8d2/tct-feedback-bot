@@ -68,15 +68,19 @@ function getPluralSuffix(amount) {
  * From the amount and provided units, returns how much of each unit the amount takes up.
  * @param {int} amount The amount to get units of.
  * @param {Array.<{name: string, conversion: int?}} units List of units to convert amount from.
- * @returns {Object.<string, int>} A dictionary from each unit's name to the amount of units.
+ * @returns {Object.<string, int>} A dictionary from each included unit name to the amount of units.
  */
 function getUnitAmounts(amount, units) {
     const unitAmounts = {};
+    let hasAnyUnits = false;
     let counter = amount;
     for (const unit of units) {
         const converted = unit.conversion != null ? Math.floor(counter / unit.conversion) : counter;
-        unitAmounts[unit.name] = converted;
-        if (converted > 0 && unit.conversion != null) {
+        if ((!hasAnyUnits && unit.conversion == null) || converted > 0) {
+            // Store unit amount. If the converted amount is 0, only store if no units
+            // are present by a non-conversion unit; indicates having an amount of 0.
+            hasAnyUnits = true;
+            unitAmounts[unit.name] = converted;
             counter -= converted * unit.conversion;
         }
     }
@@ -106,7 +110,7 @@ async function getUserById(userId) {
 function getTimeDisplay(seconds) {
     const unitAmounts = getUnitAmounts(seconds, constants.TIME_CONVERSIONS);
     return concat(
-        Object.keys(unitAmounts).filter(name => unitAmounts[name] > 0).map(name => pluralize(unitAmounts[name], name))
+        Object.keys(unitAmounts).map(name => pluralize(unitAmounts[name], name))
     );
 }
 
