@@ -91,6 +91,17 @@ async function getThreadUserCooldown(threadId, userId) {
 }
 
 /**
+ * Gets whether a user (`userId`) is a collaborator in the thread (`threadId`).
+ * @param {string} threadId Thread ID of the corresponding ThreadUser.
+ * @param {string} userId User ID of the corresponding ThreadUser.
+ * @returns {boolean} `true` if the ThreadUser is a collaborator.
+ */
+async function getIsCollaborator(threadId, userId) {
+    const threadUser = await getOrCreateThreadUserInfo(threadId, userId);
+    return threadUser ? threadUser.is_collaborator : null;
+}
+
+/**
  * Resets a user's (`userId`) active contract message ID within the thread (`threadId`).
  * Intended for use after the user's contract has been fulfilled.
  * @param {string} threadId Thread ID of the corresponding ThreadUser.
@@ -130,6 +141,29 @@ async function setActiveContractMessageId(threadId, userId, messageId) {
 }
 
 /**
+ * Sets a ThreadUser's collaborator status.
+ * @param {ThreadUsers} threadUser ThreadUser to set collaborator status.
+ * @param {boolean} isCollaborator If the ThreadUser is a collaborator in the thread.
+ * @returns {ThreadUsers} ThreadUser.
+ */
+async function setIsCollaboratorFromThreadUser(threadUser, isCollaborator = false) {
+    threadUser.is_collaborator = false;
+    return threadUser.save();
+}
+
+/**
+ * Sets whether a user (`userId`) is a collaborator in the thread (`threadId`).
+ * @param {string} threadId Thread ID of the corresponding ThreadUser.
+ * @param {string} userId User ID of the corresponding ThreadUser.
+ * @param {boolean} isCollaborator If the ThreadUser is a collaborator in the thread.
+ * @returns {ThreadUsers} ThreadUser.
+ */
+async function setIsCollaborator(threadId, userId, isCollaborator = false) {
+    const threadUser = await getOrCreateThreadUserInfo(threadId, userId);
+    return await setIsCollaboratorFromThreadUser(threadUser, isCollaborator);
+}
+
+/**
  * Sets the date when a ThreadUser last posted a contract.
  * @param {ThreadUsers} threadUser ThreadUser to set last contract posted date.
  * @param {Date} date When the ThreadUser last posted a contract. Defaults to now.
@@ -156,11 +190,14 @@ module.exports = {
     getThreadUserInfo,
     getOrCreateThreadUserInfo,
     getActiveContractMessageId,
+    getIsCollaborator,
     getLastContractPosted,
     getThreadUserCooldown,
     resetActiveContractMessageId,
     setActiveContractMessageIdFromThreadUser,
     setActiveContractMessageId,
+    setIsCollaboratorFromThreadUser,
+    setIsCollaborator,
     setLastContractPostedFromThreadUser,
     setLastContractPosted,
 
